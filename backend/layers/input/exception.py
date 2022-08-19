@@ -1,4 +1,4 @@
-"""Handler util exceptions"""
+"""Input function exceptions"""
 
 class BaseException(Exception):
     pass

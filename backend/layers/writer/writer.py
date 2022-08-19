@@ -45,3 +45,4 @@ def write_response_from_obj(status_code:int, body:dict) -> dict:
         Dictionary representing the response with needed CORS headers"""
     body_str = json.dumps(body, cls=DecimalEncoder)
     return write_response(status_code, body_str)
+    

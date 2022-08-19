@@ -9,4 +9,5 @@ def simulate_scenario(current_age:int, retirement_age:int, per_stock:Decimal, pr
 
     r = [principle] * (retirement_age - current_age)
 
-    return 0.8, r, r, r
+    return Decimal("0.8"), r, r, r
+    

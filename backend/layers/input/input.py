@@ -1,6 +1,6 @@
-"""Utility functions related to formatting or validating the format of inputs to the lambda handlers"""
+"""Utility functions related to formatting or validating the inputs to the lambda handlers"""
 
-from exception import InvalidQueryParam, InvalidAgeParam, InvalidIncIncrease, InvalidParamType, NoParamGiven
+from .exception import InvalidQueryParam, InvalidAgeParam, InvalidIncIncrease, InvalidParamType, NoParamGiven
 
 def get_converted_params(query_params: dict, valid_params:dict) ->dict:
     """Utility method to return given params casted as needed types. Raises application errors if the param is invalid or type cannot be converted.
