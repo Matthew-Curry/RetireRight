@@ -1,8 +1,13 @@
-import boto3
 import os
 import logging
 
-from backend.handler_utils.handler_utils import write_response_from_obj
+import boto3
+from botocore.exceptions import ClientError
+
+from writer import write_response, write_response_from_obj
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 def lambda_handler(event, context):
     # read in env vars
@@ -11,20 +16,26 @@ def lambda_handler(event, context):
     # get the table resource
     dynamodb = boto3.resource('dynamodb')
     table = dynamodb.Table('users')
-    logging.info("Successfully instantiated user table resource")
+    logger.info("Successfully instantiated user table resource")
 
     # delete the scenario for the given ids
     pk = user_pk_prefix + event['requestContext']['authorizer']['claims']['sub']
     scenario_id = event['pathParameters']["scenario_id"]
     sk = scenario_pk_prefix + scenario_id
+    
+    try:
+        table.delete_item(
+                        Key={
+                            'PK': pk,
+                            'SK': sk
+                            },
+                        ConditionExpression='attribute_exists(PK)',
+                    )
+    except ClientError as e:
+        logger.error(e)
+        return write_response(404, f"No scenario with id {scenario_id} exists.")
+                
 
-    table.delete_item(
-                    Key={
-                    'PK': pk,
-                    'SK': sk
-                    }
-                )
-
-    logging.info(f"Successfully deleted scenario {sk}")
+    logger.info(f"Successfully deleted scenario {sk}")
     return write_response_from_obj(204, "")
     

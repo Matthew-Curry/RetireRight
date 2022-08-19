@@ -2,7 +2,10 @@ import boto3
 import os
 import logging
 
-from backend.handler_utils.handler_utils import write_response_from_obj
+from writer import write_response, write_response_from_obj
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 def lambda_handler(event, context):
     # read in env vars
@@ -11,7 +14,7 @@ def lambda_handler(event, context):
     # get the table resource
     dynamodb = boto3.resource('dynamodb')
     table = dynamodb.Table('users')
-    logging.info("Successfully instantiated user table resource")
+    logger.info("Successfully instantiated user table resource")
 
     # get the scenario for the given ids
     pk = user_pk_prefix + event['requestContext']['authorizer']['claims']['sub']
@@ -25,8 +28,12 @@ def lambda_handler(event, context):
                         }
                 )
     
+    if 'Item' not in items:
+        logger.warn(f"No scenario with id {scenario_id} exists.")
+        return write_response(404, f"No scenario with id {scenario_id} exists.")
+    
     scenario = items['Item']
 
-    logging.info(f"Successfully got scenario {sk}")
+    logger.info(f"Successfully got scenario {sk}")
     return write_response_from_obj(200, scenario)
     

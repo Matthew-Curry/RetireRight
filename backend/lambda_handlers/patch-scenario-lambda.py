@@ -5,9 +5,12 @@ from decimal import Decimal
 
 import boto3
 
-from backend.handler_utils.handler_utils import NoParamGiven, InvalidQueryParam, InvalidParamType, get_converted_params, write_response, get_dynamo_update_params, verify_scenario_fields, read_decimal, write_response_from_obj, InvalidAgeParam, InvalidIncIncrease
-from backend.service.simulate_scenarios import simulate_scenario
+from input import get_converted_params, verify_scenario_fields, read_decimal
+from input.exception import NoParamGiven, InvalidQueryParam, InvalidParamType, InvalidAgeParam, InvalidIncIncrease
+from writer import write_response, write_response_from_obj
+from dynamo_utils import get_dynamo_update_params
 
+from service import simulate_scenario
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -86,8 +89,13 @@ def lambda_handler(event, context):
            per_stock = read_decimal(result["stockAllocation"])
            retirement_age = read_decimal(result["retirementAge"])
            principle = read_decimal(result["principle"])
-        else:
+        # is processed scenario if it contains the % success
+        elif 'percentSuccess' in result:
             scenario = result
+    
+    # if no scenario was returned, there is nothing to update
+    if scenario == None:
+        return write_response(404, f"No scenario with id {scenario_id} exists.")
     
     # overwrite the scenario with the values given to patch
     for k, v in scenario_patch.items():
@@ -99,7 +107,7 @@ def lambda_handler(event, context):
     except (InvalidAgeParam, InvalidIncIncrease) as e:
         logger.error(e)
         return write_response(404, str(e))
-        
+            
     
     logging.info("Successfully validated parameters, calling the service to process the scenarios")
     # patch the items with the given params
@@ -112,7 +120,6 @@ def lambda_handler(event, context):
 
     dynamo_update_exp, dynamo_update_values = get_dynamo_update_params(scenario_patch)
     # patch the items with the given params
-    pk = sk = user_pk_prefix + event['requestContext']['authorizer']['claims']['sub']
     table.update_item(
         Key={'PK': pk, 'SK': sk},
         UpdateExpression=dynamo_update_exp,
