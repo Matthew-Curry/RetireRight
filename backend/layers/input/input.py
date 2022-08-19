@@ -14,7 +14,6 @@ def get_converted_params(query_params: dict, valid_params:dict) ->dict:
     output:
         returns dictionary with names of query params mapped to the values casted to the required type
     """
-    # if the query_params is None, no parameters were given
     if query_params == None:
         raise NoParamGiven()
         
@@ -35,7 +34,16 @@ def get_converted_params(query_params: dict, valid_params:dict) ->dict:
 
 def verify_scenario_fields(current_age:int, params: dict):
     """helper method to verify the fields of a scenario. Currently will confirm
-    ages make sense and income increases is a valid data structure"""
+    ages make sense and income_inc is a valid data structure if provided in params
+    args: 
+        current_age (int): the current age attached to the user record
+        params (dict): the params in the scenario object as a dicionary
+    raises:
+        InvalidAgeParam: if "age_kids" or "age_home" fields are provided with values less
+                        than the current age.
+        InvalidIncIncrease: if the income_inc is not a list of dictionaries where each dictionary
+                        has keys "age" and "income" both of type int.
+        """
 
     # given ages must be less than the current age
     if "age_kids" in params:
@@ -61,7 +69,7 @@ def verify_scenario_fields(current_age:int, params: dict):
                 raise InvalidIncIncrease
 
 def read_decimal(number):
-    """Read in number as int if possible, else return. Used because DynamoDB returns all """
+    """Read in number as int if possible, else return. Used because DynamoDB returns all numbers as decimals"""
     if float(number)%1==0:
         return int(number)
     return number

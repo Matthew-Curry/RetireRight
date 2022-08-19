@@ -5,7 +5,7 @@ def get_dynamo_update_params(fields:dict) ->tuple:
     args:
         fields (dict): dictionary mapping fields to update to values
     returns:
-        tuple in form string, dictionary for the update expression and values in matching order."""
+        tuple in form (string, dictionary) for the update expression and values in matching order."""
     update_exp = 'SET '
     expression_vals = {}
     for i, k in enumerate(fields.keys()):
