@@ -66,5 +66,5 @@ class Item(ABC):
         args:
             attr (dict): key value pairs of attributes to append to item"""
         for k, v in attr.items():
-            if (k in self.POST_FIELDS and isinstance(v, self.POST_FIELDS[k])) or (k in self.PATCH_FIELDS and isinstance(v, self.PATCH_FIELDS[k])):
+            if k in self.POST_FIELDS or k in self.PATCH_FIELDS:
                 setattr(self, k, v)

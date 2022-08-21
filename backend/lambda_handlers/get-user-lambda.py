@@ -4,7 +4,7 @@ from botocore.exceptions import ClientError
 
 from writer import write_response, write_response_from_obj
 from dynamo_utils import dynamo_resource_cache, UnableToStartSession
-from domain.scenario import Scenario
+from domain.user import User
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -16,28 +16,27 @@ def lambda_handler(event, context):
     except UnableToStartSession:
         return write_response(500, "Internal error. Please try again later")
 
-    # build the scenario
-    user_id =  event['requestContext']['authorizer']['claims']['sub']
-    scenario_id = event['pathParameters']["scenario_id"]
-    scenario = Scenario(user_id, scenario_id)
+    # build the user
+    user_id = event['requestContext']['authorizer']['claims']['sub']
+    user = User(user_id)
 
     logging.info("Making request to DynamoDB to get the item")
     try:
         items = table.get_item(
-                            Key=scenario.get_key(),
-                            )
+                            Key=user.get_key(),
+                    )
     except ClientError as e:
         logger.error(e)
         return write_response(500, "Internal error. Please try again later")
     else:
         if 'Item' not in items:
-            logger.warn(f"No scenario with id {scenario_id} exists.")
-            return write_response(404, f"No scenario with id {scenario_id} exists.")
+            logger.warn(f"No user with id {user_id} exists.")
+            return write_response(404, f"No user with id {user_id} exists.")
     
     # append the retrieved fields to the scenario object and return
     db_attr = items['Item']
-    scenario.append_db_attr(db_attr)
+    user.append_db_attr(db_attr)
 
-    logger.info(f"Successfully got scenario {scenario_id}")
-    return write_response_from_obj(200, scenario.to_response())
+    logger.info(f"Successfully got scenario {user_id}")
+    return write_response_from_obj(200, user.to_response())
     

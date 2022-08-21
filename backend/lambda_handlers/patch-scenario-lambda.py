@@ -54,7 +54,8 @@ def lambda_handler(event, context):
     scenario.append_simulation_fields(per_suc, best, worst, av)
 
     dynamo_update_exp, dynamo_update_values = get_dynamo_update_params(scenario.get_patch())
-    # patch the items with the given params
+    
+    logging.info("Making request to DynamoDB to patch the item")
     try:
         table.update_item(
             Key=scenario.get_key(),

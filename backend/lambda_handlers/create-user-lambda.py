@@ -1,21 +1,32 @@
-import os
 import logging
 
-import boto3
+from botocore.exceptions import ClientError
+
+from dynamo_utils import dynamo_resource_cache, UnableToStartSession
+from domain.user import User
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 def lambda_handler(event, context):
-    # read in env vars
-    pk_prefix = os.getenv("PK_PREFIX")
     # get the table resource
-    dynamodb = boto3.resource('dynamodb')
-    table = dynamodb.Table('users')
-    logging.info("Successfully instantiated user table resource")
+    try:
+        _, table = dynamo_resource_cache.get_db_resources()
+    except UnableToStartSession:
+        return write_response(500, "Internal error. Please try again later")
+    logger.info("Successfully instantiated user table resource")
 
-    username = event['userName']
+    user_name = event['userName']
     user_id = event['request']['userAttributes']['sub']
-    pk = pk_prefix + user_id
-    table.put_item(Item={'PK': pk, 'SK': pk, 'UserId': user_id, 'UserName':username})
-    logging.info("Successfully put item in table")
+
+    user = User(user_id, user_name)
+    
+    logging.info("Making request to DynamoDB to place the item")
+    try:
+        table.put_item(Item=user.to_item(),
+                       ConditionExpression='attribute_not_exists(PK)')
+    except ClientError as e:
+        logger.error(e)
+    else:
+        logger.info("Successfully put item in table")
+        return event

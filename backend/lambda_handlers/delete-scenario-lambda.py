@@ -1,41 +1,40 @@
-import os
 import logging
 
-import boto3
 from botocore.exceptions import ClientError
 
-from writer import write_response, write_response_from_obj
+from writer import write_response
+from dynamo_utils import dynamo_resource_cache, UnableToStartSession
+from domain.scenario import Scenario
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 def lambda_handler(event, context):
-    # read in env vars
-    user_pk_prefix = os.getenv("USER_PK_PREFIX")
-    scenario_pk_prefix = os.getenv("SCENARIO_PK_PREFIX")
     # get the table resource
-    dynamodb = boto3.resource('dynamodb')
-    table = dynamodb.Table('users')
-    logger.info("Successfully instantiated user table resource")
+    try:
+        _, table = dynamo_resource_cache.get_db_resources()
+    except UnableToStartSession:
+        return write_response(500, "Internal error. Please try again later")
 
-    # delete the scenario for the given ids
-    pk = user_pk_prefix + event['requestContext']['authorizer']['claims']['sub']
+    # create scenario
+    user_id =  event['requestContext']['authorizer']['claims']['sub']
     scenario_id = event['pathParameters']["scenario_id"]
-    sk = scenario_pk_prefix + scenario_id
+    scenario = Scenario(user_id, scenario_id)
     
+    logging.info("Making request to DynamoDB to delete the item")
     try:
         table.delete_item(
-                        Key={
-                            'PK': pk,
-                            'SK': sk
-                            },
+                        Key=scenario.get_key(),
                         ConditionExpression='attribute_exists(PK)',
                     )
     except ClientError as e:
         logger.error(e)
-        return write_response(404, f"No scenario with id {scenario_id} exists.")
+        if e.response["Error"]["Code"] == "ConditionalCheckFailedException":
+            return write_response(404, f"No scenario with scenario id {scenario_id} exists")
+        else:
+            return write_response(500, "Internal error. Please try again later")
                 
 
-    logger.info(f"Successfully deleted scenario {sk}")
-    return write_response_from_obj(204, "")
+    logger.info(f"Successfully deleted scenario {scenario_id}")
+    return write_response(204, "")
     

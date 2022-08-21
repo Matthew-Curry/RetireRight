@@ -6,10 +6,11 @@ from .item import Item
 class User(Item):
     PK_PREFIX = SK_PREFIX = "USER#"
     PATCH_FIELDS = {'stockAllocation': Decimal, 'retirementAge': int, 'currentAge': int, 'principle': int}
-    POST_FIELDS = {'PK': str, 'SK': str, 'UserId': str, 'UserName':str}
+    POST_FIELDS = {'UserName':str}
 
-    def __init__(self, UserId:str):
+    def __init__(self, UserId:str, UserName=None):
         self.UserId = UserId
+        self.UserName = UserName
 
         self.PK = self.PK_PREFIX + UserId
         self.SK = self.PK_PREFIX + UserId
