@@ -19,7 +19,7 @@ class User(Item):
         return {'PK': self.PK, 'SK': self.SK}
 
     @classmethod
-    def from_item(cls, item: dict) -> User:
+    def from_item(cls, item: dict):
         # construct a cls with the needed starting keys
         new_user = cls(item["UserId"])
         item.pop("UserId")
@@ -27,3 +27,18 @@ class User(Item):
         new_user.append_attr(item)
 
         return new_user
+    
+    def to_item(self) -> dict:
+        """Convert item into dynamodb compatible key value pairs"""
+        return self.__dict__
+
+    def to_response(self) -> dict:
+        """Convert item into key value pairs for the response"""
+        # pop non application fields
+        public_fields = self.__dict__.copy()
+        if "PK" in public_fields:
+            public_fields.pop("PK")
+        if "SK" in public_fields:
+            public_fields.pop("SK")
+
+        return public_fields

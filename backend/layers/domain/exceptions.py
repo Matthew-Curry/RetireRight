@@ -3,7 +3,6 @@
 class BaseException(Exception):
     pass
 
-# exceptions for input validation functions:
 class InvalidQueryParam(BaseException):
     def __init__(self, param):
         self.param = param

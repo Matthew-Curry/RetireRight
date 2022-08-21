@@ -1,4 +1,4 @@
-"""Base item class"""
+"""Base domain item class"""
 
 from abc import ABC, abstractmethod
 
@@ -15,6 +15,14 @@ class Item(ABC):
 
     @abstractmethod
     def from_item():
+        pass
+
+    @abstractmethod
+    def to_item():
+        pass
+
+    @abstractmethod
+    def to_response():
         pass
 
     @abstractproperty
@@ -34,14 +42,29 @@ class Item(ABC):
     def get_converted_patch_params(cls, query_params):
         """Wrapper on get_converted params to verify query_params against patch fields"""
         return get_converted_params(query_params, cls.PATCH_FIELDS)
+    
+    def is_match(self, item: dict) -> bool:
+        """Returns whether the given item is this item"""
+        return item["PK"] == self.PK and item["SK"] == self.SK
 
-    def _append_attr(self, attr:dict):
+    def _append_attr(self, attr:dict, is_post=True):
         """append the attributes in the given dictionary. Should only be able to append 
-        valid patch or post fields."""
+        valid patch or post fields. Takes parameter for whether to verify against post or patch fields.
+        args:
+            attr (dict): key value pairs of attributes to append to item
+            is_post (bool): whether to validate against the post fields, else will valid against the patch fields"""
         for k, v in attr.items():
-            if (k in self.POST_FIELDS or k in self.PATCH_FIELDS) and isinstance(v, self.POST_FIELDS[k]):
-                setattr(self, k, v)
+            if is_post:
+                if k in self.POST_FIELDS and isinstance(v, self.POST_FIELDS[k]):
+                    setattr(self, k, v)
+            else:
+                if k in self.PATCH_FIELDS and isinstance(v, self.PATCH_FIELDS[k]):
+                    setattr(self, k, v)
 
-    def to_dict(self) -> dict:
-        """Convert item into key value pairs"""
-        return self.__dict__
+    def append_db_attr(self, attr:dict):
+        """append the attributes in the given dictionary from the DB. Allows appending post + patch fields (all valid application fields).
+        args:
+            attr (dict): key value pairs of attributes to append to item"""
+        for k, v in attr.items():
+            if (k in self.POST_FIELDS and isinstance(v, self.POST_FIELDS[k])) or (k in self.PATCH_FIELDS and isinstance(v, self.PATCH_FIELDS[k])):
+                setattr(self, k, v)

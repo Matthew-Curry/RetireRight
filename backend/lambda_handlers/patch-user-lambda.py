@@ -26,22 +26,16 @@ def lambda_handler(event, context):
     try:
         params = json.loads(event['body'], parse_float = Decimal)
         params = get_converted_params(params, PATCH_FIELDS)
-    except NoParamGiven as e:
+    except (NoParamGiven, InvalidQueryParam, InvalidParamType)  as e:
         logger.error(e)
-        return write_response(404, "At least one query parameter is required to patch the user.")
-    except InvalidQueryParam as e:
-        logger.error(e)
-        return write_response(404, f"The parameter {e.param} is not a valid parameter.")
-    except InvalidParamType as e:
-        logger.error(e)
-        return write_response(404, f"The parameter {e.param} cannot be converted to the required type {e.type}.")
+        return write_response(404, str(e))
 
     logging.info("Successfully validated parameters, updating item in DynamoDB")
     dynamo_update_exp, dynamo_update_values = get_dynamo_update_params(params)
     # patch the items with the given params
-    pk = sk = pk_prefix + event['requestContext']['authorizer']['claims']['sub']
+    pk = pk_prefix + event['requestContext']['authorizer']['claims']['sub']
     table.update_item(
-        Key={'PK': pk, 'SK': sk},
+        Key={'PK': pk, 'SK': pk},
         UpdateExpression=dynamo_update_exp,
         # stock allocation is decimal, ages are int.
         ExpressionAttributeValues=dynamo_update_values
