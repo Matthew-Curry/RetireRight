@@ -1,3 +1,3 @@
-"""Package exposes helper methods used by RetireRight lambdas to write HTTP responses with needed headers."""
+"""Package holds utility methods to write HTTP responses"""
 
 from .writer import write_response, write_response_from_obj

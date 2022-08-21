@@ -1,3 +1,3 @@
-"""Package exposing utility methods to interact with dynamodb for RetireRight lambdas"""
+"""Package containing utility classes and functions to assist with connecting to and querying from DynamoDb"""
 
-from .dynamo_utils import get_dynamo_update_params
+from .dynamo_utils import dynamo_resource_cache, get_dynamo_update_params
