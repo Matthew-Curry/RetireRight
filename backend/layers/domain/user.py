@@ -18,6 +18,12 @@ class User(Item):
     def get_key(self) -> dict:
         """Return key of this User as dict"""
         return {'PK': self.PK, 'SK': self.SK}
+    
+    def get_pk(self):
+        return self.PK
+
+    def get_sk(self):
+        return self.SK
 
     @classmethod
     def from_item(cls, item: dict):

@@ -12,6 +12,14 @@ class Item(ABC):
     @abstractmethod
     def get_key():
         pass
+    
+    @abstractmethod
+    def get_pk():
+        pass
+
+    @abstractmethod
+    def get_sk():
+        pass
 
     @abstractmethod
     def from_item():

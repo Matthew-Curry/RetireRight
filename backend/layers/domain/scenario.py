@@ -41,6 +41,12 @@ class Scenario(Item):
         """Return key of this User as dict"""
         return {'PK': self.PK, 'SK': self.SK}
     
+    def get_pk(self):
+        return self.PK
+
+    def get_sk(self):
+        return self.SK
+    
     def get_patch(self) -> dict:
         """Returns the most recent patch applied to the Scenario."""
         return self.patch
@@ -52,7 +58,7 @@ class Scenario(Item):
         item.pop("PK")
         item.pop("SK")
         # append remaining keys if valid and return
-        new_scenario.append_valid_attr(item)
+        new_scenario.append_db_attr(item)
 
         return new_scenario
 
