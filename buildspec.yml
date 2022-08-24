@@ -110,7 +110,7 @@ phases:
       - >
         latestWriter=`aws lambda list-layer-versions --layer-name RetireRightWriter --max-items 1 | grep LayerVersionArn | sed 's/"LayerVersionArn": "//' | cut -d'"' -f1 | tr -s " "`
       - >
-        latestSimulator =`aws lambda list-layer-versions --layer-name RetireRightSimulator --max-items 1 | grep LayerVersionArn | sed 's/"LayerVersionArn": "//' | cut -d'"' -f1 | tr -s " "`
+        latestSimulator=`aws lambda list-layer-versions --layer-name RetireRightSimulator --max-items 1 | grep LayerVersionArn | sed 's/"LayerVersionArn": "//' | cut -d'"' -f1 | tr -s " "`
 
       - echo $latestdomain
       - echo $latestDynamoUtils
