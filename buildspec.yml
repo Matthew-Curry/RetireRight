@@ -85,23 +85,18 @@ phases:
     commands: 
       - echo "Publishing the lambda layers"
 
-      - echo "here is the dir"
-
-      - ls
-
-      - echo "Publishing the domain layer"
+      - echo "Publishing the domain layer.."
       - aws lambda publish-layer-version --layer-name RetireRightDomain --zip-file fileb://domain.zip --compatible-architectures x86_64 --compatible-runtimes python3.9
 
-      - echo "Publishing the dynamo_utils layer"
+      - echo "Publishing the dynamo_utils layer.."
       - aws lambda publish-layer-version --layer-name RetireRightDynamoUtils --zip-file fileb://dynamo_utils.zip --compatible-architectures x86_64 --compatible-runtimes python3.9
 
-      - echo "Publishing the writer layer"
+      - echo "Publishing the writer layer.."
       - aws lambda publish-layer-version --layer-name RetireRightWriter --zip-file fileb://writer.zip --compatible-architectures x86_64 --compatible-runtimes python3.9
 
-      - echo "Publishing the simulator layer"
+      - echo "Publishing the simulator layer.."
       - aws lambda publish-layer-version --layer-name RetireRightSimulator --zip-file fileb://simulator.zip --compatible-architectures x86_64 --compatible-runtimes python3.9
 
-      - echo "Update functions to use new layer versions"
       - echo "Retrieving latest versions of lambda layers"
       - >
         latestdomain=`aws lambda list-layer-versions --layer-name RetireRightDomain --max-items 1 | grep LayerVersionArn | sed 's/"LayerVersionArn": "//' | cut -d'"' -f1 | tr -s " "`
@@ -111,9 +106,15 @@ phases:
         latestWriter=`aws lambda list-layer-versions --layer-name RetireRightWriter --max-items 1 | grep LayerVersionArn | sed 's/"LayerVersionArn": "//' | cut -d'"' -f1 | tr -s " "`
       - >
         latestSimulator=`aws lambda list-layer-versions --layer-name RetireRightSimulator --max-items 1 | grep LayerVersionArn | sed 's/"LayerVersionArn": "//' | cut -d'"' -f1 | tr -s " "`
-
+      
+      - echo "Retrieved the following layer ARNs and versions:"
       - echo $latestdomain
       - echo $latestDynamoUtils
       - echo $latestWriter
       - echo $latestSimulator
 
+      - echo "Updating lambda functions.."
+
+      - echo "Updating create-user-lambda.."
+      - echo "Updating create-user-lambda to use latest layers it requires.."
+      - aws lambda update-function-configuration --function-name create-user-lambda --layers ${latestdomain} ${latestDynamoUtils}
