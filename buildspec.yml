@@ -118,4 +118,4 @@ phases:
       - echo "Updating create-user-lambda.."
       - echo "Updating create-user-lambda to use latest layers it requires.."
       - aws lambda update-function-configuration --function-name create-user-lambda --layers ${latestdomain} ${latestDynamoUtils}
-      - aws lambda update-function-code --function_name create-user-lambda --zip-file fileb://create-user-deployment.zip
+      - aws lambda update-function-code --function-name create-user-lambda --zip-file fileb://create-user-deployment.zip
