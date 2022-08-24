@@ -40,9 +40,11 @@ phases:
       - mkdir deployment_package
 
       - echo "Building the create user lambda"
-      - cp create-user-lambda.py deployment_package
-      - zip -r ../create-user-deployment.zip ./deployment_package/
-      - rm -f deployment_package/*
+      #- cp create-user-lambda.py deployment_package
+      #- zip -r ../create-user-deployment.zip ./deployment_package/
+      #- cp create-user-lambda.py ../create-user-lambda.py
+      - zip ../create-user-deployment.zip create-user-lambda.py
+      #- rm -f deployment_package/*
 
       - echo "Building the create user lambda"
       - cp delete-scenario-lambda.py deployment_package
