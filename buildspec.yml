@@ -1,0 +1,8 @@
+version: 0.2
+phases:
+  install:
+    commands:
+    - echo "Installing depedencies.."
+    - pipenv install --system
+    - echo "Here are the site package locations"
+    - sudo find / -name "site-packages" -type d
