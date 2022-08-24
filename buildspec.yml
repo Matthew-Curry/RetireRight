@@ -4,5 +4,7 @@ phases:
     commands:
     - echo "Installing depedencies.."
     - pipenv install --system
-    - echo "Here are the site package locations"
-    - sudo find / -name "site-packages" -type d
+    #- echo "Here are the site package locations"
+    #- sudo find / -name "site-packages" -type d
+    - echo "Here are the packages I think"
+    - ls /root/.pyenv/versions/3.9.12/lib/python3.9/site-packages
