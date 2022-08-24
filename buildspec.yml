@@ -37,51 +37,37 @@ phases:
       - echo "Building the lambda functions.."
       - cd lambda_handlers
 
-      - mkdir deployment_package
-
       - echo "Building the create user lambda"
-      #- cp create-user-lambda.py deployment_package
-      #- zip -r ../create-user-deployment.zip ./deployment_package/
       - cp create-user-lambda.py lambda_function.py
       - zip ../create-user-deployment.zip lambda_function.py
-      #- rm -f deployment_package/*
 
       - echo "Building the delete scenario lambda"
-      #- cp delete-scenario-lambda.py deployment_package
-      #- zip -r ../delete-scenario-deployment.zip ./deployment_package/
-      #- rm -f deployment_package/*
       - cp delete-scenario-lambda.py lambda_function.py
       - zip ../delete-scenario-deployment.zip lambda_function.py
 
-      - echo "Building the create user lambda"
-      - cp get-scenario-lambda.py deployment_package
-      - zip -r ../get-scenario-deployment.zip ./deployment_package/
-      - rm -f deployment_package/*
+      - echo "Building the get scenario lambda"
+      - cp get-scenario-lambda.py lambda_function.py
+      - zip ../get-scenario-deployment.zip lambda_function.py
 
-      - echo "Building the create user lambda"
-      - cp get-scenarios-lambda.py deployment_package
-      - zip -r ../get-scenarios-deployment.zip ./deployment_package/
-      - rm -f deployment_package/*
+      - echo "Building the get scenarios lambda"
+      - cp get-scenarios-lambda.py lambda_function.py
+      - zip ../get-scenarios-deployment.zip lambda_function.py
 
-      - echo "Building the create user lambda"
-      - cp get-user-lambda.py deployment_package
-      - zip -r ../get-user-deployment.zip ./deployment_package/
-      - rm -f deployment_package/*
+      - echo "Building the get user lambda"
+      - cp get-user-lambda.py lambda_function.py
+      - zip ../get-user-deployment.zip lambda_function.py
 
-      - echo "Building the create user lambda"
-      - cp patch-scenario-lambda.py deployment_package
-      - zip -r ../patch-scenario-deployment.zip ./deployment_package/
-      - rm -f deployment_package/*
+      - echo "Building the patch scenario lambda"
+      - cp patch-scenario-lambda.py lambda_function.py
+      - zip ../patch-scenario-deployment.zip lambda_function.py
 
-      - echo "Building the create user lambda"
-      - cp patch-user-lambda.py deployment_package
-      - zip -r ../patch-user-deployment.zip ./deployment_package/
-      - rm -f deployment_package/*
+      - echo "Building the patch user lambda"
+      - cp patch-user-lambda.py lambda_function.py
+      - zip ../patch-user-deployment.zip lambda_function.py
 
-      - echo "Building the create user lambda"
-      - cp post-scenario-lambda.py deployment_package
-      - zip -r ../post-scenario-deployment.zip ./deployment_package/
-      - rm -f deployment_package/*
+      - echo "Building the post scenario lambda"
+      - cp post-scenario-lambda.py lambda_function.py
+      - zip ../post-scenario-deployment.zip lambda_function.py
 
       - cd ..
   
@@ -136,3 +122,57 @@ phases:
       - sleep 30
       - echo "Updating to use the latest code"
       - aws lambda update-function-code --function-name delete-scenario-lambda --zip-file fileb://delete-scenario-deployment.zip 
+
+      - echo "Updating get-scenario-lambda.."
+      - echo "Updating get-scenario-lambda to use latest layers it requires.."
+      - echo "Updating to use the latest layers"
+      - aws lambda update-function-configuration --function-name get-scenario-lambda --layers ${latestdomain} ${latestDynamoUtils} ${latestWriter}
+      - echo "Sleeping for 30 seconds"
+      - sleep 30
+      - echo "Updating to use the latest code"
+      - aws lambda update-function-code --function-name get-scenario-lambda --zip-file fileb://get-scenario-deployment.zip
+
+      - echo "Updating get-scenarios-lambda.."
+      - echo "Updating get-scenarios-lambda to use latest layers it requires.."
+      - echo "Updating to use the latest layers"
+      - aws lambda update-function-configuration --function-name get-scenarios-lambda --layers ${latestdomain} ${latestDynamoUtils} ${latestWriter}
+      - echo "Sleeping for 30 seconds"
+      - sleep 30
+      - echo "Updating to use the latest code"
+      - aws lambda update-function-code --function-name get-scenarios-lambda --zip-file fileb://get-scenarios-deployment.zip
+
+      - echo "Updating get-user-lambda.."
+      - echo "Updating get-user-lambda to use latest layers it requires.."
+      - echo "Updating to use the latest layers"
+      - aws lambda update-function-configuration --function-name get-user-lambda --layers ${latestdomain} ${latestDynamoUtils} ${latestWriter}
+      - echo "Sleeping for 30 seconds"
+      - sleep 30
+      - echo "Updating to use the latest code"
+      - aws lambda update-function-code --function-name get-user-lambda --zip-file fileb://get-user-deployment.zip 
+
+      - echo "Updating patch-scenario-lambda.."
+      - echo "Updating patch-scenario-lambda to use latest layers it requires.."
+      - echo "Updating to use the latest layers"
+      - aws lambda update-function-configuration --function-name patch-scenario-lambda --layers ${latestdomain} ${latestDynamoUtils} ${latestWriter} ${latestSimulator}
+      - echo "Sleeping for 30 seconds"
+      - sleep 30
+      - echo "Updating to use the latest code"
+      - aws lambda update-function-code --function-name patch-scenario-lambda --zip-file fileb://patch-scenario-deployment.zip
+
+      - echo "Updating patch-user-lambda.."
+      - echo "Updating patch-user-lambda to use latest layers it requires.."
+      - echo "Updating to use the latest layers"
+      - aws lambda update-function-configuration --function-name patch-user-lambda --layers ${latestdomain} ${latestDynamoUtils} ${latestWriter}
+      - echo "Sleeping for 30 seconds"
+      - sleep 30
+      - echo "Updating to use the latest code"
+      - aws lambda update-function-code --function-name patch-user-lambda --zip-file fileb://patch-user-deployment.zip 
+
+      - echo "Updating post-scenario-lambda.."
+      - echo "Updating post-scenario-lambda to use latest layers it requires.."
+      - echo "Updating to use the latest layers"
+      - aws lambda update-function-configuration --function-name post-scenario-lambda --layers ${latestdomain} ${latestDynamoUtils} ${latestWriter} ${latestSimulator}
+      - echo "Sleeping for 30 seconds"
+      - sleep 30
+      - echo "Updating to use the latest code"
+      - aws lambda update-function-code --function-name post-scenario-lambda --zip-file fileb://post-scenario-deployment.zip
