@@ -99,10 +99,14 @@ phases:
 
       - echo "Update functions to use new layer versions"
       - echo "Retrieving latest versions of lambda layers"
-      - latestdomain=`aws lambda list-layer-versions --layer-name RetireRightDomain --max-items 1 | grep LayerVersionArn | sed 's/"LayerVersionArn": "//' | cut -d'"' -f1 | tr -s " "`
-      - latestDynamoUtils=`aws lambda list-layer-versions --layer-name RetireRightDynamoUtils --max-items 1 | grep LayerVersionArn | sed 's/"LayerVersionArn": "//' | cut -d'"' -f1 | tr -s " "`
-      - latestWriter=`aws lambda list-layer-versions --layer-name RetireRightWriter --max-items 1 | grep LayerVersionArn | sed 's/"LayerVersionArn": "//' | cut -d'"' -f1 | tr -s " "`
-      - latestSimulator =`aws lambda list-layer-versions --layer-name RetireRightSimulator --max-items 1 | grep LayerVersionArn | sed 's/"LayerVersionArn": "//' | cut -d'"' -f1 | tr -s " "`
+      - >
+        latestdomain=`aws lambda list-layer-versions --layer-name RetireRightDomain --max-items 1 | grep LayerVersionArn | sed 's/"LayerVersionArn": "//' | cut -d'"' -f1 | tr -s " "`
+      - > 
+        latestDynamoUtils=`aws lambda list-layer-versions --layer-name RetireRightDynamoUtils --max-items 1 | grep LayerVersionArn | sed 's/"LayerVersionArn": "//' | cut -d'"' -f1 | tr -s " "`
+      - >
+        latestWriter=`aws lambda list-layer-versions --layer-name RetireRightWriter --max-items 1 | grep LayerVersionArn | sed 's/"LayerVersionArn": "//' | cut -d'"' -f1 | tr -s " "`
+      - >
+        latestSimulator =`aws lambda list-layer-versions --layer-name RetireRightSimulator --max-items 1 | grep LayerVersionArn | sed 's/"LayerVersionArn": "//' | cut -d'"' -f1 | tr -s " "`
 
       - echo $latestdomain
       - echo $latestDynamoUtils
