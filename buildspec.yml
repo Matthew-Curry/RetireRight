@@ -42,14 +42,16 @@ phases:
       - echo "Building the create user lambda"
       #- cp create-user-lambda.py deployment_package
       #- zip -r ../create-user-deployment.zip ./deployment_package/
-      #- cp create-user-lambda.py ../create-user-lambda.py
-      - zip ../create-user-deployment.zip create-user-lambda.py
+      - cp create-user-lambda.py lambda_function.py
+      - zip ../create-user-deployment.zip lambda_function.py
       #- rm -f deployment_package/*
 
-      - echo "Building the create user lambda"
-      - cp delete-scenario-lambda.py deployment_package
-      - zip -r ../delete-scenario-deployment.zip ./deployment_package/
-      - rm -f deployment_package/*
+      - echo "Building the delete scenario lambda"
+      #- cp delete-scenario-lambda.py deployment_package
+      #- zip -r ../delete-scenario-deployment.zip ./deployment_package/
+      #- rm -f deployment_package/*
+      - cp delete-scenario-lambda.py lambda_function.py
+      - zip ../delete-scenario-deployment.zip lambda_function.py
 
       - echo "Building the create user lambda"
       - cp get-scenario-lambda.py deployment_package
@@ -125,3 +127,12 @@ phases:
       - sleep 30
       - echo "Updating to use the latest code"
       - aws lambda update-function-code --function-name create-user-lambda --zip-file fileb://create-user-deployment.zip
+
+      - echo "Updating delete-scenario-lambda.."
+      - echo "Updating delete-scenario-lambda to use latest layers it requires.."
+      - echo "Updating to use the latest layers"
+      - aws lambda update-function-configuration --function-name delete-scenario-lambda --layers ${latestdomain} ${latestDynamoUtils} ${latestWriter}
+      - echo "Sleeping for 30 seconds"
+      - sleep 30
+      - echo "Updating to use the latest code"
+      - aws lambda update-function-code --function-name delete-scenario-lambda --zip-file fileb://delete-scenario-deployment.zip 
