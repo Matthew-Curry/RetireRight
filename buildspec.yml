@@ -1,10 +1,81 @@
 version: 0.2
 phases:
-  install:
+  build:
     commands:
-    - echo "Installing depedencies.."
-    - pipenv install --system
-    #- echo "Here are the site package locations"
-    #- sudo find / -name "site-packages" -type d
-    - echo "Here are the packages I think"
-    - ls /root/.pyenv/versions/3.9.12/lib/python3.9/site-packages
+      - echo "Building the lambda backend.."
+
+      # Build lambda layer artifacts
+      - echo "Building the lambda layers.."
+      - cd backend
+
+      - cd layers
+      - mkdir python
+
+      - echo "Building the domain layer.."
+      - cp domain python/ -r
+      - zip -r ../domain.zip ./python/
+      - rm -rf python/*
+
+      - echo "Building the dynamo_utils layer.."
+      - cp dynamo_utils python/ -r
+      - zip -r ../dynamo_utils.zip ./python/
+      - rm -rf python/*
+
+      - echo "Building the simulator layer.."
+      - cp simulator python/ -r
+      - zip -r ../simulator.zip ./python/
+      - rm -rf python/*
+
+      - echo "Building the writer layer.."
+      - cp writer python/ -r
+      - zip -r ../writer.zip ./python/
+      - rm -rf python/*
+
+      - cd ..
+    
+      # Build lambda function artifacts
+      - echo "Building the lambda functions.."
+      - cd lambda_handlers
+
+      - mkdir deployment_package
+
+      - echo "Building the create user lambda"
+      - cp create-user-lambda.py deployment_package
+      - zip -r ../create-user-deployment.zip ./deployment_package/
+      - rm -f deployment_package
+
+      - echo "Building the create user lambda"
+      - cp delete-scenario-lambda.py deployment_package
+      - zip -r ../delete-scenario-deployment.zip ./deployment_package/
+      - rm -f deployment_package
+
+      - echo "Building the create user lambda"
+      - cp get-scenario-lambda.py deployment_package
+      - zip -r ../get-scenario-deployment.zip ./deployment_package/
+      - rm -f deployment_package
+
+      - echo "Building the create user lambda"
+      - cp get-scenarios-lambda.py deployment_package
+      - zip -r ../get-scenarios-deployment.zip ./deployment_package/
+      - rm -f deployment_package
+
+      - echo "Building the create user lambda"
+      - cp get-user-lambda.py deployment_package
+      - zip -r ../get-user-deployment.zip ./deployment_package/
+      - rm -f deployment_package
+
+      - echo "Building the create user lambda"
+      - cp patch-scenario-lambda.py deployment_package
+      - zip -r ../patch-scenario-deployment.zip ./deployment_package/
+      - rm -f deployment_package
+
+      - echo "Building the create user lambda"
+      - cp patch-user-lambda.py deployment_package
+      - zip -r ../patch-user-deployment.zip ./deployment_package/
+      - rm -f deployment_package
+
+      - echo "Building the create user lambda"
+      - cp post-scenario-lambda.py deployment_package
+      - zip -r ../post-scenario-deployment.zip ./deployment_package/
+      - rm -f deployment_package
+
