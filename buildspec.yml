@@ -78,3 +78,34 @@ phases:
       - cp post-scenario-lambda.py deployment_package
       - zip -r ../post-scenario-deployment.zip ./deployment_package/
       - rm -f deployment_package/*
+
+      - cd ..
+  
+  post_build:
+    commands: 
+      - echo "Publishing the lambda layers"
+
+      - echo "Publishing the domain layer"
+      - aws lambda publish-layer-version --layer-name RetireRightDomain --zip-file domain.zip --compatible-architectures x86_64 --compatible-runtimes python3.9
+
+      - echo "Publishing the dynamo_utils layer"
+      - aws lambda publish-layer-version --layer-name RetireRightDynamoUtils --zip-file dynamo_utils.zip --compatible-architectures x86_64 --compatible-runtimes python3.9
+
+      - echo "Publishing the writer layer"
+      - aws lambda publish-layer-version --layer-name RetireRightWriter --zip-file writer.zip --compatible-architectures x86_64 --compatible-runtimes python3.9
+
+      - echo "Publishing the simulator layer"
+      - aws lambda publish-layer-version --layer-name RetireRightSimulator --zip-file simulator.zip --compatible-architectures x86_64 --compatible-runtimes python3.9
+
+      - echo "Update functions to use new layer versions"
+      - echo "Retrieving latest versions of lambda layers"
+      - latestdomain=`aws lambda list-layer-versions --layer-name RetireRightDomain --max-items 1 | grep LayerVersionArn | sed 's/"LayerVersionArn": "//' | cut -d'"' -f1 | tr -s " "`
+      - latestDynamoUtils=`aws lambda list-layer-versions --layer-name RetireRightDynamoUtils --max-items 1 | grep LayerVersionArn | sed 's/"LayerVersionArn": "//' | cut -d'"' -f1 | tr -s " "`
+      - latestWriter=`aws lambda list-layer-versions --layer-name RetireRightWriter --max-items 1 | grep LayerVersionArn | sed 's/"LayerVersionArn": "//' | cut -d'"' -f1 | tr -s " "`
+      - latestSimulator =`aws lambda list-layer-versions --layer-name RetireRightSimulator --max-items 1 | grep LayerVersionArn | sed 's/"LayerVersionArn": "//' | cut -d'"' -f1 | tr -s " "`
+
+      - echo $latestdomain
+      - echo $latestDynamoUtils
+      - echo $latestWriter
+      - echo $latestSimulator
+
