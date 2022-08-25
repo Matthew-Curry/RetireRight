@@ -177,14 +177,13 @@ phases:
       - echo "Updating to use the latest code"
       - aws lambda update-function-code --function-name post-scenario-lambda --zip-file fileb://post-scenario-deployment.zip
 
-      - pwd 
-      - ls
-
 artifacts:
   files:
     - '**/*'
   secondary-artifacts:
     lambda_functions:
+      base-directory:
+        backend
       files:
         - create-user-deployment.zip
         - delete-scenario-deployment.zip
@@ -196,6 +195,8 @@ artifacts:
         - post-scenario-deployment.zip
       name: lambda_functions
     lambda_layers:
+      base-directory:
+        backend
       files:
         - domain.zip
         - dynamo_utils.zip
