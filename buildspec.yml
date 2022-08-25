@@ -176,3 +176,26 @@ phases:
       - sleep 30
       - echo "Updating to use the latest code"
       - aws lambda update-function-code --function-name post-scenario-lambda --zip-file fileb://post-scenario-deployment.zip
+
+artifacts:
+  files:
+    - '**/*'
+  secondary-artifacts:
+    lambda_functions:
+      files:
+        - create-user-deployment.zip
+        - delete-scenario-deployment.zip
+        - get-scenario-deployment.zip
+        - get-scenarios-deployment.zip
+        - get-user-deployment.zip
+        - patch-scenario-deployment.zip
+        - patch-user-deployment.zip
+        - post-scenario-deployment.zip
+      name: lambda_functions
+    lambda_layers:
+      files:
+        - domain.zip
+        - dynamo_utils.zip
+        - simulator.zip
+        - writer.zip
+      lambda_layers: run_server
