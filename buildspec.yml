@@ -177,6 +177,9 @@ phases:
       - echo "Updating to use the latest code"
       - aws lambda update-function-code --function-name post-scenario-lambda --zip-file fileb://post-scenario-deployment.zip
 
+      - pwd 
+      - ls
+
 artifacts:
   files:
     - '**/*'
