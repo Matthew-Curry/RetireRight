@@ -36,25 +36,30 @@ def simulate_scenario(current_age:int, retirement_age:int, per_stock:Decimal, pr
     random.seed(45)
 
     # variables to store results
-    sum_ending_balance = 0
-    closest_av = 0
-
     max_result = []
     min_result = []
     av_result = []
 
+    sum_ending_balance = 0
+    closest_av = 0
+
     num_success = 0
 
     for n in range(0, N):
+        # initialize total assests and income
         total_assets = principle
         income = scenario.income_inc[current_age]
+        # pull sample of returns for the number of years of the simulation
         returns = dist.samples(years, random.random())
-        result = []
+        # set variables from home decision attributes
         yearly_downpayment_saving = (0.2*scenario.home_cost - scenario.downpayment_savings)/(scenario.age_home - current_age)
         mortgage_payment = (scenario.home_cost *0.8)/scenario.mortgage_length
+        # initialize kids to 0, a set to keep track of when kids become adults
         kids = 0
         kids_to_adults = set()
-        for year in range(0, years):
+        # the result to populate, list holding net assets for each year
+        result = []
+        for year in range(1, years + 1):
             age = year + current_age
             # check if income changed this year
             if year in scenario.income_inc:
