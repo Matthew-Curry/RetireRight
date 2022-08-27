@@ -32,9 +32,13 @@ class InvalidIncIncrease(BaseException):
     def __init__(self, err):
         super().__init__(f"Invalid income increase component.{err}")
 
-class InvalidIncIncreaseTypes(InvalidIncIncrease):
+class InvalidIncType(InvalidIncIncrease):
     def __init__(self):
-        super().__init__("Age and income increase values must be integers.")
+        super().__init__("Income increase values must be integers.")
+
+class InvalidIncAgeType(InvalidIncIncrease):
+    def __init__(self):
+        super().__init__("Ages must be castable to integers.")
 
 class NegetiveIncomeException(InvalidIncIncrease):
     def __init__(self):

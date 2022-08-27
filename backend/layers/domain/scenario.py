@@ -4,7 +4,7 @@ from decimal import Decimal
 import uuid
 
 from .item import Item
-from .exceptions import InvalidAgeParam, InvalidIncIncreaseTypes, NegetiveIncomeException, NoCurrentIncomeException
+from .exceptions import InvalidAgeParam, InvalidIncAgeType, InvalidIncType, NegetiveIncomeException, NoCurrentIncomeException
 
 class Scenario(Item):
     PK_PREFIX = "USER#"
@@ -105,8 +105,10 @@ class Scenario(Item):
         raises:
             InvalidAgeParam: if age of having a kid, buying a home, or increasing income 
                             are provided with values less than the current age.
-            InvalidIncIncrease: if a negetive income value is provided, or if the current age 
-                                is not included.
+            InvalidIncAgeType: if age key in inc_inc is not castable to an integer
+            InvalidIncType: if income increase is not an integer
+            NegetiveIncomeException: if a negetive income value is provided
+            NoCurrentIncomeException: if income at current age is not provided
             """
 
         # given ages must be less than the current age
@@ -124,8 +126,14 @@ class Scenario(Item):
         found_current_age = False
         if "income_inc" in params:
             for k, v in params["income_inc"].items():
-                if isinstance(k, int) == False or isinstance(v, int) == False:
-                    raise InvalidIncIncreaseTypes
+                try:
+                    k = int(k)
+                except Exception as e:
+                    raise InvalidIncAgeType
+                
+                if isinstance(v, int) == False:
+                    raise InvalidIncType
+
                 if k < current_age:
                     raise InvalidAgeParam("income_inc", k, current_age)
                 elif k == current_age:
