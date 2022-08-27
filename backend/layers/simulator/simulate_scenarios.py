@@ -1,5 +1,5 @@
 """Core service to run simulation of a given scenario"""
-
+import logging
 import random
 from decimal import Decimal
 from math import sqrt
@@ -8,15 +8,18 @@ from statistics import NormalDist
 N = 1000
 RETIREMENT_LENGTH = 30
 
-STOCK_RETURN = Decimal(0.998)
+STOCK_RETURN = Decimal(0.0998)
 STOCK_SD = Decimal(0.195)
-BOND_RETURN = Decimal(0.693)
+BOND_RETURN = Decimal(0.0693)
 BOND_SD = Decimal(0.075)
 COV = Decimal(0.006)
 
 INFLATION_RATE = Decimal(0.03)
 
 CHILD_COST = 12980
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 def simulate_scenario(current_age:int, retirement_age:int, per_stock:Decimal, principle:int, scenario) -> tuple:
     """Runs asset growth simulation subject to a set of user parameters and a scenario
@@ -46,7 +49,8 @@ def simulate_scenario(current_age:int, retirement_age:int, per_stock:Decimal, pr
     closest_av = 0
 
     num_success = 0
-
+    
+    logger.info("Starting simulation")
     for n in range(0, N):
         # initialize total assests and income
         total_assets = principle
@@ -64,10 +68,12 @@ def simulate_scenario(current_age:int, retirement_age:int, per_stock:Decimal, pr
         mortgage_length = scenario.mortgage_length
         income_inc = scenario.income_inc
         # pull sample of returns for the number of years of the simulation
-        returns = dist.samples(years, random.random())
+        logger.info("Generating simulated returns")
+        returns = dist.samples(years, seed = random.random())
         # set variables from home decision attributes
-        yearly_downpayment_saving = (0.2*home_cost - downpayment_savings)/(age_home - current_age)
-        mortgage_payment = (home_cost *0.8)/mortgage_length
+        if age_home:
+            yearly_downpayment_saving = (0.2*home_cost - downpayment_savings)/(age_home - current_age)
+            mortgage_payment = (home_cost *0.8)/mortgage_length
         # initialize kids to 0, a set to keep track of when kids become adults
         kids = 0
         kids_to_adults = set()
@@ -77,6 +83,7 @@ def simulate_scenario(current_age:int, retirement_age:int, per_stock:Decimal, pr
         yearly_kid_cost = CHILD_COST
         # the result to populate, list holding net assets for each year
         result = []
+        logger.info("All variables initialized for simulation run. Starting run..")
         for year in range(1, years + 1):
             # apply inflation adjustment to all cost of living estimates
             rent = inflation_factor * rent
@@ -87,15 +94,18 @@ def simulate_scenario(current_age:int, retirement_age:int, per_stock:Decimal, pr
 
             age = year + current_age
             # check if income changed this year
-            if year in income_inc:
-                income = income_inc[year]
+            if age in income_inc:
+                income = income_inc[age]
             
-            # if haven't bought a home yet, less the amount of savings for the downpayment, and the yearly rent payment
-            if age < age_home:
-                income = income - yearly_downpayment_saving - (rent *12)
-            # if still paying off mortgage, less the yearly paymnent
-            elif age > age_home and age < age_home + mortgage_length:
-                income = income - mortgage_rate * mortgage_payment
+            if age_home:
+                # if haven't bought a home yet, less the amount of savings for the downpayment, and the yearly rent payment
+                if age < age_home:
+                    income = income - yearly_downpayment_saving - (rent *12)
+                # if still paying off mortgage, less the yearly paymnent
+                elif age > age_home and age < age_home + mortgage_length:
+                    income = income - mortgage_rate * mortgage_payment
+            else:
+                income = income - (rent *12)
             
             # check if user had a kid this year
             if age in age_kids:
@@ -111,23 +121,27 @@ def simulate_scenario(current_age:int, retirement_age:int, per_stock:Decimal, pr
             
             # apply income to total assets, then apply investment rate
             total_assets = total_assets + income
-            total_assets = total_assets * (1 + returns[year])
+            total_assets = total_assets * (1 + Decimal(returns[year - 1]))
 
             result.append(total_assets)
         
         # apply this result to the global simulation result
-        if result[-1] > max_result[-1]:
-            max_result = result
+        logger.info(f"Completed run {n}. Recording results..")
+        if n == 0:
+            max_result = min_result = av_result = result
+        else:
+            if result[-1] > max_result[-1]:
+                max_result = result
         
-        if result[-1] > min_result[-1]:
-            min_result = result
+            if result[-1] < min_result[-1]:
+                min_result = result
 
-        sum_ending_balance = sum_ending_balance + result[-1]
-        av = sum_ending_balance/n 
+            sum_ending_balance = sum_ending_balance + result[-1]
+            av = sum_ending_balance/n 
 
-        if abs(av - result[-1]) < abs(av - closest_av):
-            closest_av = av
-            av_result = result 
+            if abs(av - result[-1]) < abs(av - closest_av):
+                closest_av = av
+                av_result = result 
         
         retirement_yearly_cost = (food *12) + (entertainment *12) + (yearly_travel * 12)
         if not age_home:
