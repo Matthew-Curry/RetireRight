@@ -6,7 +6,7 @@ from botocore.exceptions import ClientError
 from writer import write_response
 from dynamo_utils import dynamo_resource_cache, UnableToStartSession, get_dynamo_update_params
 from domain.user import User
-from domain.exceptions import NoParamGiven, InvalidQueryParam, InvalidParamType
+from domain.exceptions import NoParamGiven, InvalidQueryParam, InvalidQueryParams, InvalidParamType
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -20,7 +20,7 @@ def lambda_handler(event, context):
     # convert the string query params to required types, return 404 on exception
     try:
         params = User.get_converted_patch_params(event['body'])
-    except (NoParamGiven, InvalidQueryParam, InvalidParamType)  as e:
+    except (NoParamGiven, InvalidQueryParam, InvalidQueryParams, InvalidParamType)  as e:
         logger.error(e)
         return write_response(404, str(e))
 

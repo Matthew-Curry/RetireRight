@@ -7,7 +7,7 @@ from writer import write_response, write_response_from_obj
 from dynamo_utils import dynamo_resource_cache, UnableToStartSession, read_decimal
 from domain.scenario import Scenario
 from domain.user import User
-from domain.exceptions import NoParamGiven, InvalidQueryParam, InvalidParamType, InvalidAgeParam, InvalidIncIncrease
+from domain.exceptions import NoParamGiven, InvalidQueryParam, InvalidQueryParams, InvalidParamType, InvalidAgeParam, InvalidIncIncrease
 from simulator import simulate_scenario
 
 logger = logging.getLogger()
@@ -23,7 +23,7 @@ def lambda_handler(event, context):
     # convert the string query params to required types, return 404 on exception
     try:
         scenario_params = Scenario.get_converted_post_params(event['body'])
-    except (NoParamGiven, InvalidQueryParam, InvalidParamType) as e:
+    except (NoParamGiven, InvalidQueryParam, InvalidQueryParams, InvalidParamType) as e:
         logger.error(e)
         return write_response(404, str(e))
     

@@ -4,7 +4,7 @@ from decimal import Decimal
 import uuid
 
 from .item import Item
-from .exceptions import InvalidAgeParam, InvalidIncIncrease
+from .exceptions import InvalidAgeParam, InvalidIncIncreaseTypes, NegetiveIncomeException, NoCurrentIncomeException
 
 class Scenario(Item):
     PK_PREFIX = "USER#"
@@ -124,16 +124,18 @@ class Scenario(Item):
         found_current_age = False
         if "income_inc" in params:
             for k, v in params["income_inc"].items():
+                if isinstance(k, int) == False or isinstance(v, int) == False:
+                    raise InvalidIncIncreaseTypes
                 if k < current_age:
                     raise InvalidAgeParam("income_inc", k, current_age)
                 elif k == current_age:
                     found_current_age = True
                 
                 if v < 0:
-                    raise InvalidIncIncrease
+                    raise NegetiveIncomeException
             
             if found_current_age == False:
-                raise InvalidIncIncrease
+                raise NoCurrentIncomeException
                     
     def append_simulation_fields(self, per_suc:Decimal, best:list, worst:list, av:list):
         """Used as entrypoint to add simulation result fields to an already constructed scenario"""
