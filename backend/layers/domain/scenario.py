@@ -33,6 +33,19 @@ class Scenario(Item):
         self.PK = self.PK_PREFIX + UserId
         self.SK = self.SK_PREFIX + scenario_id 
 
+        # intiialize all attrbiutes to 0 values
+        self.rent = 0
+        self.food = 0
+        self.entertainment = 0
+        self.yearly_travel = 0
+        self.age_kids = []
+        self.age_home = 0
+        self.home_cost = 0
+        self.downpayment_savings = 0
+        self.mortgage_rate = 0
+        self.mortgage_length = 0
+        self.income_inc = {}
+
         # initialize patch to none
         self.patch = None
 
