@@ -15,7 +15,7 @@ class InvalidAgeParam(BaseException):
 
 class InvalidIncIncrease(BaseException):
     def __init__(self):
-        super().__init__(f"Invalid income increase component. All components must be a map with keys age and income both of type int.")
+        super().__init__(f"Invalid income increase component. The current age must be included as an integer, and all income values must be positive.")
 
 class InvalidParamType(BaseException):
     def __init__(self, param, type):
