@@ -1,6 +1,4 @@
-import json
 import logging
-
 from botocore.exceptions import ClientError
 
 from writer import write_response, write_response_from_obj
@@ -25,7 +23,7 @@ def lambda_handler(event, context):
         scenario_params = Scenario.get_converted_post_params(event['body'])
     except (NoParamGiven, InvalidQueryParam, InvalidQueryParams, InvalidParamType) as e:
         logger.error(e)
-        return write_response(404, str(e))
+        return write_response(400, str(e))
     
     # pull the related user's relevant attributes from database
     user_id = event['requestContext']['authorizer']['claims']['sub']
@@ -39,7 +37,7 @@ def lambda_handler(event, context):
         scenerio.append_valid_post_attr(current_age, scenario_params)
     except (InvalidAgeParam, InvalidIncIncrease) as e:
         logger.error(e)
-        return write_response(404, str(e))
+        return write_response(400, str(e))
 
     logging.info("Successfully validated parameters, calling the simulator to process the scenario")
     per_suc, best, worst, av = simulate_scenario(current_age, retirement_age, per_stock, principle, scenerio)

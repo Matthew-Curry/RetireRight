@@ -3,7 +3,8 @@ from decimal import Decimal
 from .exceptions import NoParamGiven, InvalidQueryParam, InvalidQueryParams, InvalidParamType
 
 def get_converted_params(query_params: str, valid_params:dict) -> dict:
-    """Utility method to return given param string converted to needed types. Raises application errors if the param is invalid or type cannot be converted.
+    """Utility method that converts query param string to a dictionary. Validates all parameters against expected type and raises application
+        errors if unexpected parameters or invalid types for parameters are encountered.
     args:
         query_params (str): the query params from the request as a string. Expected to be in JSON string format
         valid_params (dict): mapping of the same param names used in the query params to the type the field is expected to be.
@@ -17,27 +18,25 @@ def get_converted_params(query_params: str, valid_params:dict) -> dict:
     """
     
     if query_params.strip() == "":
-        raise NoParamGiven()
-
-    query_params = json.loads(query_params, parse_float = Decimal)
+        raise NoParamGiven
+    
+    try:
+        query_params = json.loads(query_params, parse_float = Decimal)
+    except Exception as e:
+        raise InvalidQueryParams
 
     if isinstance(query_params, dict) == False:
-        raise InvalidQueryParams()
-
+        raise InvalidQueryParams
+    
+    # validate all fields of the params
     for p, v in query_params.items():
-        # validate the field is of the expected type
         try: 
             data_type = valid_params[p]
-            # if should be set, and is list, convert
-            if data_type == set and isinstance(v, list):
-                v = set(v)
             if isinstance(v, data_type) == False:
                 raise InvalidParamType(p, valid_params[p])
         except KeyError as e:
             raise InvalidQueryParam(p)
         except InvalidParamType as e:
             raise e
-        
-        query_params[p] = v
     
     return query_params

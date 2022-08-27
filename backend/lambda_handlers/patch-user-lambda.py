@@ -1,6 +1,4 @@
-import json
 import logging
-
 from botocore.exceptions import ClientError
 
 from writer import write_response
@@ -22,7 +20,7 @@ def lambda_handler(event, context):
         params = User.get_converted_patch_params(event['body'])
     except (NoParamGiven, InvalidQueryParam, InvalidQueryParams, InvalidParamType)  as e:
         logger.error(e)
-        return write_response(404, str(e))
+        return write_response(400, str(e))
 
     logging.info("Successfully validated parameters, updating item in DynamoDB")
     dynamo_update_exp, dynamo_update_values = get_dynamo_update_params(params)

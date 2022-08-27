@@ -1,5 +1,4 @@
 import logging
-
 from botocore.exceptions import ClientError
 
 from dynamo_utils import dynamo_resource_cache, UnableToStartSession

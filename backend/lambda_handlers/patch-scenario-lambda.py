@@ -1,6 +1,4 @@
-import json
 import logging
-
 from botocore.exceptions import ClientError
 
 from writer import write_response, write_response_from_obj
@@ -25,7 +23,7 @@ def lambda_handler(event, context):
         scenario_patch = Scenario.get_converted_patch_params(event['body'])
     except (NoParamGiven, InvalidQueryParam, InvalidQueryParams, InvalidParamType)  as e:
         logger.error(e)
-        return write_response(404, str(e))
+        return write_response(400, str(e))
     
     # pull the related user's relevant attributes
     user_id = event['requestContext']['authorizer']['claims']['sub']
@@ -44,7 +42,7 @@ def lambda_handler(event, context):
         scenario.append_valid_patch_attr(current_age, scenario_patch)
     except (InvalidAgeParam, InvalidIncIncrease) as e:
         logger.error(e)
-        return write_response(404, str(e))
+        return write_response(400, str(e))
             
     logging.info("Successfully applied patch to the scenario, starting simulation..")
     # get the simulation results and append

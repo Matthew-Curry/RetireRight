@@ -30,7 +30,7 @@ class NoParamGiven(BaseException):
 # income increase errors
 class InvalidIncIncrease(BaseException):
     def __init__(self, err):
-        super().__init__(f"Invalid income increase component.{err}")
+        super().__init__(f"Invalid income increase component. {err}")
 
 class InvalidIncType(InvalidIncIncrease):
     def __init__(self):

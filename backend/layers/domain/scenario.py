@@ -14,7 +14,7 @@ class Scenario(Item):
                                     "food": int,
                                     "entertainment": int,
                                     "yearly_travel": int,
-                                    "kids": set,
+                                    "age_kids": list,
                                     "age_home": int,
                                     "home_cost": int,
                                     "downpayment_savings": int,
@@ -105,7 +105,7 @@ class Scenario(Item):
         raises:
             InvalidAgeParam: if age of having a kid, buying a home, or increasing income 
                             are provided with values less than the current age.
-            InvalidIncAgeType: if age key in inc_inc is not castable to an integer
+            InvalidIncAgeType: if age key in income_inc is not castable to an integer
             InvalidIncType: if income increase is not an integer
             NegetiveIncomeException: if a negetive income value is provided
             NoCurrentIncomeException: if income at current age is not provided
@@ -116,10 +116,10 @@ class Scenario(Item):
             if params["age_home"] < current_age:
                 raise InvalidAgeParam("age_home", params["age_home"], current_age)
         
-        if "kids" in params:
-            for age in params["kids"]:
+        if "age_kids" in params:
+            for age in params["age_kids"]:
                 if age < current_age:
-                    raise InvalidAgeParam("kids", params["age_kids"], current_age)
+                    raise InvalidAgeParam("age_kids", params["age_kids"], current_age)
 
         # if income inc is given, current age must be included, all ages must be greater than the current age, 
         # and all income values must be positive
