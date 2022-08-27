@@ -39,7 +39,7 @@ class Scenario(Item):
         self.entertainment = 0
         self.yearly_travel = 0
         self.age_kids = []
-        self.age_home = 0
+        self.age_home = None
         self.home_cost = 0
         self.downpayment_savings = 0
         self.mortgage_rate = 0
