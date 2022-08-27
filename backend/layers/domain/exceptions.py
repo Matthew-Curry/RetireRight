@@ -10,7 +10,7 @@ class InvalidQueryParam(BaseException):
 
 class InvalidQueryParams(BaseException):
     def __init__(self):
-        super().__init__(f"The provided query params is not in valid JSON notation")
+        super().__init__("The provided query params is not in valid JSON notation")
 
 class InvalidAgeParam(BaseException):
     def __init__(self, param, param_value, current_age):
@@ -29,18 +29,18 @@ class NoParamGiven(BaseException):
 
 # income increase errors
 class InvalidIncIncrease(BaseException):
-    def __init__(self):
-        super().__init__(f"Invalid income increase component. The current age must be included as an integer, and all income values must be positive integers.")
+    def __init__(self, err):
+        super().__init__(f"Invalid income increase component.{err}")
 
 class InvalidIncIncreaseTypes(InvalidIncIncrease):
     def __init__(self):
-        super().__init__(f"Age and income increase values must be integers.")
+        super().__init__("Age and income increase values must be integers.")
 
 class NegetiveIncomeException(InvalidIncIncrease):
     def __init__(self):
-        super().__init__(f"Income increases must be positive.")
+        super().__init__("Income increases must be positive.")
 
 class NoCurrentIncomeException(InvalidIncIncrease):
     def __init__(self):
-        super().__init__(f"Income increases must include the income of the user's current age.")
+        super().__init__("Income increases must include the income of the user's current age.")
 
