@@ -1,6 +1,5 @@
 import json
 import logging
-from decimal import Decimal 
 
 from botocore.exceptions import ClientError
 
@@ -23,8 +22,7 @@ def lambda_handler(event, context):
     logging.info("Successfully instantiated user table resource")
     # convert the string query params to required types, return 404 on exception
     try:
-        scenario_patch = json.loads(event['body'], parse_float = Decimal)
-        scenario_patch = Scenario.get_converted_patch_params(scenario_patch)
+        scenario_patch = Scenario.get_converted_patch_params(event['body'])
     except (NoParamGiven, InvalidQueryParam, InvalidParamType)  as e:
         logger.error(e)
         return write_response(404, str(e))

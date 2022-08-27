@@ -1,6 +1,5 @@
 import json
 import logging
-from decimal import Decimal
 
 from botocore.exceptions import ClientError
 
@@ -20,8 +19,7 @@ def lambda_handler(event, context):
         return write_response(500, "Internal error. Please try again later")
     # convert the string query params to required types, return 404 on exception
     try:
-        params = json.loads(event['body'], parse_float = Decimal)
-        params = User.get_converted_patch_params(params)
+        params = User.get_converted_patch_params(event['body'])
     except (NoParamGiven, InvalidQueryParam, InvalidParamType)  as e:
         logger.error(e)
         return write_response(404, str(e))
