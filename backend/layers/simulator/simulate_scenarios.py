@@ -8,11 +8,13 @@ from statistics import NormalDist
 N = 1000
 RETIREMENT_LENGTH = 30
 
-STOCK_RETURN = 0.998
-STOCK_SD = 0.195
-BOND_RETURN = 0.693
-BOND_SD = 0.075
-COV = 0.006
+STOCK_RETURN = Decimal(0.998)
+STOCK_SD = Decimal(0.195)
+BOND_RETURN = Decimal(0.693)
+BOND_SD = Decimal(0.075)
+COV = Decimal(0.006)
+
+INFLATION_RATE = Decimal(0.03)
 
 CHILD_COST = 12980
 
@@ -48,37 +50,60 @@ def simulate_scenario(current_age:int, retirement_age:int, per_stock:Decimal, pr
     for n in range(0, N):
         # initialize total assests and income
         total_assets = principle
-        income = scenario.income_inc[current_age]
+        income = scenario.income_inc[str(current_age)]
+        # initialize all vars from the scenario
+        rent = scenario.rent
+        food = scenario.food
+        entertainment = scenario.entertainment
+        yearly_travel = scenario.yearly_travel
+        age_kids = set(scenario.age_kids)
+        age_home = scenario.age_home
+        home_cost = scenario.home_cost
+        downpayment_savings = scenario.downpayment_savings
+        mortgage_rate = scenario.mortgage_rate
+        mortgage_length = scenario.mortgage_length
+        income_inc = scenario.income_inc
         # pull sample of returns for the number of years of the simulation
         returns = dist.samples(years, random.random())
         # set variables from home decision attributes
-        yearly_downpayment_saving = (0.2*scenario.home_cost - scenario.downpayment_savings)/(scenario.age_home - current_age)
-        mortgage_payment = (scenario.home_cost *0.8)/scenario.mortgage_length
+        yearly_downpayment_saving = (0.2*home_cost - downpayment_savings)/(age_home - current_age)
+        mortgage_payment = (home_cost *0.8)/mortgage_length
         # initialize kids to 0, a set to keep track of when kids become adults
         kids = 0
         kids_to_adults = set()
+        # inflation factor is one plus the global rate
+        inflation_factor = 1 + INFLATION_RATE
+        # kid cost initialized to global var before adjusting during simulation run
+        yearly_kid_cost = CHILD_COST
         # the result to populate, list holding net assets for each year
         result = []
         for year in range(1, years + 1):
+            # apply inflation adjustment to all cost of living estimates
+            rent = inflation_factor * rent
+            food = inflation_factor * food
+            entertainment = inflation_factor * entertainment
+            yearly_travel = inflation_factor * yearly_travel
+            yearly_kid_cost = inflation_factor * yearly_kid_cost
+
             age = year + current_age
             # check if income changed this year
-            if year in scenario.income_inc:
-                income = scenario.income_inc[year]
+            if year in income_inc:
+                income = income_inc[year]
             
             # if haven't bought a home yet, less the amount of savings for the downpayment, and the yearly rent payment
-            if age < scenario.age_home:
-                income = income - yearly_downpayment_saving - (scenario.rent *12)
+            if age < age_home:
+                income = income - yearly_downpayment_saving - (rent *12)
             # if still paying off mortgage, less the yearly paymnent
-            elif age > scenario.age_home and age < scenario.age_home + scenario.mortgage_length:
-                income = income - scenario.mortgage_rate * mortgage_payment
+            elif age > age_home and age < age_home + mortgage_length:
+                income = income - mortgage_rate * mortgage_payment
             
             # check if user had a kid this year
-            if age in scenario.age_kids:
+            if age in age_kids:
                 kids += 1
                 kids_to_adults.add(age + 18)
 
             # less all expenses for the year from the income
-            income = income - (scenario.food *12) - (scenario.entertainment *12) - (scenario.yearly_travel * 12) - (CHILD_COST * kids)
+            income = income - (food *12) - (entertainment *12) - (yearly_travel * 12) - (CHILD_COST * kids)
 
             # check if kid became adult
             if age in kids_to_adults:
@@ -104,9 +129,9 @@ def simulate_scenario(current_age:int, retirement_age:int, per_stock:Decimal, pr
             closest_av = av
             av_result = result 
         
-        retirement_yearly_cost = (scenario.food *12) + (scenario.entertainment *12) + (scenario.yearly_travel * 12)
-        if not scenario.age_home:
-            retirement_yearly_cost += (scenario.rent *12)
+        retirement_yearly_cost = (food *12) + (entertainment *12) + (yearly_travel * 12)
+        if not age_home:
+            retirement_yearly_cost += (rent *12)
 
         retirement_total_cost = retirement_yearly_cost * RETIREMENT_LENGTH
 
