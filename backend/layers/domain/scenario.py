@@ -4,7 +4,7 @@ from decimal import Decimal
 import uuid
 
 from .item import Item
-from .exceptions import InvalidAgeParam, InvalidIncIncrease
+from .exceptions import InvalidAgeParam, InvalidIncAgeType, InvalidIncType, NegetiveIncomeException, NoCurrentIncomeException
 
 class Scenario(Item):
     PK_PREFIX = "USER#"
@@ -14,14 +14,13 @@ class Scenario(Item):
                                     "food": int,
                                     "entertainment": int,
                                     "yearly_travel": int,
-                                    "kids": int,
-                                    "age_kids": int,
+                                    "age_kids": list,
                                     "age_home": int,
                                     "home_cost": int,
                                     "downpayment_savings": int,
                                     "mortgage_rate": Decimal,
                                     "mortgage_length": int,
-                                    "income_inc": list
+                                    "income_inc": dict
                                     }
 
     def __init__(self, UserId:str, scenario_id:str = None):
@@ -104,34 +103,47 @@ class Scenario(Item):
             current_age (int): the current age attached to the user record
             params (dict): the params in the scenario object as a dicionary
         raises:
-            InvalidAgeParam: if "age_kids" or "age_home" fields are provided with values less
-                            than the current age.
-            InvalidIncIncrease: if the income_inc is not a list of dictionaries where each dictionary
-                            has keys "age" and "income" both of type int.
+            InvalidAgeParam: if age of having a kid, buying a home, or increasing income 
+                            are provided with values less than the current age.
+            InvalidIncAgeType: if age key in income_inc is not castable to an integer
+            InvalidIncType: if income increase is not an integer
+            NegetiveIncomeException: if a negetive income value is provided
+            NoCurrentIncomeException: if income at current age is not provided
             """
 
         # given ages must be less than the current age
-        if "age_kids" in params:
-            if params["age_kids"] < current_age:
-                raise InvalidAgeParam("age_kids", params["age_kids"], current_age)
         if "age_home" in params:
             if params["age_home"] < current_age:
                 raise InvalidAgeParam("age_home", params["age_home"], current_age)
+        
+        if "age_kids" in params:
+            for age in params["age_kids"]:
+                if age < current_age:
+                    raise InvalidAgeParam("age_kids", params["age_kids"], current_age)
 
-        # if income inc is given, components must be structured correctly.
+        # if income inc is given, current age must be included, all ages must be greater than the current age, 
+        # and all income values must be positive
+        found_current_age = False
         if "income_inc" in params:
-            for i in params["income_inc"]:
-                if isinstance(i, dict):
-                    if len(i.keys()) != 2:
-                        raise InvalidIncIncrease
-                    for k, v in i.items():
-                        if k != "age" and k != "income":
-                            raise InvalidIncIncrease
-                        if not isinstance(v, int):
-                            raise InvalidIncIncrease
-                            
-                else:
-                    raise InvalidIncIncrease
+            for k, v in params["income_inc"].items():
+                try:
+                    k = int(k)
+                except Exception as e:
+                    raise InvalidIncAgeType
+                
+                if isinstance(v, int) == False:
+                    raise InvalidIncType
+
+                if k < current_age:
+                    raise InvalidAgeParam("income_inc", k, current_age)
+                elif k == current_age:
+                    found_current_age = True
+                
+                if v < 0:
+                    raise NegetiveIncomeException
+            
+            if found_current_age == False:
+                raise NoCurrentIncomeException
                     
     def append_simulation_fields(self, per_suc:Decimal, best:list, worst:list, av:list):
         """Used as entrypoint to add simulation result fields to an already constructed scenario"""

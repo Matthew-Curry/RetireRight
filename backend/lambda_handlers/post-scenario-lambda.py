@@ -1,14 +1,11 @@
-import json
 import logging
-from decimal import Decimal 
-
 from botocore.exceptions import ClientError
 
 from writer import write_response, write_response_from_obj
 from dynamo_utils import dynamo_resource_cache, UnableToStartSession, read_decimal
 from domain.scenario import Scenario
 from domain.user import User
-from domain.exceptions import NoParamGiven, InvalidQueryParam, InvalidParamType, InvalidAgeParam, InvalidIncIncrease
+from domain.exceptions import NoParamGiven, InvalidQueryParam, InvalidQueryParams, InvalidParamType, InvalidAgeParam, InvalidIncIncrease
 from simulator import simulate_scenario
 
 logger = logging.getLogger()
@@ -23,11 +20,10 @@ def lambda_handler(event, context):
     logging.info("Successfully instantiated user table resource")
     # convert the string query params to required types, return 404 on exception
     try:
-        scenario_params = json.loads(event['body'], parse_float = Decimal)
-        scenario_params = Scenario.get_converted_post_params(scenario_params)
-    except (NoParamGiven, InvalidQueryParam, InvalidParamType) as e:
+        scenario_params = Scenario.get_converted_post_params(event['body'])
+    except (NoParamGiven, InvalidQueryParam, InvalidQueryParams, InvalidParamType) as e:
         logger.error(e)
-        return write_response(404, str(e))
+        return write_response(400, str(e))
     
     # pull the related user's relevant attributes from database
     user_id = event['requestContext']['authorizer']['claims']['sub']
@@ -41,7 +37,7 @@ def lambda_handler(event, context):
         scenerio.append_valid_post_attr(current_age, scenario_params)
     except (InvalidAgeParam, InvalidIncIncrease) as e:
         logger.error(e)
-        return write_response(404, str(e))
+        return write_response(400, str(e))
 
     logging.info("Successfully validated parameters, calling the simulator to process the scenario")
     per_suc, best, worst, av = simulate_scenario(current_age, retirement_age, per_stock, principle, scenerio)

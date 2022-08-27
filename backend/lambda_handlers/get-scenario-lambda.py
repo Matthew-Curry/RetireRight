@@ -1,5 +1,4 @@
 import logging
-
 from botocore.exceptions import ClientError
 
 from writer import write_response, write_response_from_obj

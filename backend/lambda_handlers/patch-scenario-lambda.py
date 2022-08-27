@@ -1,14 +1,11 @@
-import json
 import logging
-from decimal import Decimal 
-
 from botocore.exceptions import ClientError
 
 from writer import write_response, write_response_from_obj
 from dynamo_utils import dynamo_resource_cache, get_dynamo_update_params, UnableToStartSession, read_decimal
 from domain.scenario import Scenario
 from domain.user import User
-from domain.exceptions import NoParamGiven, InvalidQueryParam, InvalidParamType, InvalidAgeParam, InvalidIncIncrease
+from domain.exceptions import NoParamGiven, InvalidQueryParam, InvalidQueryParams, InvalidParamType, InvalidAgeParam, InvalidIncIncrease
 from simulator import simulate_scenario
 
 logger = logging.getLogger()
@@ -23,11 +20,10 @@ def lambda_handler(event, context):
     logging.info("Successfully instantiated user table resource")
     # convert the string query params to required types, return 404 on exception
     try:
-        scenario_patch = json.loads(event['body'], parse_float = Decimal)
-        scenario_patch = Scenario.get_converted_patch_params(scenario_patch)
-    except (NoParamGiven, InvalidQueryParam, InvalidParamType)  as e:
+        scenario_patch = Scenario.get_converted_patch_params(event['body'])
+    except (NoParamGiven, InvalidQueryParam, InvalidQueryParams, InvalidParamType)  as e:
         logger.error(e)
-        return write_response(404, str(e))
+        return write_response(400, str(e))
     
     # pull the related user's relevant attributes
     user_id = event['requestContext']['authorizer']['claims']['sub']
@@ -46,7 +42,7 @@ def lambda_handler(event, context):
         scenario.append_valid_patch_attr(current_age, scenario_patch)
     except (InvalidAgeParam, InvalidIncIncrease) as e:
         logger.error(e)
-        return write_response(404, str(e))
+        return write_response(400, str(e))
             
     logging.info("Successfully applied patch to the scenario, starting simulation..")
     # get the simulation results and append
