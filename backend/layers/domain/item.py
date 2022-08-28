@@ -82,5 +82,6 @@ class Item(ABC):
                 # to expected type for consistency
                 data_type = valid_fields[k]
                 if isinstance(v, Decimal) and data_type is not Decimal:
+                    print(data_type)
                     v = data_type(v)
                 setattr(self, k, v)
