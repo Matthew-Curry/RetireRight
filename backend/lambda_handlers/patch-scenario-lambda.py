@@ -59,9 +59,11 @@ def lambda_handler(event, context):
     found_scenario = False
     for result in response['Responses']['users']:
         if user.is_match(result):
-           user.append_db_attr(result)
+            user.append_db_attr(result)
+            found_user = True
         elif scenario.is_match(result):
             scenario.append_db_attr(result)
+            found_scenario = True
     
     # if no scenario or user is found, cannot proceed
     if found_scenario == False:

@@ -146,17 +146,18 @@ class Scenario(Item):
         # if an age of home purchase is provided, a homeCost, mortgageRate, and
         # mortgageLength must also be provided.
         if "ageHome" in params:
-            if params["ageHome"] < current_age:
-                raise InvalidAgeParam("ageHome", params["ageHome"], current_age)
+            if params["ageHome"]:
+                if params["ageHome"] < current_age:
+                    raise InvalidAgeParam("ageHome", params["ageHome"], current_age)
 
-            if "homeCost" not in params:
-                raise MissingHomeParam("homeCost")
+                if "homeCost" not in params:
+                    raise MissingHomeParam("homeCost")
 
-            if "mortgageRate" not in params:
-                raise MissingHomeParam("mortgageRate")
+                if "mortgageRate" not in params:
+                    raise MissingHomeParam("mortgageRate")
 
-            if "mortgageLength" not in params:
-                raise MissingHomeParam("mortgageLength")
+                if "mortgageLength" not in params:
+                    raise MissingHomeParam("mortgageLength")
         
         # the ages the user plans to have kids must be after the current age
         if "ageKids" in params:
