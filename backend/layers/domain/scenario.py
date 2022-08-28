@@ -1,10 +1,11 @@
 """Holds Scenario domain object."""
 
 from decimal import Decimal
+from re import L
 import uuid
 
 from .item import Item
-from .exceptions import InvalidAgeParam, MissingHomeParam, InvalidIncAgeType, InvalidIncType, NegetiveIncomeException, NoCurrentIncomeException
+from .exceptions import InvalidAgeParam, MissingHomeParam, InvalidIncAgeType, InvalidIncType, NegetiveIncomeException, NoCurrentIncomeException, IncomeRequiredException
 
 class Scenario(Item):
     PK_PREFIX = "USER#"
@@ -40,7 +41,7 @@ class Scenario(Item):
         self.PK = self.PK_PREFIX + UserId
         self.SK = self.SK_PREFIX + scenario_id 
 
-        # intiialize all attrbiutes to 0 values
+        # intiialize all attrbiutes to 0 values, other than incomeInc which is a required parameter
         self.rent = 0
         self.food = 0
         self.entertainment = 0
@@ -51,7 +52,6 @@ class Scenario(Item):
         self.downpaymentSavings = 0
         self.mortgageRate = 0
         self.mortgageLength = 0
-        self.incomeInc = {}
 
         # initialize patch to none
         self.patch = None
@@ -166,7 +166,7 @@ class Scenario(Item):
                     raise InvalidAgeParam("ageKids", params["ageKids"], current_age)
 
         # if income inc is given, current age must be included, all other ages must be greater than the current age, 
-        # and all income values must be positive
+        # and all income values must be positive. Income information must be provided.
         found_current_age = False
         if "incomeInc" in params:
             for k, v in params["incomeInc"].items():
@@ -175,7 +175,12 @@ class Scenario(Item):
                 except Exception as e:
                     raise InvalidIncAgeType
                 
-                if isinstance(v, int) == False:
+                # value can be a decimal (if incoming from DB) but must not have places beyond decimal
+                # (conform to being an int)
+                if isinstance(v, Decimal):
+                    if v.as_tuple().exponent != 0:
+                        raise InvalidIncType
+                elif isinstance(v, int) == False:
                     raise InvalidIncType
 
                 if k < current_age:
@@ -188,6 +193,8 @@ class Scenario(Item):
             
             if found_current_age == False:
                 raise NoCurrentIncomeException
+        else:
+            raise IncomeRequiredException
                     
     def append_simulation_fields(self, per_suc:Decimal, best:list, worst:list, av:list):
         """Used as entrypoint to add simulation result fields to an already constructed scenario"""

@@ -53,3 +53,7 @@ class NoCurrentIncomeException(InvalidIncIncrease):
     def __init__(self):
         super().__init__("Income increases must include the income of the user's current age.")
 
+class IncomeRequiredException(InvalidIncIncrease):
+    def __init__(self):
+        super().__init__("Income information must be provided.")
+
