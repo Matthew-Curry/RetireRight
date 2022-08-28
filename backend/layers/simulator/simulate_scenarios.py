@@ -8,13 +8,15 @@ from statistics import NormalDist
 N = 1000
 RETIREMENT_LENGTH = 30
 
-STOCK_RETURN = Decimal(0.0998)
-STOCK_SD = Decimal(0.195)
-BOND_RETURN = Decimal(0.0693)
-BOND_SD = Decimal(0.075)
-COV = Decimal(0.006)
+STOCK_RETURN = Decimal("0.0998")
+STOCK_SD = Decimal("0.195")
+BOND_RETURN = Decimal("0.0693")
+BOND_SD = Decimal("0.075")
+COV = Decimal("0.006")
 
-INFLATION_RATE = Decimal(0.03)
+INFLATION_RATE = Decimal("0.03")
+
+DOWNPAYMENT_PERCENT = Decimal("0.2")
 
 CHILD_COST = 12980
 
@@ -64,7 +66,7 @@ def simulate_scenario(current_age:int, retirement_age:int, per_stock:Decimal, pr
         age_home = scenario.age_home
         home_cost = scenario.home_cost
         downpayment_savings = scenario.downpayment_savings
-        mortgage_rate = scenario.mortgage_rate
+        mortgage_factor = 1 + scenario.mortgage_rate
         mortgage_length = scenario.mortgage_length
         income_inc = scenario.income_inc
         # pull sample of returns for the number of years of the simulation
@@ -72,8 +74,10 @@ def simulate_scenario(current_age:int, retirement_age:int, per_stock:Decimal, pr
         returns = dist.samples(years, seed = random.random())
         # set variables from home decision attributes
         if age_home:
-            yearly_downpayment_saving = (0.2*home_cost - downpayment_savings)/(age_home - current_age)
-            mortgage_payment = (home_cost *0.8)/mortgage_length
+            yearly_downpayment_saving = (DOWNPAYMENT_PERCENT*home_cost - downpayment_savings)/(age_home - current_age)
+            yearly_split = (home_cost *(1-DOWNPAYMENT_PERCENT))/mortgage_length
+            mortgage_payment = mortgage_factor * yearly_split
+            age_home_paid = age_home + mortgage_length
         # initialize kids to 0, a set to keep track of when kids become adults
         kids = 0
         kids_to_adults = set()
@@ -96,16 +100,19 @@ def simulate_scenario(current_age:int, retirement_age:int, per_stock:Decimal, pr
             # check if income changed this year
             if age in income_inc:
                 income = income_inc[age]
+
+            # update the net income to the income
+            net_income = income
             
             if age_home:
                 # if haven't bought a home yet, less the amount of savings for the downpayment, and the yearly rent payment
                 if age < age_home:
-                    income = income - yearly_downpayment_saving - (rent *12)
+                    net_income = net_income - yearly_downpayment_saving - (rent *12)
                 # if still paying off mortgage, less the yearly paymnent
-                elif age > age_home and age < age_home + mortgage_length:
-                    income = income - mortgage_rate * mortgage_payment
+                elif age > age_home and age < age_home_paid:
+                    net_income = net_income - mortgage_payment
             else:
-                income = income - (rent *12)
+                net_income = net_income - (rent *12)
             
             # check if user had a kid this year
             if age in age_kids:
@@ -113,14 +120,14 @@ def simulate_scenario(current_age:int, retirement_age:int, per_stock:Decimal, pr
                 kids_to_adults.add(age + 18)
 
             # less all expenses for the year from the income
-            income = income - (food *12) - (entertainment *12) - (yearly_travel * 12) - (CHILD_COST * kids)
+            net_income = net_income - (food *12) - (entertainment *12) - yearly_travel - (CHILD_COST * kids)
 
             # check if kid became adult
             if age in kids_to_adults:
                 kids -= 1
             
             # apply income to total assets, then apply investment rate
-            total_assets = total_assets + income
+            total_assets = total_assets + net_income
             total_assets = total_assets * (1 + Decimal(returns[year - 1]))
 
             result.append(total_assets)
@@ -144,12 +151,15 @@ def simulate_scenario(current_age:int, retirement_age:int, per_stock:Decimal, pr
                 av_result = result 
         
         retirement_yearly_cost = (food *12) + (entertainment *12) + (yearly_travel * 12)
+        home_payoff = 0
         if not age_home:
             retirement_yearly_cost += (rent *12)
+        elif age < age_home_paid:
+            home_payoff = (age_home_paid - age) * mortgage_payment
 
-        retirement_total_cost = retirement_yearly_cost * RETIREMENT_LENGTH
+        retirement_total_cost = retirement_yearly_cost * RETIREMENT_LENGTH + home_payoff
 
         if result[-1] > retirement_total_cost:
             num_success += 1
     
-    return Decimal(num_success/N), max_result, min_result, av_result
+    return Decimal(str(num_success/N)), max_result, min_result, av_result

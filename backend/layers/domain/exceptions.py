@@ -27,6 +27,11 @@ class NoParamGiven(BaseException):
     def __init__(self):
         super().__init__("At least one query parameter is required for this method.")
 
+class MissingHomeParam(BaseException):
+    def __init__(self, param):
+        self.param = param
+        super().__init__(f"If age_home param given, {param} is required.")
+
 # income increase errors
 class InvalidIncIncrease(BaseException):
     def __init__(self, err):
