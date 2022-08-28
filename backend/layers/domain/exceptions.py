@@ -3,14 +3,14 @@
 class BaseException(Exception):
     pass
 
-class InvalidQueryParam(BaseException):
+class InvalidParam(BaseException):
     def __init__(self, param):
         self.param = param
         super().__init__(f"The parameter {param} is not a valid parameter.")
 
-class InvalidQueryParams(BaseException):
+class InvalidRequestBody(BaseException):
     def __init__(self):
-        super().__init__("The provided query params is not in valid JSON notation")
+        super().__init__("The provided request body is not in valid JSON notation")
 
 class InvalidAgeParam(BaseException):
     def __init__(self, param, param_value, current_age):
@@ -25,7 +25,7 @@ class InvalidParamType(BaseException):
 
 class NoParamGiven(BaseException):
     def __init__(self):
-        super().__init__("At least one query parameter is required for this method.")
+        super().__init__("At least one parameter must be given in the request body for this method.")
 
 class MissingHomeParam(BaseException):
     def __init__(self, param):

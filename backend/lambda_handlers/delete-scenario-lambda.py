@@ -9,13 +9,11 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 def lambda_handler(event, context):
-    # get the table resource
     try:
         _, table = dynamo_resource_cache.get_db_resources()
     except UnableToStartSession:
         return write_response(500, "Internal error. Please try again later")
 
-    # create scenario
     user_id =  event['requestContext']['authorizer']['claims']['sub']
     scenario_id = event['pathParameters']["scenario_id"]
     scenario = Scenario(user_id, scenario_id)

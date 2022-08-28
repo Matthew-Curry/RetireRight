@@ -11,21 +11,27 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 def lambda_handler(event, context):
-    # get the table resource
     try:
         _, table = dynamo_resource_cache.get_db_resources()
     except UnableToStartSession:
         return write_response(500, "Internal error. Please try again later")
 
-    # build the user, retrieve primary key
     user_id =  event['requestContext']['authorizer']['claims']['sub']
     user = User(user_id)
+
+    # use the limit if it is passed as a query parameter, else give practically infinite limit
+    if 'limit' in event["queryStringParameters"]:
+        limit = event["queryStringParameters"]['limit']
+    else:
+        limit = 1000000000000
 
     logging.info("Making request to DynamoDB to get the scenarios")
     try:
         items = table.query(
                             KeyConditionExpression = Key("PK").eq(user.get_pk()),
                             FilterExpression='attribute_exists(ScenarioId)',
+                            ScanIndexForward = False,
+                            Limit = limit
                             )
     except ClientError as e:
         logger.error(e)

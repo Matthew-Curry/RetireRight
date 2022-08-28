@@ -25,6 +25,14 @@ class User(Item):
 
     def get_sk(self):
         return self.SK
+    
+    def has_sim_attr(self) -> bool:
+        """returns whether the user instance has all fields needed to run a simulation (the PATCH fields)"""
+        for field in self.PATCH_FIELDS:
+            if field not in self.__dict__:
+                return False
+        
+        return True
 
     @classmethod
     def from_item(cls, item: dict):
