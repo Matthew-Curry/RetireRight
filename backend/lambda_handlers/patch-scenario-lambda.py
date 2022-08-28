@@ -2,7 +2,7 @@ import logging
 from botocore.exceptions import ClientError
 
 from writer import write_response, write_response_from_obj
-from dynamo_utils import dynamo_resource_cache, get_dynamo_update_params, UnableToStartSession, read_decimal
+from dynamo_utils import dynamo_resource_cache, get_dynamo_update_params, UnableToStartSession
 from domain.scenario import Scenario
 from domain.user import User
 from domain.exceptions import NoParamGiven, InvalidQueryParam, InvalidQueryParams, InvalidParamType, InvalidAgeParam, MissingHomeParam, InvalidIncIncrease
@@ -18,35 +18,68 @@ def lambda_handler(event, context):
     except UnableToStartSession:
         return write_response(500, "Internal error. Please try again later")
     logging.info("Successfully instantiated user table resource")
-    # convert the string query params to required types, return 404 on exception
+    # convert the string query params to required types, return 400 on exception
     try:
         scenario_patch = Scenario.get_converted_patch_params(event['body'])
     except (NoParamGiven, InvalidQueryParam, InvalidQueryParams, InvalidParamType)  as e:
         logger.error(e)
         return write_response(400, str(e))
     
-    # pull the related user's relevant attributes
+    # pull the related user's relevant attributes into domain objects
     user_id = event['requestContext']['authorizer']['claims']['sub']
     scenario_id = event['pathParameters']["scenario_id"]
 
-    scenario, db_scenario, current_age, retirement_age, per_stock, principle = get_inputs_from_db(user_id, scenario_id, dynamodb)
+    user = User(user_id)
+    scenario = Scenario(user_id, scenario_id)
+    try:
+        # use batch get items to save network io
+        response = dynamodb.batch_get_item(
+                                RequestItems = {
+                                            'users': {
+                                                'Keys': [ user.get_key(), scenario.get_key()]
+                                            }
+                                        }
+                                    )
+    except ClientError as e:
+        logger.error(e)
+        return write_response(500, "Internal error. Please try again later")
+    else:
+        error = False
+        if 'Responses' not in response:
+            error = True
+        elif 'users' not in response['Responses']:
+            error = True
+        
+        if error:
+            logger.warn(f"Could not find data for user {user_id}.")
+            return write_response(404, f"Could not find data for user {user_id}, so the scenario could not be posted.")
     
-    # if no scenario was returned, there is nothing to update
-    if db_scenario == None:
+    # loop responses and add to appropriate objects
+    found_user = False
+    found_scenario = False
+    for result in response['Responses']['users']:
+        if user.is_match(result):
+           user.append_db_attr(result)
+        elif scenario.is_match(result):
+            scenario.append_db_attr(result)
+    
+    # if no scenario or user is found, cannot proceed
+    if found_scenario == False:
         return write_response(404, f"No scenario with id {scenario_id} exists.")
+
+    if found_user == False:
+        return write_response(404, f"No user with id {user_id} exists, so the scenario could not be patched.")
     
-    # append the attrbiutes retrieved from the database
-    scenario.append_db_attr(db_scenario)
     # apply the patch
     try:
-        scenario.append_valid_patch_attr(current_age, scenario_patch)
+        scenario.append_valid_patch_attr(user.current_age, scenario_patch)
     except (InvalidAgeParam, InvalidIncIncrease, MissingHomeParam) as e:
         logger.error(e)
         return write_response(400, str(e))
             
     logging.info("Successfully applied patch to the scenario, starting simulation..")
     # get the simulation results and append
-    per_suc, best, worst, av = simulate_scenario(current_age, retirement_age, per_stock, principle, scenario)
+    per_suc, best, worst, av = simulate_scenario(user, scenario)
     scenario.append_simulation_fields(per_suc, best, worst, av)
 
     dynamo_update_exp, dynamo_update_values = get_dynamo_update_params(scenario.get_patch())
@@ -56,7 +89,6 @@ def lambda_handler(event, context):
         table.update_item(
             Key=scenario.get_key(),
             UpdateExpression=dynamo_update_exp,
-            # stock allocation is decimal, ages are int.
             ExpressionAttributeValues=dynamo_update_values,
             ConditionExpression='attribute_exists(PK)'
         )
@@ -69,55 +101,3 @@ def lambda_handler(event, context):
     
     logging.info(f"Successfully patched scenario {scenario_id}")
     return write_response_from_obj(200, scenario.to_response())
-
-def get_inputs_from_db(user_id, scenario_id, dynamodb):
-    """helper method to retrieve the scenario and needed user attributes for the simulation
-    args:
-        user_id: the id of the user from the request
-        scenario_id: the id of the scenario from the request
-        dynamodb: the dynamodb resource
-    returns:
-        tuple in form (scenario, db_scenario, current_age, retirement_age, per_stock, principle)"""
-    user = User(user_id)
-    scenario = Scenario(user_id, scenario_id)
-    # use batch get items to save network io
-    response = dynamodb.batch_get_item(
-                                RequestItems = {
-                                            'users': {
-                                                'Keys': [ user.get_key(), scenario.get_key()]
-                                            }
-                                        }
-                                    )
-    # process the items in the response to retrieve the user fields and scenario
-    items = response['Responses']['users']
-    db_scenario, current_age, retirement_age, per_stock, principle = process_items(items, user, scenario)
-    return scenario, db_scenario, current_age, retirement_age, per_stock, principle
-
-def process_items(items, user, scenario) -> tuple:
-    """Helper method to process list of items that is expected to include
-    a user and scenario object from DynamoDb. Returns the scenario and needed user fields
-    args:
-        items: list of dynamodb objects from query
-        user: the user object expected in the list of items
-        scenario: the scenario object expected in the list of items
-    output:
-        returns tuple in form (db_scenario, current_age, retirement_age, per_stock, principle)"""
-    
-    current_age = None
-    retirement_age = None
-    per_stock = None
-    principle = None
-    db_scenario = None
-    for result in items:
-        # is user, get current age
-        if user.is_match(result):
-           current_age = read_decimal(result["currentAge"])
-           per_stock = read_decimal(result["stockAllocation"])
-           retirement_age = read_decimal(result["retirementAge"])
-           principle = read_decimal(result["principle"])
-        # is processed scenario if it contains the % success
-        elif scenario.is_match(result):
-            db_scenario = result
-    
-    return db_scenario, current_age, retirement_age, per_stock, principle
-    

@@ -1,6 +1,7 @@
 """Base domain item class"""
 
 from abc import ABC, abstractmethod
+from decimal import Decimal
 
 from .general_converter import get_converted_params
 
@@ -71,8 +72,15 @@ class Item(ABC):
 
     def append_db_attr(self, attr:dict):
         """append the attributes in the given dictionary from the DB. Allows appending post + patch fields (all valid application fields).
+        Will convert numeric primitives to native Python data type as all numerics are read in as Decimal in DynamoDB
         args:
             attr (dict): key value pairs of attributes to append to item"""
+        valid_fields = {**self.POST_FIELDS, **self.PATCH_FIELDS}
         for k, v in attr.items():
-            if k in self.POST_FIELDS or k in self.PATCH_FIELDS:
+            if k in valid_fields:
+                # if numeric that should not be a decimal appears, convert
+                # to expected type for consistency
+                data_type = valid_fields[k]
+                if isinstance(v, Decimal) and data_type is not Decimal:
+                    v = data_type(v)
                 setattr(self, k, v)

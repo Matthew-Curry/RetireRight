@@ -1,9 +1,11 @@
 """Core service to run simulation of a given scenario"""
 import logging
 import random
-from decimal import Decimal
+from decimal import Decimal, getcontext
 from math import sqrt
 from statistics import NormalDist
+
+getcontext().prec = 2
 
 N = 1000
 RETIREMENT_LENGTH = 30
@@ -23,16 +25,19 @@ CHILD_COST = 12980
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-def simulate_scenario(current_age:int, retirement_age:int, per_stock:Decimal, principle:int, scenario) -> tuple:
-    """Runs asset growth simulation subject to a set of user parameters and a scenario
+def simulate_scenario(user, scenario) -> tuple:
+    """Runs asset growth simulation for a user and a scenario
     args:
-        current_age (int): the current age of the user
-        retirement_age (int): the targeted retirement age of the user
-        per_stock (Decimal): the percentage of the user's investment portfolio invested in stocks
-        principle (int): initial amount in investment account
+        user (User): the user object, holds age and investment choice attributes
         scenario (Scenario): the given scenario holding lifestyle choice variables
     returns:
         tuple in form (percent chance of success, best result, worst result, average result)"""
+    
+    # unpack vars from the user
+    current_age = user.current_age
+    retirement_age = user.retirement_age
+    per_stock = user.per_stock
+    principle = user.principle
 
     years = retirement_age - current_age
     
@@ -78,10 +83,10 @@ def simulate_scenario(current_age:int, retirement_age:int, per_stock:Decimal, pr
             yearly_split = (home_cost *(1-DOWNPAYMENT_PERCENT))/mortgage_length
             mortgage_payment = mortgage_factor * yearly_split
             age_home_paid = age_home + mortgage_length
-        # initialize kids to 0, a set to keep track of when kids become adults
+        # initialize kids to 0, and a set to keep track of when kids become adults
         kids = 0
         kids_to_adults = set()
-        # inflation factor is one plus the global rate
+        # inflation factor is one plus the global var holding rate rate
         inflation_factor = 1 + INFLATION_RATE
         # kid cost initialized to global var before adjusting during simulation run
         yearly_kid_cost = CHILD_COST

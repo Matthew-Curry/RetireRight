@@ -31,7 +31,7 @@ class User(Item):
         new_user = cls(item["UserId"])
         item.pop("UserId")
 
-        new_user.append_attr(item)
+        new_user.append_db_attr(item)
 
         return new_user
     

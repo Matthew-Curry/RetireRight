@@ -12,7 +12,8 @@ def lambda_handler(event, context):
     try:
         _, table = dynamo_resource_cache.get_db_resources()
     except UnableToStartSession:
-        return write_response(500, "Internal error. Please try again later")
+        logger.error("Unable to connect to dynamo db")
+        exit()
     logger.info("Successfully instantiated user table resource")
 
     user_name = event['userName']

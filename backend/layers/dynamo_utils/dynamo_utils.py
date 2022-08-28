@@ -65,9 +65,3 @@ def get_dynamo_update_params(fields:dict) -> tuple:
         expression_vals[f':val{i + 1}'] = fields[k]
     
     return update_exp, expression_vals
-
-def read_decimal(number):
-    """Read in number as int if possible, else return. Used because DynamoDB returns all numbers as decimals"""
-    if float(number)%1==0:
-        return int(number)
-    return number
