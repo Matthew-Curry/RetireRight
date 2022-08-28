@@ -51,7 +51,7 @@ def simulate_scenario(user, scenario) -> tuple:
     av_result = []
 
     sum_ending_balance = 0
-    closest_av = float('inf')
+    closest_av = Decimal(float('inf'))
 
     num_success = 0
     

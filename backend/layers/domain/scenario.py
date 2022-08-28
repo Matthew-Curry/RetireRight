@@ -34,7 +34,7 @@ class Scenario(Item):
     def __init__(self, user_id:str, scenario_id:str = None):
         # if scenario id given set, else generate id that is timestamp + uuid
         if not scenario_id:
-            scenario_id = str(time.time()) + uuid.uuid4().hex
+            scenario_id = str(int(time.time())) + uuid.uuid4().hex
         
         self.ScenarioId = scenario_id
 

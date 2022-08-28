@@ -20,10 +20,10 @@ def lambda_handler(event, context):
     user = User(user_id)
 
     # use the limit if it is passed as a query parameter, else give practically infinite limit
-    if 'limit' in event["queryStringParameters"]:
-        limit = event["queryStringParameters"]['limit']
-    else:
-        limit = 1000000000000
+    limit = 1000000000000
+    if event["queryStringParameters"]:
+        if 'limit' in event["queryStringParameters"]:
+            limit = int(event["queryStringParameters"]['limit']) + 1
 
     logging.info("Making request to DynamoDB to get the scenarios")
     try:
