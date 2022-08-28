@@ -4,7 +4,7 @@ from decimal import Decimal
 import uuid
 
 from .item import Item
-from .exceptions import InvalidAgeParam, InvalidIncAgeType, InvalidIncType, NegetiveIncomeException, NoCurrentIncomeException
+from .exceptions import InvalidAgeParam, MissingHomeParam, InvalidIncAgeType, InvalidIncType, NegetiveIncomeException, NoCurrentIncomeException
 
 class Scenario(Item):
     PK_PREFIX = "USER#"
@@ -111,7 +111,8 @@ class Scenario(Item):
     @staticmethod
     def verify_scenario_fields(current_age:int, params: dict):
         """helper method to verify the fields of a scenario. Currently will confirm
-        ages make sense and income_inc is a valid data structure if provided in params
+        ages and combination of home paramsmake sense and income_inc is a valid data 
+        structure if provided in params.
         args: 
             current_age (int): the current age attached to the user record
             params (dict): the params in the scenario object as a dicionary
@@ -122,13 +123,27 @@ class Scenario(Item):
             InvalidIncType: if income increase is not an integer
             NegetiveIncomeException: if a negetive income value is provided
             NoCurrentIncomeException: if income at current age is not provided
+            MissingHomeParam: if age_home is provided but one of the required params
+                            home_cost, mortgage_rate, or mortgage_length is missing.
             """
 
-        # given ages must be less than the current age
+        # the age the user plans to buy a home must be after the current age. Also, 
+        # if an age of home purchase is provided, a home_cost, mortgage_rate, and
+        # mortgage_length must also be provided.
         if "age_home" in params:
             if params["age_home"] < current_age:
                 raise InvalidAgeParam("age_home", params["age_home"], current_age)
+
+            if "home_cost" not in params:
+                raise MissingHomeParam("home_cost")
+
+            if "mortgage_rate" not in params:
+                raise MissingHomeParam("mortgage_rate")
+
+            if "mortgage_length" not in params:
+                raise MissingHomeParam("mortgage_length")
         
+        # the ages the user plans to have kids must be after the current age
         if "age_kids" in params:
             for age in params["age_kids"]:
                 if age < current_age:
