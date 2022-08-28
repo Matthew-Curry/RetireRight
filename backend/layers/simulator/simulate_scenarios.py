@@ -1,11 +1,9 @@
 """Core service to run simulation of a given scenario"""
 import logging
 import random
-from decimal import Decimal, getcontext
+from decimal import Decimal
 from math import sqrt
 from statistics import NormalDist
-
-getcontext().prec = 2
 
 N = 1000
 RETIREMENT_LENGTH = 30
@@ -68,8 +66,8 @@ def simulate_scenario(user, scenario) -> tuple:
         entertainment = scenario.entertainment
         yearly_travel = scenario.yearlyTravel
         age_kids = set(scenario.ageKids)
-        age_home = scenario.age_home
-        home_cost = scenario.ageHome
+        age_home = scenario.ageHome
+        home_cost = scenario.homeCost
         downpayment_savings = scenario.downpaymentSavings
         mortgage_factor = 1 + scenario.mortgageRate
         mortgage_length = scenario.mortgageLength
@@ -135,7 +133,7 @@ def simulate_scenario(user, scenario) -> tuple:
             total_assets = total_assets + net_income
             total_assets = total_assets * (1 + Decimal(returns[year - 1]))
 
-            result.append(total_assets)
+            result.append(total_assets.quantize(Decimal('.01')))
         
         # apply this result to the global simulation result
         logger.info(f"Completed run {n}. Recording results..")
