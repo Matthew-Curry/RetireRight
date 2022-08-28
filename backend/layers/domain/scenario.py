@@ -1,8 +1,8 @@
 """Holds Scenario domain object."""
 
 from decimal import Decimal
-from re import L
 import uuid
+import time
 
 from .item import Item
 from .exceptions import InvalidAgeParam, MissingHomeParam, InvalidIncAgeType, InvalidIncType, NegetiveIncomeException, NoCurrentIncomeException, IncomeRequiredException
@@ -31,14 +31,14 @@ class Scenario(Item):
         "average": list
     }
 
-    def __init__(self, UserId:str, scenario_id:str = None):
-        # if scenario id given set, else generate uuid
+    def __init__(self, user_id:str, scenario_id:str = None):
+        # if scenario id given set, else generate id that is timestamp + uuid
         if not scenario_id:
-            scenario_id = uuid.uuid4().hex
+            scenario_id = str(time.time()) + uuid.uuid4().hex
         
         self.ScenarioId = scenario_id
 
-        self.PK = self.PK_PREFIX + UserId
+        self.PK = self.PK_PREFIX + user_id
         self.SK = self.SK_PREFIX + scenario_id 
 
         # intiialize all attrbiutes to 0 values, other than incomeInc which is a required parameter
@@ -126,8 +126,8 @@ class Scenario(Item):
     @staticmethod
     def verify_scenario_fields(current_age:int, params: dict):
         """helper method to verify the fields of a scenario. Currently will confirm
-        ages and combination of home params make sense and incomeInc is a valid data 
-        structure if provided in params.
+        ages and combination of home params follow business rules and incomeInc is a 
+        valid data structure if provided in params.
         args: 
             current_age (int): the current age attached to the user record
             params (dict): the params in the scenario object as a dicionary
@@ -166,7 +166,7 @@ class Scenario(Item):
                     raise InvalidAgeParam("ageKids", params["ageKids"], current_age)
 
         # if income inc is given, current age must be included, all other ages must be greater than the current age, 
-        # and all income values must be positive. Income information must be provided.
+        # and all income values must be positive integers. Income information must be provided.
         found_current_age = False
         if "incomeInc" in params:
             for k, v in params["incomeInc"].items():

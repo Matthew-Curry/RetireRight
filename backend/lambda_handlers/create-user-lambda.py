@@ -8,7 +8,6 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 def lambda_handler(event, context):
-    # get the table resource
     try:
         _, table = dynamo_resource_cache.get_db_resources()
     except UnableToStartSession:
@@ -21,7 +20,7 @@ def lambda_handler(event, context):
 
     user = User(user_id, user_name)
     
-    logging.info("Making request to DynamoDB to place the item")
+    logger.info("Making request to DynamoDB to place the item")
     try:
         table.put_item(Item=user.to_item(),
                        ConditionExpression='attribute_not_exists(PK)')

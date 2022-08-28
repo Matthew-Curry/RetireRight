@@ -75,7 +75,7 @@ class Item(ABC):
                     setattr(self, k, v)
 
     def append_db_attr(self, attr:dict):
-        """append the attributes in the given dictionary from the DB. Allows appending post + patch fields (all valid application fields).
+        """append the attributes in the given dictionary from the DB. Allows appending post + patch + processed fields (all valid application fields).
         Will convert numeric primitives to native Python data type as all numerics are read in as Decimal in DynamoDB
         args:
             attr (dict): key value pairs of attributes to append to item"""

@@ -51,7 +51,7 @@ def simulate_scenario(user, scenario) -> tuple:
     av_result = []
 
     sum_ending_balance = 0
-    closest_av = 0
+    closest_av = float('inf')
 
     num_success = 0
     
@@ -84,7 +84,7 @@ def simulate_scenario(user, scenario) -> tuple:
         # initialize kids to 0, and a set to keep track of when kids become adults
         kids = 0
         kids_to_adults = set()
-        # inflation factor is one plus the global var holding rate rate
+        # inflation factor is one plus the global var holding inflation rate
         inflation_factor = 1 + INFLATION_RATE
         # kid cost initialized to global var before adjusting during simulation run
         yearly_kid_cost = CHILD_COST
@@ -153,7 +153,7 @@ def simulate_scenario(user, scenario) -> tuple:
                 closest_av = av
                 av_result = result 
         
-        retirement_yearly_cost = (food *12) + (entertainment *12) + (yearly_travel * 12)
+        retirement_yearly_cost = (food *12) + (entertainment *12) + yearly_travel
         home_payoff = 0
         if not age_home:
             retirement_yearly_cost += (rent *12)
