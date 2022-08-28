@@ -2,7 +2,7 @@ import logging
 from botocore.exceptions import ClientError
 
 from writer import write_response, write_response_from_obj
-from dynamo_utils import dynamo_resource_cache, UnableToStartSession, read_decimal
+from dynamo_utils import dynamo_resource_cache, UnableToStartSession
 from domain.scenario import Scenario
 from domain.user import User
 from domain.exceptions import NoParamGiven, InvalidQueryParam, InvalidQueryParams, InvalidParamType, InvalidAgeParam, MissingHomeParam, InvalidIncIncrease
@@ -18,29 +18,49 @@ def lambda_handler(event, context):
     except UnableToStartSession:
         return write_response(500, "Internal error. Please try again later")
     logging.info("Successfully instantiated user table resource")
-    # convert the string query params to required types, return 404 on exception
+    # convert the string query params to required types, return 400 on exception
     try:
         scenario_params = Scenario.get_converted_post_params(event['body'])
     except (NoParamGiven, InvalidQueryParam, InvalidQueryParams, InvalidParamType) as e:
         logger.error(e)
         return write_response(400, str(e))
     
-    # pull the related user's relevant attributes from database
+    # pull the related user's relevant attributes from database into a user object
     user_id = event['requestContext']['authorizer']['claims']['sub']
-    current_age, retirement_age, per_stock, principle = get_user_attr(user_id, table)
+    user = User(user_id)
+    try:
+        attr = table.get_item(
+                        Key=user.get_key(),
+                        AttributesToGet=[
+                            'currentAge',
+                            'retirementAge',
+                            'stockAllocation',
+                            'principle'
+                            
+                        ],
+                )
+    except ClientError as e:
+        logger.error(e)
+        return write_response(500, "Internal error. Please try again later")
+    else:
+        if 'Item' not in attr:
+            logger.warn(f"No user with id {user_id} exists.")
+            return write_response(404, f"No user with id {user_id} exists, so the scenario could not be posted.")
+    
+    user.append_db_attr(attr['Item'])
 
     # build scenario
     scenerio = Scenario(user_id)
     
     # add the given parameters to the scenario
     try:
-        scenerio.append_valid_post_attr(current_age, scenario_params)
+        scenerio.append_valid_post_attr(user.current_age, scenario_params)
     except (InvalidAgeParam, InvalidIncIncrease, MissingHomeParam) as e:
         logger.error(e)
         return write_response(400, str(e))
 
     logging.info("Successfully validated parameters, calling the simulator to process the scenario")
-    per_suc, best, worst, av = simulate_scenario(current_age, retirement_age, per_stock, principle, scenerio)
+    per_suc, best, worst, av = simulate_scenario(user, scenerio)
     scenerio.append_simulation_fields(per_suc, best, worst, av)
 
     logging.info("Making request to DynamoDB to place the item")
@@ -56,29 +76,3 @@ def lambda_handler(event, context):
     
     logging.info("Successfully put scenario")
     return write_response_from_obj(200, scenerio.to_response())
-
-def get_user_attr(user_id, table):
-    """Get user attributes relevant to the simulation from the database
-    args:
-        user_id: the user id
-        table: DynamoDB table resource to use in query"""
-    user = User(user_id)
-
-    attr = table.get_item(
-                        Key=user.get_key(),
-                        AttributesToGet=[
-                            'currentAge',
-                            'retirementAge',
-                            'stockAllocation',
-                            'principle'
-                            
-                        ],
-                )
-    
-    current_age = read_decimal(attr['Item']["currentAge"])
-    retirement_age = read_decimal(attr['Item']["retirementAge"])
-    per_stock = read_decimal(attr['Item']["stockAllocation"])
-    principle = read_decimal(attr['Item']["principle"])
-
-    return current_age, retirement_age, per_stock, principle
-    

@@ -32,7 +32,7 @@ def lambda_handler(event, context):
             logger.warn(f"No user with id {user_id} exists.")
             return write_response(404, f"No user with id {user_id} exists.")
     
-    # append the retrieved fields to the scenario object and return
+    # append the retrieved fields to the user object and return
     db_attr = items['Item']
     user.append_db_attr(db_attr)
 

@@ -33,7 +33,6 @@ def lambda_handler(event, context):
         else:
             return write_response(500, "Internal error. Please try again later")
                 
-
     logger.info(f"Successfully deleted scenario {scenario_id}")
     return write_response(204, "")
     

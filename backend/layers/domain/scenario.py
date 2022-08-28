@@ -50,7 +50,7 @@ class Scenario(Item):
         self.patch = None
 
     def get_key(self) -> dict:
-        """Return key of this User as dict"""
+        """Return key of this Scenario as dict"""
         return {'PK': self.PK, 'SK': self.SK}
     
     def get_pk(self):
@@ -75,15 +75,19 @@ class Scenario(Item):
         return new_scenario
 
     def append_valid_post_attr(self, current_age:int, attr:dict):
-        """Validate attr according to business rules, if valid, append to the instance is valid post fields
+        """Validate attr according to business rules, if valid, append to the instance if valid post fields
         params:
             attr (dict): the attributes to append
             current_age (int): the current age of the user, needed to validate the age related attributes
         raises:
-            InvalidAgeParam: if "age_kids" or "age_home" fields are provided with values less
-                            than the current age.
-            InvalidIncIncrease: if the income_inc is not a list of dictionaries where each dictionary
-                            has keys "age" and "income" both of type int.
+            InvalidAgeParam: if age of having a kid, buying a home, or increasing income 
+                            are provided with values less than the current age.
+            InvalidIncAgeType: if age key in income_inc is not castable to an integer
+            InvalidIncType: if income increase is not an integer
+            NegetiveIncomeException: if a negetive income value is provided
+            NoCurrentIncomeException: if income at current age is not provided
+            MissingHomeParam: if age_home is provided but one of the required params
+                            home_cost, mortgage_rate, or mortgage_length is missing.
             """
         Scenario.verify_scenario_fields(current_age, attr)
         self._append_attr(attr)
@@ -95,10 +99,14 @@ class Scenario(Item):
             attr (dict): the attributes to append
             current_age (int): the current age of the user, needed to validate the age related attributes
         raises:
-            InvalidAgeParam: if "age_kids" or "age_home" fields are provided with values less
-                            than the current age.
-            InvalidIncIncrease: if the income_inc is not a list of dictionaries where each dictionary
-                            has keys "age" and "income" both of type int.
+            InvalidAgeParam: if age of having a kid, buying a home, or increasing income 
+                            are provided with values less than the current age.
+            InvalidIncAgeType: if age key in income_inc is not castable to an integer
+            InvalidIncType: if income increase is not an integer
+            NegetiveIncomeException: if a negetive income value is provided
+            NoCurrentIncomeException: if income at current age is not provided
+            MissingHomeParam: if age_home is provided but one of the required params
+                            home_cost, mortgage_rate, or mortgage_length is missing.
             """
         # verify patch attributes alongside current attributes
         patch = attr
@@ -111,7 +119,7 @@ class Scenario(Item):
     @staticmethod
     def verify_scenario_fields(current_age:int, params: dict):
         """helper method to verify the fields of a scenario. Currently will confirm
-        ages and combination of home paramsmake sense and income_inc is a valid data 
+        ages and combination of home params make sense and income_inc is a valid data 
         structure if provided in params.
         args: 
             current_age (int): the current age attached to the user record
@@ -149,7 +157,7 @@ class Scenario(Item):
                 if age < current_age:
                     raise InvalidAgeParam("age_kids", params["age_kids"], current_age)
 
-        # if income inc is given, current age must be included, all ages must be greater than the current age, 
+        # if income inc is given, current age must be included, all other ages must be greater than the current age, 
         # and all income values must be positive
         found_current_age = False
         if "income_inc" in params:
