@@ -13,14 +13,14 @@ class Scenario(Item):
     PATCH_FIELDS = POST_FIELDS = {"rent": int, 
                                     "food": int,
                                     "entertainment": int,
-                                    "yearly_travel": int,
-                                    "age_kids": list,
-                                    "age_home": int,
-                                    "home_cost": int,
-                                    "downpayment_savings": int,
-                                    "mortgage_rate": Decimal,
-                                    "mortgage_length": int,
-                                    "income_inc": dict
+                                    "yearlyTravel": int,
+                                    "ageKids": list,
+                                    "ageHome": int,
+                                    "homeCost": int,
+                                    "downpaymentSavings": int,
+                                    "mortgageRate": Decimal,
+                                    "mortgageLength": int,
+                                    "incomeInc": dict
                                     }
 
     def __init__(self, UserId:str, scenario_id:str = None):
@@ -37,14 +37,14 @@ class Scenario(Item):
         self.rent = 0
         self.food = 0
         self.entertainment = 0
-        self.yearly_travel = 0
-        self.age_kids = []
-        self.age_home = None
-        self.home_cost = 0
-        self.downpayment_savings = 0
-        self.mortgage_rate = 0
-        self.mortgage_length = 0
-        self.income_inc = {}
+        self.yearlyTravel = 0
+        self.ageKids = []
+        self.ageHome = None
+        self.homeCost = 0
+        self.downpaymentSavings = 0
+        self.mortgageRate = 0
+        self.mortgageLength = 0
+        self.incomeInc = {}
 
         # initialize patch to none
         self.patch = None
@@ -82,12 +82,12 @@ class Scenario(Item):
         raises:
             InvalidAgeParam: if age of having a kid, buying a home, or increasing income 
                             are provided with values less than the current age.
-            InvalidIncAgeType: if age key in income_inc is not castable to an integer
+            InvalidIncAgeType: if age key in incomeInc is not castable to an integer
             InvalidIncType: if income increase is not an integer
             NegetiveIncomeException: if a negetive income value is provided
             NoCurrentIncomeException: if income at current age is not provided
-            MissingHomeParam: if age_home is provided but one of the required params
-                            home_cost, mortgage_rate, or mortgage_length is missing.
+            MissingHomeParam: if ageHome is provided but one of the required params
+                            homeCost, mortgageRate, or mortgageLength is missing.
             """
         Scenario.verify_scenario_fields(current_age, attr)
         self._append_attr(attr)
@@ -101,12 +101,12 @@ class Scenario(Item):
         raises:
             InvalidAgeParam: if age of having a kid, buying a home, or increasing income 
                             are provided with values less than the current age.
-            InvalidIncAgeType: if age key in income_inc is not castable to an integer
+            InvalidIncAgeType: if age key in incomeInc is not castable to an integer
             InvalidIncType: if income increase is not an integer
             NegetiveIncomeException: if a negetive income value is provided
             NoCurrentIncomeException: if income at current age is not provided
-            MissingHomeParam: if age_home is provided but one of the required params
-                            home_cost, mortgage_rate, or mortgage_length is missing.
+            MissingHomeParam: if ageHome is provided but one of the required params
+                            homeCost, mortgageRate, or mortgageLength is missing.
             """
         # verify patch attributes alongside current attributes
         patch = attr
@@ -119,7 +119,7 @@ class Scenario(Item):
     @staticmethod
     def verify_scenario_fields(current_age:int, params: dict):
         """helper method to verify the fields of a scenario. Currently will confirm
-        ages and combination of home params make sense and income_inc is a valid data 
+        ages and combination of home params make sense and incomeInc is a valid data 
         structure if provided in params.
         args: 
             current_age (int): the current age attached to the user record
@@ -127,41 +127,41 @@ class Scenario(Item):
         raises:
             InvalidAgeParam: if age of having a kid, buying a home, or increasing income 
                             are provided with values less than the current age.
-            InvalidIncAgeType: if age key in income_inc is not castable to an integer
+            InvalidIncAgeType: if age key in incomeInc is not castable to an integer
             InvalidIncType: if income increase is not an integer
             NegetiveIncomeException: if a negetive income value is provided
             NoCurrentIncomeException: if income at current age is not provided
-            MissingHomeParam: if age_home is provided but one of the required params
-                            home_cost, mortgage_rate, or mortgage_length is missing.
+            MissingHomeParam: if ageHome is provided but one of the required params
+                            homeCost, mortgageRate, or mortgageLength is missing.
             """
 
         # the age the user plans to buy a home must be after the current age. Also, 
-        # if an age of home purchase is provided, a home_cost, mortgage_rate, and
-        # mortgage_length must also be provided.
-        if "age_home" in params:
-            if params["age_home"] < current_age:
-                raise InvalidAgeParam("age_home", params["age_home"], current_age)
+        # if an age of home purchase is provided, a homeCost, mortgageRate, and
+        # mortgageLength must also be provided.
+        if "ageHome" in params:
+            if params["ageHome"] < current_age:
+                raise InvalidAgeParam("ageHome", params["ageHome"], current_age)
 
-            if "home_cost" not in params:
-                raise MissingHomeParam("home_cost")
+            if "homeCost" not in params:
+                raise MissingHomeParam("homeCost")
 
-            if "mortgage_rate" not in params:
-                raise MissingHomeParam("mortgage_rate")
+            if "mortgageRate" not in params:
+                raise MissingHomeParam("mortgageRate")
 
-            if "mortgage_length" not in params:
-                raise MissingHomeParam("mortgage_length")
+            if "mortgageLength" not in params:
+                raise MissingHomeParam("mortgageLength")
         
         # the ages the user plans to have kids must be after the current age
-        if "age_kids" in params:
-            for age in params["age_kids"]:
+        if "ageKids" in params:
+            for age in params["ageKids"]:
                 if age < current_age:
-                    raise InvalidAgeParam("age_kids", params["age_kids"], current_age)
+                    raise InvalidAgeParam("ageKids", params["ageKids"], current_age)
 
         # if income inc is given, current age must be included, all other ages must be greater than the current age, 
         # and all income values must be positive
         found_current_age = False
-        if "income_inc" in params:
-            for k, v in params["income_inc"].items():
+        if "incomeInc" in params:
+            for k, v in params["incomeInc"].items():
                 try:
                     k = int(k)
                 except Exception as e:
@@ -171,7 +171,7 @@ class Scenario(Item):
                     raise InvalidIncType
 
                 if k < current_age:
-                    raise InvalidAgeParam("income_inc", k, current_age)
+                    raise InvalidAgeParam("incomeInc", k, current_age)
                 elif k == current_age:
                     found_current_age = True
                 

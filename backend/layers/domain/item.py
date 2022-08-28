@@ -81,6 +81,6 @@ class Item(ABC):
                 # if numeric that should not be a decimal appears, convert
                 # to expected type for consistency
                 data_type = valid_fields[k]
-                if isinstance(v, Decimal) and data_type is not Decimal:
+                if isinstance(v, Decimal) and data_type is not Decimal and data_type is not list and data_type is not dict:
                     v = data_type(v)
                 setattr(self, k, v)

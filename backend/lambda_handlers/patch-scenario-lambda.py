@@ -72,7 +72,7 @@ def lambda_handler(event, context):
     
     # apply the patch
     try:
-        scenario.append_valid_patch_attr(user.current_age, scenario_patch)
+        scenario.append_valid_patch_attr(user.currentAge, scenario_patch)
     except (InvalidAgeParam, InvalidIncIncrease, MissingHomeParam) as e:
         logger.error(e)
         return write_response(400, str(e))
