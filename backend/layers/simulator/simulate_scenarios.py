@@ -34,9 +34,9 @@ def simulate_scenario(user, scenario) -> tuple:
         tuple in form (percent chance of success, best result, worst result, average result)"""
     
     # unpack vars from the user
-    current_age = user.current_age
-    retirement_age = user.retirement_age
-    per_stock = user.per_stock
+    current_age = user.currentAge
+    retirement_age = user.retirementAge
+    per_stock = user.stockAllocation
     principle = user.principle
 
     years = retirement_age - current_age
@@ -66,14 +66,14 @@ def simulate_scenario(user, scenario) -> tuple:
         rent = scenario.rent
         food = scenario.food
         entertainment = scenario.entertainment
-        yearly_travel = scenario.yearly_travel
-        age_kids = set(scenario.age_kids)
+        yearly_travel = scenario.yearlyTravel
+        age_kids = set(scenario.ageKids)
         age_home = scenario.age_home
-        home_cost = scenario.home_cost
-        downpayment_savings = scenario.downpayment_savings
-        mortgage_factor = 1 + scenario.mortgage_rate
-        mortgage_length = scenario.mortgage_length
-        income_inc = scenario.income_inc
+        home_cost = scenario.ageHome
+        downpayment_savings = scenario.downpaymentSavings
+        mortgage_factor = 1 + scenario.mortgageRate
+        mortgage_length = scenario.mortgageLength
+        income_inc = scenario.incomeInc
         # pull sample of returns for the number of years of the simulation
         logger.info("Generating simulated returns")
         returns = dist.samples(years, seed = random.random())

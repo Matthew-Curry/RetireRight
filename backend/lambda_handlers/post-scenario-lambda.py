@@ -54,7 +54,7 @@ def lambda_handler(event, context):
     
     # add the given parameters to the scenario
     try:
-        scenerio.append_valid_post_attr(user.current_age, scenario_params)
+        scenerio.append_valid_post_attr(user.currentAge, scenario_params)
     except (InvalidAgeParam, InvalidIncIncrease, MissingHomeParam) as e:
         logger.error(e)
         return write_response(400, str(e))
