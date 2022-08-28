@@ -68,8 +68,8 @@ def simulate_scenario(user, scenario) -> tuple:
         entertainment = scenario.entertainment
         yearly_travel = scenario.yearlyTravel
         age_kids = set(scenario.ageKids)
-        age_home = scenario.age_home
-        home_cost = scenario.ageHome
+        age_home = scenario.ageHome
+        home_cost = scenario.homeCost
         downpayment_savings = scenario.downpaymentSavings
         mortgage_factor = 1 + scenario.mortgageRate
         mortgage_length = scenario.mortgageLength
