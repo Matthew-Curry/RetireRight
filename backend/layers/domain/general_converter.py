@@ -28,6 +28,9 @@ def get_converted_params(query_params: str, valid_params:dict) -> dict:
     if isinstance(query_params, dict) == False:
         raise InvalidQueryParams
     
+    print("HERE ARE THE TYPES IT IS CHECKING")
+    print(valid_params)
+
     # validate all fields of the params
     for p, v in query_params.items():
         try: 
