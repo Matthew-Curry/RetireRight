@@ -5,7 +5,7 @@ from writer import write_response, write_response_from_obj
 from dynamo_utils import dynamo_resource_cache, UnableToStartSession, read_decimal
 from domain.scenario import Scenario
 from domain.user import User
-from domain.exceptions import NoParamGiven, InvalidQueryParam, InvalidQueryParams, InvalidParamType, InvalidAgeParam, InvalidIncIncrease
+from domain.exceptions import NoParamGiven, InvalidQueryParam, InvalidQueryParams, InvalidParamType, InvalidAgeParam, MissingHomeParam, InvalidIncIncrease
 from simulator import simulate_scenario
 
 logger = logging.getLogger()
@@ -35,7 +35,7 @@ def lambda_handler(event, context):
     # add the given parameters to the scenario
     try:
         scenerio.append_valid_post_attr(current_age, scenario_params)
-    except (InvalidAgeParam, InvalidIncIncrease) as e:
+    except (InvalidAgeParam, InvalidIncIncrease, MissingHomeParam) as e:
         logger.error(e)
         return write_response(400, str(e))
 
