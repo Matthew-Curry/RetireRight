@@ -21,7 +21,14 @@ class Scenario(Item):
                                     "mortgageRate": Decimal,
                                     "mortgageLength": int,
                                     "incomeInc": dict
-                                    }
+                                }
+    
+    PROCESSED_FIELDS = {
+        "percentSuccess": Decimal,
+        "best": list,
+        "worst": list,
+        "average": list
+    }
 
     def __init__(self, UserId:str, scenario_id:str = None):
         # if scenario id given set, else generate uuid

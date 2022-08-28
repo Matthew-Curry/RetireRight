@@ -7,6 +7,7 @@ class User(Item):
     PK_PREFIX = SK_PREFIX = "USER#"
     PATCH_FIELDS = {'stockAllocation': Decimal, 'retirementAge': int, 'currentAge': int, 'principle': int}
     POST_FIELDS = {'UserName':str}
+    PROCESSED_FIELDS = {}
 
     def __init__(self, UserId:str, UserName=None):
         self.UserId = UserId

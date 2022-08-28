@@ -42,6 +42,10 @@ class Item(ABC):
     def POST_FIELDS(cls):
         pass
 
+    @abstractproperty
+    def PROCESSED_FIELDS(cls):
+        pass
+
     @classmethod
     def get_converted_post_params(cls, query_params):
         """Wrapper on get_converted params to verify query_params against post fields"""
@@ -75,7 +79,7 @@ class Item(ABC):
         Will convert numeric primitives to native Python data type as all numerics are read in as Decimal in DynamoDB
         args:
             attr (dict): key value pairs of attributes to append to item"""
-        valid_fields = {**self.POST_FIELDS, **self.PATCH_FIELDS}
+        valid_fields = {**self.POST_FIELDS, **self.PATCH_FIELDS, **self.PROCESSED_FIELDS}
         for k, v in attr.items():
             if k in valid_fields:
                 # if numeric that should not be a decimal appears, convert
