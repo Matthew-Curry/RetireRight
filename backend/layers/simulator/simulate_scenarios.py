@@ -101,8 +101,8 @@ def simulate_scenario(user, scenario) -> tuple:
 
             age = year + current_age
             # check if income changed this year
-            if age in income_inc:
-                income = income_inc[age]
+            if str(age) in income_inc:
+                income = income_inc[str(age)]
 
             # update the net income to the income
             net_income = income
