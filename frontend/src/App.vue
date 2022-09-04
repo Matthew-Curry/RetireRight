@@ -5,7 +5,18 @@
       Click on a scenario to see/change it and view the resulting net asset
       growth in the chart.
     </h2>
-    <user></user>
+    <user
+      :username="user.username"
+      :stockAllocation="user.stockAllocation"
+      :retirementAge="user.retirementAge"
+      :currentAge="user.currentAge"
+      :principle="user.principle"
+
+      @updated-stock-allocation="updateUserStockAllocation"
+      @updated-retirement-age="updateUserRetirementAge"
+      @updated-current-age="updateUserCurrentAge"
+      @updated-principle="updateUserPrinciple"
+    ></user>
     <ul>
       <app-scenario
         v-for="(sourceData, index) in scenarios"
@@ -20,7 +31,9 @@
       </app-scenario>
     </ul>
     <chart></chart>
-    <button v-if="scenarios.length < 5" @click="addScenario">Add Scenario</button>
+    <button v-if="scenarios.length < 5" @click="addScenario">
+      Add Scenario
+    </button>
   </div>
 </template>
 
@@ -40,6 +53,13 @@ export default {
 
   data() {
     return {
+      user: {
+        username: "Matt",
+        stockAllocation: 0.7,
+        retirementAge: 55,
+        currentAge: 25,
+        principle: 3000,
+      },
       selectedScenarioIndex: 0,
       scenarios: [
         {
@@ -54,7 +74,7 @@ export default {
           mortgageRate: 0.06,
           mortgageLength: 15,
           ageKids: [34, 35, 36],
-          incomeInc: {"25": 120000, "30": 200000}
+          incomeInc: { 25: 120000, 30: 200000 },
         },
         {
           percentSuccess: 0.8,
@@ -68,7 +88,7 @@ export default {
           mortgageRate: 0.06,
           mortgageLength: 15,
           ageKids: [34, 35, 36],
-          incomeInc: {"25": 120000, "30": 200000}
+          incomeInc: { 25: 120000, 30: 200000 },
         },
         {
           percentSuccess: 0.9,
@@ -82,7 +102,7 @@ export default {
           mortgageRate: 0.06,
           mortgageLength: 15,
           ageKids: [34, 35, 36],
-          incomeInc: {"25": 120000, "30": 200000}
+          incomeInc: { 25: 120000, 30: 200000 },
         },
         {
           percentSuccess: 0.95,
@@ -96,7 +116,7 @@ export default {
           mortgageRate: 0.06,
           mortgageLength: 15,
           ageKids: [34, 35, 36],
-          incomeInc: {"25": 120000, "30": 200000}
+          incomeInc: { 25: 120000, 30: 200000 },
         },
         {
           percentSuccess: 0.4,
@@ -110,7 +130,7 @@ export default {
           mortgageRate: 0.06,
           mortgageLength: 15,
           ageKids: [34, 35, 36],
-          incomeInc: {"25": 120000, "30": 200000}
+          incomeInc: { 25: 120000, 30: 200000 },
         },
       ],
     };
@@ -126,33 +146,47 @@ export default {
         this.scenarios[index][field] = patchValues[field];
       }
 
-      alert("Scenario updated!")
+      alert("Scenario updated!");
     },
 
     deleteScenario(index) {
-      this.scenarios.splice(index,1);
+      this.scenarios.splice(index, 1);
     },
 
     addScenario() {
-      this.scenarios.push(
-        {
-          percentSuccess: null,
-          rent: null,
-          food: null,
-          entertainment: null,
-          yearlyTravel: null,
-          ageHome: null,
-          homeCost: null,
-          downpaymentSavings: null,
-          mortgageRate: null,
-          mortgageLength: null,
-          ageKids: [],
-          incomeInc: {}
-        }
-      )
+      this.scenarios.push({
+        percentSuccess: null,
+        rent: null,
+        food: null,
+        entertainment: null,
+        yearlyTravel: null,
+        ageHome: null,
+        homeCost: null,
+        downpaymentSavings: null,
+        mortgageRate: null,
+        mortgageLength: null,
+        ageKids: [],
+        incomeInc: {},
+      });
 
-      this.selectedScenarioIndex = this.scenarios.length -1
-    }
+      this.selectedScenarioIndex = this.scenarios.length - 1;
+    },
+
+    updateUserStockAllocation(newVal) {
+      this.user.stockAllocation = newVal;
+    },
+
+    updateUserRetirementAge(newVal) {
+      this.user.retirementAge = newVal;
+    },
+
+    updateUserCurrentAge(newVal) {
+      this.user.currentAge = newVal;
+    },
+
+    updateUserPrinciple(newVal) {
+      this.user.principle = newVal;
+    },
   },
 };
 </script>
