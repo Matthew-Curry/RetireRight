@@ -8,9 +8,10 @@
   >
     <h2>Scenario {{ scenarioNumber }}</h2>
     <h3 id="percentage" :class="percentCSSClass">{{ percentSuccess }}</h3>
-    <form v-if="isSelected" @submit.prevent>
-      <div class="form-control">
-        <label for="rent">Rent</label>
+    <section v-if="isSelected">
+
+      <div class="form-control flex-box">
+        <label class = "single-input-label" for="rent">Rent</label>
         <input
           id="rent"
           name="rent"
@@ -20,8 +21,8 @@
         />
       </div>
 
-      <div class="form-control">
-        <label for="food">Food</label>
+      <div class="form-control flex-box">
+        <label class = "single-input-label" for="food">Food</label>
         <input
           id="food"
           name="food"
@@ -31,8 +32,8 @@
         />
       </div>
 
-      <div class="form-control">
-        <label for="entertainment">Entertainment</label>
+      <div class="form-control flex-box">
+        <label class = "single-input-label" for="entertainment">Entertainment</label>
         <input
           id="entertainment"
           name="entertainment"
@@ -42,8 +43,8 @@
         />
       </div>
 
-      <div class="form-control">
-        <label for="yearlyTravel">Yearly Travel</label>
+      <div class="form-control flex-box">
+        <label class = "single-input-label" for="yearlyTravel">Yearly Travel</label>
         <input
           id="yearlyTravel"
           name="yearlyTravel"
@@ -53,8 +54,8 @@
         />
       </div>
 
-      <div class="form-control">
-        <label for="ageHome">Age Home</label>
+      <div class="form-control flex-box">
+        <label class = "single-input-label" for="ageHome">Age Home</label>
         <input
           id="ageHome"
           name="ageHome"
@@ -64,8 +65,8 @@
         />
       </div>
 
-      <div class="form-control">
-        <label for="downpaymentSavings">Downpayment Savings</label>
+      <div class="form-control flex-box">
+        <label class = "single-input-label" for="downpaymentSavings">Downpayment Savings</label>
         <input
           id="downpaymentSavings"
           name="downpaymentSavings"
@@ -75,8 +76,8 @@
         />
       </div>
 
-      <div class="form-control">
-        <label for="mortgageRate">Mortgage Rate</label>
+      <div class="form-control flex-box">
+        <label class = "single-input-label" for="mortgageRate">Mortgage Rate</label>
         <input
           id="mortgageRate"
           name="mortgageRate"
@@ -87,8 +88,8 @@
         />
       </div>
 
-      <div class="form-control">
-        <label for="mortgageLength">Mortgage Length</label>
+      <div class="form-control flex-box">
+        <label class = "single-input-label" for="mortgageLength">Mortgage Length</label>
         <input
           id="mortgageLength"
           name="mortgageLength"
@@ -127,6 +128,8 @@
           v-model="additionalKid"
           id="ageOfKids"
           name="ageOfKids"
+          type="number"
+          @input="updateChangedFields('ageKids')"
         />
         <button
           class="saveButton saveAgeButton"
@@ -144,12 +147,12 @@
         <div
           v-for="(income, age) in incomeInc"
           :key="age"
-          style="display: flex; flex-shrink: 0; align-items: center"
+          class="flex-box"
         >
-          <label style="width: 3rem">Age</label>
+          <label class="ageIncomeLabel">Age</label>
           <input
             id="ageIncome"
-            style="width: 2rem"
+            class="ageIncomeValue"
             name="ageIncome"
             type="number"
             :value="age"
@@ -158,9 +161,9 @@
               incomeAge = age;
             "
           />
-          <label style="width: 4rem">Income</label>
+          <label class="valueIncomeLabel">Income</label>
           <input
-            style="width: 4rem"
+            class="incomeValue"
             id="ageIncome"
             name="ageIncome"
             type="number"
@@ -186,20 +189,20 @@
         </button>
         <div
           v-if="addingIncome"
-          style="display: flex; flex-shrink: 0; align-items: center"
+          class="flex-box"
         >
-          <label style="width: 3rem">Age</label>
+          <label class="ageIncomeLabel">Age</label>
           <input
             id="ageIncome"
-            style="width: 2rem"
+            class="ageIncomeValue"
             name="ageIncome"
             type="number"
             v-model="incomeAge"
             @input="updateChangedFields('incomeInc')"
           />
-          <label style="width: 4rem">Income</label>
+          <label class="valueIncomeLabel">Income</label>
           <input
-            style="width: 4rem"
+            class="incomeValue"
             id="ageIncome"
             name="ageIncome"
             type="number"
@@ -235,7 +238,7 @@
           Delete Scenario
         </button>
       </div>
-    </form>
+    </section>
   </section>
 </template>
 
@@ -358,13 +361,18 @@ export default {
     },
 
     updateChangedFields(field) {
-      this.changedFields.push(field);
+      if (!this.changedFields.includes(field)) {
+        this.changedFields.push(field);
+      }
     },
 
     submitAge() {
       this.ageKids.push(this.additionalKid);
       this.additionalKid = null;
       this.addingKid = false;
+
+      console.log("Just added a kid")
+      console.log(this.ageKids)
     },
 
     removeAge(index) {
@@ -395,8 +403,10 @@ export default {
     submitForm() {
       // build JSON of only the changed fields
       const patchValues = {};
+      console.log("yes submitting a form")
       for (const field of this.changedFields) {
-
+        console.log("Field on submissions")
+        console.log(this.$data[field])
         patchValues[field] = this.$data[field];
       }
       this.$emit("form-submitted", this.scenarioIndex, patchValues);
@@ -445,12 +455,39 @@ form {
   background-color: #0e0d0d;
 }
 
+.flex-box {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+}
+
+.single-input-label {
+  width: 20rem;
+  text-align: left;
+}
+
 .form-control {
   margin: 0.5rem 0;
 }
 
 label {
   font-weight: bold;
+}
+
+.ageIncomeLabel {
+  width: 3rem;
+}
+
+.valueIncomeLabel {
+  width: 4rem;
+}
+
+.ageIncomeValue {
+  width: 2rem;
+}
+
+.incomeValue {
+  width: 5rem;
 }
 
 h2 {

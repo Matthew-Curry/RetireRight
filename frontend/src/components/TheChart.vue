@@ -1,10 +1,94 @@
 <template>
-<section>
-</section>
+  <div >
+    <canvas id="the-chart"></canvas>
+  </div>
 </template>
 
 <script>
+import Chart from "chart.js";
+
 export default {
-    
-}
+  props: {
+    bestData: {
+      type: Array,
+      required: true,
+    },
+
+    worstData: {
+      type: Array,
+      required: true,
+    },
+
+    averageData: {
+      type: Array,
+      required: true,
+    },
+
+  },
+
+  data() {
+    return {
+      chartData: {
+        type: "scatter",
+        data: {
+          datasets: [
+            {
+              label: "Best",
+              data: null,
+              borderColor: "rgba(71, 183,132,.5)",
+              borderWidth: 3,
+              showLine: true,
+              fill:false
+            },
+            {
+              label: "worst",
+              data: null,
+              borderColor: "rgba(255, 76, 48, 1)",
+              borderWidth: 3,
+              showLine: true,
+              fill:false
+            },
+            {
+              label: "average",
+              data: null,
+              borderColor: "rgba(243, 225, 107)",
+              borderWidth: 3,
+              showLine: true,
+              fill:false
+            },
+          ],
+        },
+        options: {
+            scales: {
+                xAxes: [{
+                    type: 'linear'
+            }]
+            }
+        }
+      },
+    };
+  },
+
+  beforeMount() {
+    this.chartData.data.datasets[0].data = this.bestData;
+    this.chartData.data.datasets[1].data = this.worstData;
+    this.chartData.data.datasets[2].data = this.averageData;
+  },
+
+  mounted() {
+    const ctx = document.getElementById("the-chart");
+    console.log(this.chartData);
+    new Chart(ctx, this.chartData);
+  },
+};
 </script>
+
+<style>
+canvas {
+
+  width:70% !important;
+  height:600px !important;
+
+}
+
+</style>

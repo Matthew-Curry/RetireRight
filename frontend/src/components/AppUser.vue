@@ -2,7 +2,7 @@
   <section class="base">
     <h2>{{ username }}</h2>
     <div class="form-control">
-      <label for="localCurrentAge">Current Age </label>
+      <label for="localCurrentAge">Current Age</label>
       <input
         id="localCurrentAge"
         name="localCurrentAge"
@@ -13,35 +13,38 @@
     </div>
 
     <div class="form-control">
-      <label for="localRetirementAge">Retirement Age </label>
+      <label for="localRetirementAge">Retirement Age</label>
       <input
         id="localRetirementAge"
         name="localRetirementAge"
         type="number"
         v-model="localRetirementAge"
         @input="updateChangedFields('localRetirementAge')"
+        ref="localRetirementAge"
       />
     </div>
 
     <div class="form-control">
-      <label for="localPrinciple">Principle </label>
+      <label for="localPrinciple">Principle</label>
       <input
         id="localPrinciple"
         name="localPrinciple"
         type="number"
         v-model="localPrinciple"
         @input="updateChangedFields('localPrinciple')"
+        ref="localPrinciple"
       />
     </div>
 
     <div class="form-control">
-      <label for="localStockAllocation">Stock Allocation </label>
+      <label for="localStockAllocation">Stock Allocation</label>
       <input
         id="localStockAllocation"
         name="localStockAllocation"
         type="number"
         v-model="localStockAllocation"
         @input="updateChangedFields('localStockAllocation')"
+        ref="localStockAllocation"
       />
     </div>
     <button
@@ -85,7 +88,12 @@ export default {
     },
   },
 
-  emits: ["updated-stock-allocation", "updated-retirement-age", "updated-current-age", "updated-principle"],
+  emits: [
+    "updated-stock-allocation",
+    "updated-retirement-age",
+    "updated-current-age",
+    "updated-principle",
+  ],
 
   data() {
     return {
@@ -97,11 +105,11 @@ export default {
       changedFields: [],
       saveHovered: false,
       eventMap: {
-        "localStockAllocation": "updated-stock-allocation",
-        "localRetirementAge": "updated-retirement-age",
-        "localCurrentAge": "updated-current-age",
-        "localPrinciple": "updated-principle",
-      }
+        localStockAllocation: "updated-stock-allocation",
+        localRetirementAge: "updated-retirement-age",
+        localCurrentAge: "updated-current-age",
+        localPrinciple: "updated-principle",
+      },
     };
   },
 
@@ -114,7 +122,9 @@ export default {
 
   methods: {
     updateChangedFields(field) {
-      this.changedFields.push(field);
+      if (!this.changedFields.includes(field)) {
+        this.changedFields.push(field);
+      }
     },
 
     updateSaveHovered() {
@@ -123,22 +133,24 @@ export default {
 
     submitForm() {
       // emit events for each changed field
-      console.log("the changed fields")
-      console.log(this.changedFields)
       for (const field of this.changedFields) {
-        const eventName = this.eventMap[field]
-        const value = this.$data[field]
+        const eventName = this.eventMap[field];
+        const value = this.$data[field];
         this.$emit(eventName, value);
       }
 
       this.changedFields = [];
     },
-
   },
 };
 </script>
 
 <style scoped>
+label {
+  width: 10rem;
+  text-align: left;
+}
+
 .base {
   margin: 2rem auto;
   max-width: 30rem;
@@ -151,6 +163,9 @@ export default {
 
 .form-control {
   margin: 0.5rem 0;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
 }
 
 .saveButton {
