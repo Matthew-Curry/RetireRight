@@ -14,96 +14,112 @@
         <input
           id="rent"
           name="rent"
-          type="text"
+          type="number"
           v-model="rent"
           @input="updateChangedFields('rent')"
         />
       </div>
+
       <div class="form-control">
         <label for="food">Food</label>
         <input
           id="food"
           name="food"
-          type="text"
+          type="number"
           v-model="food"
           @input="updateChangedFields('food')"
         />
       </div>
+
       <div class="form-control">
         <label for="entertainment">Entertainment</label>
         <input
           id="entertainment"
           name="entertainment"
-          type="text"
+          type="number"
           v-model="entertainment"
           @input="updateChangedFields('entertainment')"
         />
       </div>
+
       <div class="form-control">
         <label for="yearlyTravel">Yearly Travel</label>
         <input
           id="yearlyTravel"
           name="yearlyTravel"
-          type="text"
+          type="number"
           v-model="yearlyTravel"
           @input="updateChangedFields('yearlyTravel')"
         />
       </div>
+
       <div class="form-control">
         <label for="ageHome">Age Home</label>
         <input
           id="ageHome"
           name="ageHome"
-          type="text"
+          type="number"
           v-model="ageHome"
           @input="updateChangedFields('ageHome')"
         />
       </div>
+
       <div class="form-control">
         <label for="downpaymentSavings">Downpayment Savings</label>
         <input
           id="downpaymentSavings"
           name="downpaymentSavings"
-          type="text"
+          type="number"
           v-model="downpaymentSavings"
           @input="updateChangedFields('downpaymentSavings')"
         />
       </div>
+
       <div class="form-control">
         <label for="mortgageRate">Mortgage Rate</label>
         <input
           id="mortgageRate"
           name="mortgageRate"
-          type="text"
+          type="number" 
+          step="0.01"
           v-model="mortgageRate"
           @input="updateChangedFields('mortgageRate')"
         />
       </div>
+
       <div class="form-control">
         <label for="mortgageLength">Mortgage Length</label>
         <input
           id="mortgageLength"
           name="mortgageLength"
-          type="text"
+          type="number"
           v-model="mortgageLength"
           @input="updateChangedFields('mortgageLength')"
         />
       </div>
+
       <div class="form-control">
         <label for="ageOfKids">Age of Having Child</label>
         <div v-for="(age, index) in ageKids" :key="index">
           <input
             id="ageOfKids"
             name="ageOfKids"
-            type="text"
+            type="number"
             v-model="ageKids[index]"
             @input="updateChangedFields('ageKids')"
           />
-          <button class="deleteButton deleteAgeButton" @click="removeAge(index)">
-            Remove Age
+          <button
+            class="deleteButton deleteAgeButton"
+            @click="removeAge(index)"
+          >
+            Remove age
           </button>
         </div>
-        <button class="saveButton saveAgeButton" v-if="addingKid === false" @click="addingKid = true">
+        <button
+          class="saveButton saveAgeButton"
+          v-if="addingKid === false"
+          @click="addingKid = true"
+        >
           Add age
         </button>
         <input
@@ -112,7 +128,92 @@
           id="ageOfKids"
           name="ageOfKids"
         />
-        <button class="saveButton saveAgeButton" v-if="addingKid" @click="submitAge">Submit age</button>
+        <button
+          class="saveButton saveAgeButton"
+          v-if="addingKid"
+          @click="submitAge"
+        >
+          Submit age
+        </button>
+      </div>
+
+      <div class="form-control">
+        <label for="ageIncome"
+          >Age of Income Increases. Please include current age.</label
+        >
+        <div
+          v-for="(income, age) in incomeInc"
+          :key="age"
+          style="display: flex; flex-shrink: 0; align-items: center"
+        >
+          <label style="width: 3rem">Age</label>
+          <input
+            id="ageIncome"
+            style="width: 2rem"
+            name="ageIncome"
+            type="number"
+            :value="age"
+            @input="
+              updateChangedFields('incomeInc');
+              incomeAge = age;
+            "
+          />
+          <label style="width: 4rem">Income</label>
+          <input
+            style="width: 4rem"
+            id="ageIncome"
+            name="ageIncome"
+            type="number"
+            :value="income"
+            @input="
+              updateChangedFields('incomeInc');
+              incomeValue = income;
+            "
+          />
+          <button
+            class="deleteButton deleteAgeButton"
+            @click="removeIncomeAge(age)"
+          >
+            Remove age
+          </button>
+        </div>
+        <button
+          class="saveButton saveAgeButton"
+          v-if="addingIncome === false"
+          @click="addingIncome = true"
+        >
+          Add age
+        </button>
+        <div
+          v-if="addingIncome"
+          style="display: flex; flex-shrink: 0; align-items: center"
+        >
+          <label style="width: 3rem">Age</label>
+          <input
+            id="ageIncome"
+            style="width: 2rem"
+            name="ageIncome"
+            type="number"
+            v-model="incomeAge"
+            @input="updateChangedFields('incomeInc')"
+          />
+          <label style="width: 4rem">Income</label>
+          <input
+            style="width: 4rem"
+            id="ageIncome"
+            name="ageIncome"
+            type="number"
+            v-model="incomeValue"
+            @input="updateChangedFields('incomeInc')"
+          />
+        </div>
+        <button
+          class="saveButton saveAgeButton"
+          v-if="addingIncome"
+          @click="submitIncome(age)"
+        >
+          Submit age
+        </button>
       </div>
       <div class="form-control">
         <button
@@ -166,18 +267,23 @@ export default {
       saveHovered: false,
       deleteHovered: false,
       addingKid: false,
+      addingIncome: false,
       additionalKid: null,
+      incomeAge: null,
+      incomeValue: null,
       changedFields: [],
 
       // attributes from the data prop
-      rent: 0,
-      food: 0,
-      entertainment: 0,
-      yearlyTravel: 0,
-      ageHome: 0,
-      downpaymentSavings: 0,
-      mortgageRate: 0,
-      mortgageLength: 0,
+      rent: null,
+      food: null,
+      entertainment: null,
+      yearlyTravel: null,
+      ageHome: null,
+      downpaymentSavings: null,
+      mortgageRate: null,
+      mortgageLength: null,
+      ageKids: null,
+      incomeInc: null,
     };
   },
 
@@ -190,7 +296,8 @@ export default {
     this.downpaymentSavings = this.sourceData.downpaymentSavings;
     this.mortgageRate = this.sourceData.mortgageRate;
     this.mortgageLength = this.sourceData.mortgageLength;
-    this.ageKids = this.sourceData.ageKids;
+    this.ageKids = [...this.sourceData.ageKids];
+    this.incomeInc = JSON.parse(JSON.stringify(this.sourceData.incomeInc));
   },
 
   computed: {
@@ -261,7 +368,24 @@ export default {
     },
 
     removeAge(index) {
-        this.ageKids.splice(index,1);
+      this.ageKids.splice(index, 1);
+    },
+
+    removeIncomeAge(age) {
+      delete this.incomeInc[age];
+    },
+
+    submitIncome(age) {
+      if (this.incomeAge) {
+        delete this.incomeInc[age];
+        this.incomeInc[this.incomeAge] = this.incomeValue;
+      } else {
+        this.incomeInc[age] = this.incomeValue;
+      }
+
+      this.incomeAge = null;
+      this.incomeValue = null;
+      this.addingIncome = false;
     },
 
     deleteScenario() {
@@ -271,7 +395,8 @@ export default {
     submitForm() {
       // build JSON of only the changed fields
       const patchValues = {};
-      for (let field in this.changedFields) {
+      for (const field of this.changedFields) {
+
         patchValues[field] = this.$data[field];
       }
       this.$emit("form-submitted", this.scenarioIndex, patchValues);
@@ -357,8 +482,8 @@ select {
 }
 
 .saveAgeButton {
-    font-size: 0.8rem;
-    padding: 0.25rem .7rem
+  font-size: 0.8rem;
+  padding: 0.25rem 0.7rem;
 }
 
 .darkSaveButton {
@@ -378,12 +503,24 @@ select {
 }
 
 .deleteAgeButton {
-    font-size: 0.8rem;
-    padding: 0.25rem .7rem
+  font-size: 0.8rem;
+  padding: 0.25rem 0.7rem;
 }
 
 .darkDeleteButton {
   border: 1px solid #68020a;
   background-color: #68020a;
+}
+
+div.settings {
+  display: grid;
+  grid-template-columns: max-content max-content;
+  grid-gap: 5px;
+}
+div.settings label {
+  text-align: right;
+}
+div.settings label:after {
+  content: ":";
 }
 </style>
