@@ -20,6 +20,7 @@
       </app-scenario>
     </ul>
     <chart></chart>
+    <button v-if="scenarios.length < 5" @click="addScenario">Add Scenario</button>
   </div>
 </template>
 
@@ -52,7 +53,8 @@ export default {
           downpaymentSavings: 0,
           mortgageRate: 0.06,
           mortgageLength: 15,
-          ageKids: [34, 35, 36]
+          ageKids: [34, 35, 36],
+          incomeInc: {"25": 120000, "30": 200000}
         },
         {
           percentSuccess: 0.8,
@@ -65,7 +67,8 @@ export default {
           downpaymentSavings: 0,
           mortgageRate: 0.06,
           mortgageLength: 15,
-          ageKids: [34, 35, 36]
+          ageKids: [34, 35, 36],
+          incomeInc: {"25": 120000, "30": 200000}
         },
         {
           percentSuccess: 0.9,
@@ -78,7 +81,8 @@ export default {
           downpaymentSavings: 0,
           mortgageRate: 0.06,
           mortgageLength: 15,
-          ageKids: [34, 35, 36]
+          ageKids: [34, 35, 36],
+          incomeInc: {"25": 120000, "30": 200000}
         },
         {
           percentSuccess: 0.95,
@@ -91,7 +95,8 @@ export default {
           downpaymentSavings: 0,
           mortgageRate: 0.06,
           mortgageLength: 15,
-          ageKids: [34, 35, 36]
+          ageKids: [34, 35, 36],
+          incomeInc: {"25": 120000, "30": 200000}
         },
         {
           percentSuccess: 0.4,
@@ -104,7 +109,8 @@ export default {
           downpaymentSavings: 0,
           mortgageRate: 0.06,
           mortgageLength: 15,
-          ageKids: [34, 35, 36]
+          ageKids: [34, 35, 36],
+          incomeInc: {"25": 120000, "30": 200000}
         },
       ],
     };
@@ -125,6 +131,27 @@ export default {
 
     deleteScenario(index) {
       this.scenarios.splice(index,1);
+    },
+
+    addScenario() {
+      this.scenarios.push(
+        {
+          percentSuccess: null,
+          rent: null,
+          food: null,
+          entertainment: null,
+          yearlyTravel: null,
+          ageHome: null,
+          homeCost: null,
+          downpaymentSavings: null,
+          mortgageRate: null,
+          mortgageLength: null,
+          ageKids: [],
+          incomeInc: {}
+        }
+      )
+
+      this.selectedScenarioIndex = this.scenarios.length -1
     }
   },
 };
@@ -138,5 +165,16 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+
+button {
+  font: inherit;
+  border: 1px solid #0076bb;
+  background-color: #0076bb;
+  color: white;
+  cursor: pointer;
+  padding: 0.75rem 2rem;
+  border-radius: 30px;
+  margin: 5px;
 }
 </style>
