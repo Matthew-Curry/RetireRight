@@ -1,60 +1,27 @@
 <template>
-  <div>
-    <h1>RetireRight</h1>
-    <h2>
-      Click on a scenario to see/change it and view the resulting net asset
-      growth in the chart.
-    </h2>
-    <div style="float: right">
-      <user
-        :username="user.username"
-        :stockAllocation="user.stockAllocation"
-        :retirementAge="user.retirementAge"
-        :currentAge="user.currentAge"
-        :principle="user.principle"
-        @updated-stock-allocation="updateUserStockAllocation"
-        @updated-retirement-age="updateUserRetirementAge"
-        @updated-current-age="updateUserCurrentAge"
-        @updated-principle="updateUserPrinciple"
-      ></user>
+  <main>
+    <nav>
       <ul>
-          <app-scenario
-            v-for="(sourceData, index) in scenarios"
-            :key="index"
-            @selected="updateSelectedScenario"
-            @form-submitted="patchScenario"
-            @deleted="deleteScenario"
-            :scenarioIndex="index"
-            :isSelected="index === selectedScenarioIndex"
-            :sourceData="sourceData"
-          >
-          </app-scenario>
+        <li>
+          <router-link to="/">Main</router-link>
+        </li>
+        <li>
+          <router-link to="/scenarios">Scenarios</router-link>
+        </li>
+        <li>
+          <router-link to="/about">About</router-link>
+        </li>
       </ul>
-    </div>
-    <chart
-      :bestData="bestData"
-      :worstData="worstData"
-      :averageData="averageData"
-    ></chart>
-    <button v-if="scenarios.length < 5" @click="addScenario">
-      Add Scenario
-    </button>
-  </div>
+    </nav>
+    <router-view></router-view>
+  </main>
 </template>
 
 <script>
-import AppScenario from "./components/AppScenario.vue";
-import AppUser from "./components/AppUser.vue";
-import TheChart from "./components/TheChart.vue";
+import { computed } from 'vue'
 
 export default {
   name: "App",
-
-  components: {
-    "app-scenario": AppScenario,
-    user: AppUser,
-    chart: TheChart,
-  },
 
   data() {
     return {
@@ -64,11 +31,6 @@ export default {
         retirementAge: 55,
         currentAge: 25,
         principle: 3000,
-        years: [
-          0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-          20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36,
-          37, 38, 39,
-        ],
       },
 
       selectedScenarioIndex: 0,
@@ -85,7 +47,7 @@ export default {
           mortgageRate: 0.06,
           mortgageLength: 15,
           ageKids: [34, 35, 36],
-          incomeInc: { 25: 120000, 30: 200000 },
+          incomeInc: { "25": 120000, "30": 200000 },
           average: [
             { x: 0, y: 95558.81 },
             { x: 1, y: 142808.22 },
@@ -299,7 +261,7 @@ export default {
 
       alert("Scenario updated!");
 
-      console.log(this.scenarios)
+      console.log(this.scenarios);
     },
 
     deleteScenario(index) {
@@ -341,6 +303,27 @@ export default {
       this.user.principle = newVal;
     },
   },
+
+  provide() {
+    return {
+      user: computed(() => this.user),
+      updateUserStockAllocation: this.updateUserStockAllocation,
+      updateUserRetirementAge: this.updateUserRetirementAge,
+      updateUserCurrentAge: this.updateUserCurrentAge,
+      updateUserPrinciple: this.updateUserPrinciple,
+
+      bestData: computed(() => this.bestData),
+      worstData: computed(() => this.worstData),
+      averageData: computed(() => this.averageData),
+
+      scenarios: computed(() => this.scenarios),
+      updateSelectedScenario: this.updateSelectedScenario,
+      patchScenario: this.patchScenario,
+      deleteScenario: this.deleteScenario,
+      selectedScenarioIndex: computed(() => this.selectedScenarioIndex),
+      addScenario: this.addScenario,
+    };
+  },
 };
 </script>
 
@@ -364,4 +347,10 @@ button {
   border-radius: 30px;
   margin: 5px;
 }
+
+li {
+  display: inline-block;
+  margin-left: 5rem;
+}
 </style>
+

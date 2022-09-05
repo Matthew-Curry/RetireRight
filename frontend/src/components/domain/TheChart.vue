@@ -1,5 +1,5 @@
 <template>
-  <div >
+  <div>
     <canvas id="the-chart"></canvas>
   </div>
 </template>
@@ -23,7 +23,6 @@ export default {
       type: Array,
       required: true,
     },
-
   },
 
   data() {
@@ -38,33 +37,57 @@ export default {
               borderColor: "rgba(71, 183,132,.5)",
               borderWidth: 3,
               showLine: true,
-              fill:false
+              fill: false,
             },
             {
-              label: "worst",
+              label: "Worst",
               data: null,
               borderColor: "rgba(255, 76, 48, 1)",
               borderWidth: 3,
               showLine: true,
-              fill:false
+              fill: false,
             },
             {
-              label: "average",
+              label: "Average",
               data: null,
               borderColor: "rgba(243, 225, 107)",
               borderWidth: 3,
+              maxHeight: 40,
               showLine: true,
-              fill:false
+              fill: false,
             },
           ],
         },
         options: {
-            scales: {
-                xAxes: [{
-                    type: 'linear'
-            }]
-            }
-        }
+          scales: {
+            yAxes: [
+              {
+                scaleLabel: {
+                  display: true,
+                  labelString: "Net Worth",
+                  fontSize: 40,
+                },
+              },
+            ],
+            xAxes: [
+              {
+                scaleLabel: {
+                  display: true,
+                  labelString: "Years Until Retirement",
+                  fontSize: 40,
+                },
+              },
+            ],
+          },
+          legend: {
+            display: true,
+            position: "top",
+            labels: {
+              fontFamily: "Comic Sans MS",
+              fontSize: 25,
+            },
+          },
+        },
       },
     };
   },
@@ -85,10 +108,7 @@ export default {
 
 <style>
 canvas {
-
-  width:70% !important;
-  height:600px !important;
-
+  width: 75% !important;
+  height: 600px !important;
 }
-
 </style>

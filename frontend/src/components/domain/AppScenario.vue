@@ -145,29 +145,19 @@
           >Age of Income Increases. Please include current age.</label
         >
         <div
-          v-for="(income, age) in incomeInc"
+          v-for="(imcome, age) in incomeInc"
           :key="age"
           class="flex-box"
         >
           <label class="ageIncomeLabel">Age</label>
-          <input
-            id="ageIncome"
-            class="ageIncomeValue"
-            name="ageIncome"
-            type="number"
-            :value="age"
-            @input="
-              updateChangedFields('incomeInc');
-              incomeAge = age;
-            "
-          />
+          <p>{{age}} </p>
           <label class="valueIncomeLabel">Income</label>
           <input
             class="incomeValue"
             id="ageIncome"
             name="ageIncome"
             type="number"
-            :value="income"
+            v-model="incomeInc[age]"
             @input="
               updateChangedFields('incomeInc');
               incomeValue = income;
@@ -339,6 +329,7 @@ export default {
 
   methods: {
     select() {
+      console.log("Selected")
       if (!this.isSelected) {
         this.$emit("selected", this.scenarioIndex);
       }
@@ -404,6 +395,7 @@ export default {
       // build JSON of only the changed fields
       const patchValues = {};
       console.log("yes submitting a form")
+      console.log(this.changedFields)
       for (const field of this.changedFields) {
         console.log("Field on submissions")
         console.log(this.$data[field])
