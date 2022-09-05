@@ -2,9 +2,9 @@ import { createApp } from 'vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
 import App from './App.vue'
-import MainPage from "./components/pages/MainPage.vue";
-import ScenarioPage from "./components/pages/ScenarioPage.vue";
-import AboutPage from "./components/pages/AboutPage.vue";
+import MainPage from "./views/MainPage.vue";
+import ScenarioPage from "./views/ScenarioPage.vue";
+import AboutPage from "./views/AboutPage.vue";
 
 const app = createApp(App);
 

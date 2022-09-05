@@ -100,7 +100,6 @@ export default {
 
   mounted() {
     const ctx = document.getElementById("the-chart");
-    console.log(this.chartData);
     new Chart(ctx, this.chartData);
   },
 };

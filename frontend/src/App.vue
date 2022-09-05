@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { computed } from 'vue'
+import { computed } from "vue";
 
 export default {
   name: "App",
@@ -47,7 +47,7 @@ export default {
           mortgageRate: 0.06,
           mortgageLength: 15,
           ageKids: [34, 35, 36],
-          incomeInc: { "25": 120000, "30": 200000 },
+          incomeInc: { 25: 120000, 30: 200000 },
           average: [
             { x: 0, y: 95558.81 },
             { x: 1, y: 142808.22 },
@@ -188,6 +188,23 @@ export default {
           mortgageLength: 15,
           ageKids: [34, 35, 36],
           incomeInc: { 25: 120000, 30: 200000 },
+          average: [
+            { x: 37, y: 351410432.35 },
+            { x: 38, y: 378755349.58 },
+            { x: 39, y: 453894292.9 },
+          ],
+          worst: [
+            { x: 29, y: 80470096.89 },
+            { x: 30, y: 96034523.12 },
+            { x: 31, y: 132532815.51 },
+            { x: 32, y: 198159734.33 },
+          ],
+          best: [
+            { x: 21, y: 13379783.62 },
+            { x: 22, y: 19023405.36 },
+            { x: 23, y: 22674820.05 },
+            { x: 24, y: 22641138.97 },
+          ],
         },
         {
           percentSuccess: 0.9,
@@ -260,8 +277,6 @@ export default {
       }
 
       alert("Scenario updated!");
-
-      console.log(this.scenarios);
     },
 
     deleteScenario(index) {
@@ -315,6 +330,9 @@ export default {
       bestData: computed(() => this.bestData),
       worstData: computed(() => this.worstData),
       averageData: computed(() => this.averageData),
+      //bestData: this.bestData,
+      //worstData: this.worstData,
+      //averageData: this.averageData,
 
       scenarios: computed(() => this.scenarios),
       updateSelectedScenario: this.updateSelectedScenario,

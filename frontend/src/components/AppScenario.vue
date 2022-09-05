@@ -9,79 +9,93 @@
     <h2>Scenario {{ scenarioNumber }}</h2>
     <h3 id="percentage" :class="percentCSSClass">{{ percentSuccess }}</h3>
     <section v-if="isSelected">
-
       <div class="form-control flex-box">
-        <label class = "single-input-label" for="rent">Rent</label>
+        <label class="single-input-label" for="rent">Rent</label>
         <input
           id="rent"
           name="rent"
           type="number"
+          min="0"
           v-model="rent"
           @input="updateChangedFields('rent')"
         />
       </div>
 
       <div class="form-control flex-box">
-        <label class = "single-input-label" for="food">Food</label>
+        <label class="single-input-label" for="food">Food</label>
         <input
           id="food"
           name="food"
           type="number"
+          min="0"
           v-model="food"
           @input="updateChangedFields('food')"
         />
       </div>
 
       <div class="form-control flex-box">
-        <label class = "single-input-label" for="entertainment">Entertainment</label>
+        <label class="single-input-label" for="entertainment"
+          >Entertainment</label
+        >
         <input
           id="entertainment"
           name="entertainment"
           type="number"
+          min="0"
           v-model="entertainment"
           @input="updateChangedFields('entertainment')"
         />
       </div>
 
       <div class="form-control flex-box">
-        <label class = "single-input-label" for="yearlyTravel">Yearly Travel</label>
+        <label class="single-input-label" for="yearlyTravel"
+          >Yearly Travel</label
+        >
         <input
           id="yearlyTravel"
           name="yearlyTravel"
           type="number"
+          min="0"
           v-model="yearlyTravel"
           @input="updateChangedFields('yearlyTravel')"
         />
       </div>
 
       <div class="form-control flex-box">
-        <label class = "single-input-label" for="ageHome">Age Home</label>
+        <label class="single-input-label" for="ageHome">Age Home</label>
         <input
           id="ageHome"
           name="ageHome"
           type="number"
+          min="0"
+          step="1"
           v-model="ageHome"
           @input="updateChangedFields('ageHome')"
         />
       </div>
 
       <div class="form-control flex-box">
-        <label class = "single-input-label" for="downpaymentSavings">Downpayment Savings</label>
+        <label class="single-input-label" for="downpaymentSavings"
+          >Downpayment Savings</label
+        >
         <input
           id="downpaymentSavings"
           name="downpaymentSavings"
           type="number"
+          min="0"
           v-model="downpaymentSavings"
           @input="updateChangedFields('downpaymentSavings')"
         />
       </div>
 
       <div class="form-control flex-box">
-        <label class = "single-input-label" for="mortgageRate">Mortgage Rate</label>
+        <label class="single-input-label" for="mortgageRate"
+          >Mortgage Rate</label
+        >
         <input
           id="mortgageRate"
           name="mortgageRate"
-          type="number" 
+          type="number"
           step="0.01"
           v-model="mortgageRate"
           @input="updateChangedFields('mortgageRate')"
@@ -89,11 +103,14 @@
       </div>
 
       <div class="form-control flex-box">
-        <label class = "single-input-label" for="mortgageLength">Mortgage Length</label>
+        <label class="single-input-label" for="mortgageLength"
+          >Mortgage Length</label
+        >
         <input
           id="mortgageLength"
           name="mortgageLength"
           type="number"
+          min="0"
           v-model="mortgageLength"
           @input="updateChangedFields('mortgageLength')"
         />
@@ -106,6 +123,8 @@
             id="ageOfKids"
             name="ageOfKids"
             type="number"
+            min="0"
+            step="1"
             v-model="ageKids[index]"
             @input="updateChangedFields('ageKids')"
           />
@@ -129,6 +148,8 @@
           id="ageOfKids"
           name="ageOfKids"
           type="number"
+          min="0"
+          step="1"
           @input="updateChangedFields('ageKids')"
         />
         <button
@@ -144,19 +165,16 @@
         <label for="ageIncome"
           >Age of Income Increases. Please include current age.</label
         >
-        <div
-          v-for="(imcome, age) in incomeInc"
-          :key="age"
-          class="flex-box"
-        >
+        <div v-for="(imcome, age) in incomeInc" :key="age" class="flex-box">
           <label class="ageIncomeLabel">Age</label>
-          <p>{{age}} </p>
+          <p>{{ age }}</p>
           <label class="valueIncomeLabel">Income</label>
           <input
             class="incomeValue"
             id="ageIncome"
             name="ageIncome"
             type="number"
+            min="0"
             v-model="incomeInc[age]"
             @input="
               updateChangedFields('incomeInc');
@@ -177,10 +195,7 @@
         >
           Add age
         </button>
-        <div
-          v-if="addingIncome"
-          class="flex-box"
-        >
+        <div v-if="addingIncome" class="flex-box">
           <label class="ageIncomeLabel">Age</label>
           <input
             id="ageIncome"
@@ -247,6 +262,11 @@ export default {
 
     sourceData: {
       type: Object,
+      required: true,
+    },
+
+    currentAge: {
+      type: Number,
       required: true,
     },
   },
@@ -329,7 +349,6 @@ export default {
 
   methods: {
     select() {
-      console.log("Selected")
       if (!this.isSelected) {
         this.$emit("selected", this.scenarioIndex);
       }
@@ -361,9 +380,6 @@ export default {
       this.ageKids.push(this.additionalKid);
       this.additionalKid = null;
       this.addingKid = false;
-
-      console.log("Just added a kid")
-      console.log(this.ageKids)
     },
 
     removeAge(index) {
@@ -391,14 +407,69 @@ export default {
       this.$emit("deleted", this.scenarioIndex);
     },
 
+    validateFailure() {
+      if (this.rent < 0) {
+        return "Rent cannot be negative.";
+      }
+
+      if (this.entertainment < 0) {
+        return "Entertainment spending cannot be negative.";
+      }
+
+      if (this.food < 0) {
+        return "Food spending cannot be negative.";
+      }
+
+      if (this.yearlyTravel < 0) {
+        return "Yearly travel spending cannot be negative.";
+      }
+
+      if (this.downpaymentSavings < 0) {
+        return "Downpayment savings cannot be negative.";
+      }
+
+      if (this.mortgageRate < 0) {
+        return "Mortgage rate cannot be negative.";
+      }
+
+      if (this.mortgageRate > 1) {
+        return "Mortgage rate cannot be greater than 1.";
+      }
+
+      if (this.mortgageLength < 0) {
+        return "Mortgage length cannot be negative.";
+      }
+
+      if (this.ageHome < 0) {
+        return "Age of home purchase cannot be negative.";
+      }
+
+      if (this.ageHome < this.currentAge) {
+        return "Age of home purchase cannot be smaller than the current age.";
+      }
+
+      for (const age of this.ageKids) {
+        if (age < this.currentAge) {
+          return "No age of having a child can exceed the user's current age.";
+        }
+      }
+
+      for (const age of Object.keys(this.incomeInc)) {
+        if (age < this.currentAge) {
+          return "No age of an income increase can exceed the user's current age.";
+        }
+      }
+    },
+
     submitForm() {
+      const msg = this.validateFailure();
+      if (msg) {
+        alert(msg);
+        return;
+      }
       // build JSON of only the changed fields
       const patchValues = {};
-      console.log("yes submitting a form")
-      console.log(this.changedFields)
       for (const field of this.changedFields) {
-        console.log("Field on submissions")
-        console.log(this.$data[field])
         patchValues[field] = this.$data[field];
       }
       this.$emit("form-submitted", this.scenarioIndex, patchValues);

@@ -7,6 +7,8 @@
         id="localCurrentAge"
         name="localCurrentAge"
         type="number"
+        min="0"
+        step="1"
         v-model="localCurrentAge"
         @input="updateChangedFields('localCurrentAge')"
       />
@@ -18,6 +20,8 @@
         id="localRetirementAge"
         name="localRetirementAge"
         type="number"
+        min="0"
+        step="1"
         v-model="localRetirementAge"
         @input="updateChangedFields('localRetirementAge')"
         ref="localRetirementAge"
@@ -30,6 +34,8 @@
         id="localPrinciple"
         name="localPrinciple"
         type="number"
+        min="0"
+        step="1"
         v-model="localPrinciple"
         @input="updateChangedFields('localPrinciple')"
         ref="localPrinciple"
@@ -42,6 +48,9 @@
         id="localStockAllocation"
         name="localStockAllocation"
         type="number"
+        min="0"
+        step="0.01"
+        max="1"
         v-model="localStockAllocation"
         @input="updateChangedFields('localStockAllocation')"
         ref="localStockAllocation"
@@ -127,11 +136,42 @@ export default {
       }
     },
 
+    validateFailure() {
+      if (this.localStockAllocation < 0) {
+        return "Stock allocation cannot be negative.";
+      }
+
+      if (this.localStockAllocation > 1) {
+        return "Stock allocation cannot exceed 1.";
+      }
+
+      if (this.localRetirementAge <= 0) {
+        return "Retirement age must be greater than 0.";
+      }
+
+      if (this.localCurrentAge <= 0) {
+        return "Current age must be greater than 0.";
+      }
+
+      if (this.localPrinciple < 0) {
+        return "Investment principle cannot be negative.";
+      }
+
+      if (this.localRetirementAge < this.localCurrentAge) {
+        return "Retirement age must be greater than current age";
+      }
+    },
+
     updateSaveHovered() {
       this.saveHovered = !this.saveHovered;
     },
 
     submitForm() {
+      const msg = this.validateFailure();
+      if (msg) {
+        alert(msg);
+        return;
+      }
       // emit events for each changed field
       for (const field of this.changedFields) {
         const eventName = this.eventMap[field];

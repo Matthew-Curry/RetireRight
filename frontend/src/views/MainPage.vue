@@ -2,9 +2,10 @@
   <div>
     <h1>RetireRight</h1>
     <p>
-      Select a scenario to view the resulting net asset growth in the chart. Select "Scenarios" to
-      view, edit, and add scenarios, as well as to see the probability of success for each. More information
-      can be found on the "About" page.
+      Select a scenario to view the resulting net asset growth in the chart.
+      Select "Scenarios" to view, edit, and add scenarios, as well as to see the
+      probability of success for each. More information can be found on the
+      "About" page.
     </p>
     <div style="float: right">
       <user
@@ -18,8 +19,19 @@
         @updated-current-age="updateUserCurrentAge"
         @updated-principle="updateUserPrinciple"
       ></user>
+      <label id="dropdown" for="scenarios">Choose a Scenario:</label>
+      <select :value="selectedScenarioIndex.value" name="scenarios" id="scenarios" @change="updateSelectedScenario(parseInt($event.target.value))">
+        <option
+          v-for="(sourceData, index) in scenarios.value"
+          :key="index"
+          :value="index"
+        >
+          Scenario {{ index + 1 }}
+        </option>
+      </select>
     </div>
     <chart
+      :key="selectedScenarioIndex.value"
       :bestData="bestData.value"
       :worstData="worstData.value"
       :averageData="averageData.value"
@@ -28,18 +40,21 @@
 </template>
 
 <script>
-import AppUser from "../domain/AppUser.vue";
-import TheChart from "../domain/TheChart.vue";
+import AppUser from "../components/AppUser.vue";
+import TheChart from "../components/TheChart.vue";
 
 export default {
   name: "App",
 
   components: {
-    'user': AppUser,
-    'chart': TheChart,
+    user: AppUser,
+    chart: TheChart,
   },
 
   inject: [
+    "scenarios",
+    "updateSelectedScenario",
+    "selectedScenarioIndex",
     "user",
     "updateUserStockAllocation",
     "updateUserRetirementAge",
@@ -52,3 +67,12 @@ export default {
   ],
 };
 </script>
+
+<style scoped>
+#dropdown {
+  font-size: 1.5em;
+}
+
+
+
+</style>
