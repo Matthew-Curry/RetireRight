@@ -39,7 +39,7 @@ export const router = createRouter({
         },
         {
             path: '/login', beforeEnter(to, from, next) {
-                auth.auth.getSession();
+                auth.login();
             }
         },
 
