@@ -23,8 +23,7 @@ var authData = {
 var auth = new CognitoAuth(authData);
 
 auth.userhandler = {
-    onSuccess: function (result) {
-        console.log("On Success result", result);
+    onSuccess: function () {
         userInfoStore.setLoggedIn(true);
         getUserInfo().then(response => {
             router.push('/')
