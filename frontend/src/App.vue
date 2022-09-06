@@ -1,5 +1,5 @@
 <template>
-  <main>
+  <main v-if="renderPage">
     <nav>
       <ul>
         <li>
@@ -17,28 +17,21 @@
       </ul>
     </nav>
     <router-view></router-view>
-    <h1> APP {{ userInfo }}</h1>
   </main>
 </template>
 
 <script>
 import { computed } from "vue";
-import UserInfoStore from './cognito/user-info-store';
+import apiCon from "./api/apiService";
+import auth from "./cognito/auth";
 
 export default {
   name: "App",
 
   data() {
     return {
-      userInfo: UserInfoStore.state,
-      user: {
-        username: "Matt",
-        stockAllocation: 0.7,
-        retirementAge: 55,
-        currentAge: 25,
-        principle: 3000,
-      },
-
+      user: null,
+      renderPage: false,
       selectedScenarioIndex: 0,
       scenarios: [
         {
@@ -270,85 +263,124 @@ export default {
     averageData() {
       return this.scenarios[this.selectedScenarioIndex].average;
     },
+
+    currentRouteName() {
+      console.log("CURRENT REOUTE NAME");
+      console.log(this.$router.currentRoute.path);
+      return this.$router.currentRoute.path;
+    },
   },
 
-  methods: {
-    updateSelectedScenario(newIndex) {
-      this.selectedScenarioIndex = newIndex;
-    },
-
-    patchScenario(index, patchValues) {
-      for (let field in patchValues) {
-        this.scenarios[index][field] = patchValues[field];
+  watch: {
+    '$route' (to, from) {
+      console.log('IN THE WATCHER')
+      if (to.fullPath === "/" && to.fullPath === from.fullPath) {
+        console.log('IN THE IF')
+        this.updateUserData();
       }
-
-      alert("Scenario updated!");
-    },
-
-    deleteScenario(index) {
-      this.scenarios.splice(index, 1);
-    },
-
-    addScenario() {
-      this.scenarios.push({
-        percentSuccess: null,
-        rent: null,
-        food: null,
-        entertainment: null,
-        yearlyTravel: null,
-        ageHome: null,
-        homeCost: null,
-        downpaymentSavings: null,
-        mortgageRate: null,
-        mortgageLength: null,
-        ageKids: [],
-        incomeInc: {},
-      });
-
-      this.selectedScenarioIndex = this.scenarios.length - 1;
-    },
-
-    updateUserStockAllocation(newVal) {
-      this.user.stockAllocation = newVal;
-    },
-
-    updateUserRetirementAge(newVal) {
-      this.user.retirementAge = newVal;
-    },
-
-    updateUserCurrentAge(newVal) {
-      this.user.currentAge = newVal;
-    },
-
-    updateUserPrinciple(newVal) {
-      this.user.principle = newVal;
-    },
+    }
   },
 
-  provide() {
-    return {
-      user: computed(() => this.user),
-      updateUserStockAllocation: this.updateUserStockAllocation,
-      updateUserRetirementAge: this.updateUserRetirementAge,
-      updateUserCurrentAge: this.updateUserCurrentAge,
-      updateUserPrinciple: this.updateUserPrinciple,
+     mounted() {
+      if(auth.isTokenHere()) {
+        this.refreshData();
+      }
+    },
 
-      bestData: computed(() => this.bestData),
-      worstData: computed(() => this.worstData),
-      averageData: computed(() => this.averageData),
-      //bestData: this.bestData,
-      //worstData: this.worstData,
-      //averageData: this.averageData,
+    methods: {
 
-      scenarios: computed(() => this.scenarios),
-      updateSelectedScenario: this.updateSelectedScenario,
-      patchScenario: this.patchScenario,
-      deleteScenario: this.deleteScenario,
-      selectedScenarioIndex: computed(() => this.selectedScenarioIndex),
-      addScenario: this.addScenario,
-    };
-  },
-};
+      refreshData() {
+        this.updateUserData();
+        this.renderPage = true;
+      },
+
+      updateUserData() {
+        console.log("CURRENT PATH");
+        console.log(console.log(this.$router.currentRoute.path));
+        apiCon.getUser().then((data) => {
+          this.user = data;
+
+          if ("stockAllocation" in this.user) {
+            this.user.stockAllocation = parseFloat(this.user.stockAllocation);
+          }
+          console.log("THIS IS THE USER");
+          console.log(this.user);
+        });
+      },
+
+      updateSelectedScenario(newIndex) {
+        this.selectedScenarioIndex = newIndex;
+      },
+
+      patchScenario(index, patchValues) {
+        for (let field in patchValues) {
+          this.scenarios[index][field] = patchValues[field];
+        }
+
+        alert("Scenario updated!");
+      },
+
+      deleteScenario(index) {
+        this.scenarios.splice(index, 1);
+      },
+
+      addScenario() {
+        this.scenarios.push({
+          percentSuccess: null,
+          rent: null,
+          food: null,
+          entertainment: null,
+          yearlyTravel: null,
+          ageHome: null,
+          homeCost: null,
+          downpaymentSavings: null,
+          mortgageRate: null,
+          mortgageLength: null,
+          ageKids: [],
+          incomeInc: {},
+        });
+
+        this.selectedScenarioIndex = this.scenarios.length - 1;
+      },
+
+      updateUserStockAllocation(newVal) {
+        this.user.stockAllocation = newVal;
+      },
+
+      updateUserRetirementAge(newVal) {
+        this.user.retirementAge = newVal;
+      },
+
+      updateUserCurrentAge(newVal) {
+        this.user.currentAge = newVal;
+      },
+
+      updateUserPrinciple(newVal) {
+        this.user.principle = newVal;
+      },
+    },
+
+    provide() {
+      return {
+        user: computed(() => this.user),
+        updateUserStockAllocation: this.updateUserStockAllocation,
+        updateUserRetirementAge: this.updateUserRetirementAge,
+        updateUserCurrentAge: this.updateUserCurrentAge,
+        updateUserPrinciple: this.updateUserPrinciple,
+
+        bestData: computed(() => this.bestData),
+        worstData: computed(() => this.worstData),
+        averageData: computed(() => this.averageData),
+
+        scenarios: computed(() => this.scenarios),
+        updateSelectedScenario: this.updateSelectedScenario,
+        patchScenario: this.patchScenario,
+        deleteScenario: this.deleteScenario,
+        selectedScenarioIndex: computed(() => this.selectedScenarioIndex),
+        addScenario: this.addScenario,
+      };
+    },
+  };
 </script>
 
 <style>

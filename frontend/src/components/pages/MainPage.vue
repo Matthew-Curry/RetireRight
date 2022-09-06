@@ -9,7 +9,7 @@
     </p>
     <div style="float: right">
       <user
-        :username="user.value.username"
+        :username="user.value.UserName"
         :stockAllocation="user.value.stockAllocation"
         :retirementAge="user.value.retirementAge"
         :currentAge="user.value.currentAge"
@@ -36,7 +36,6 @@
       :worstData="worstData.value"
       :averageData="averageData.value"
     ></chart>
-    <h1>{{ userInfo }}</h1>
   </div>
 </template>
 

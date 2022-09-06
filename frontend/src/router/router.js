@@ -1,14 +1,14 @@
 /* eslint-disable */
 import { createRouter, createWebHistory } from 'vue-router';
 
-import auth  from './cognito/auth';
-import UserInfoStore from './cognito/user-info-store';
+import auth  from '../cognito/auth';
+import UserInfoStore from '../cognito/user-info-store';
 
-import MainPage from "./components/pages/MainPage.vue";
-import ScenarioPage from "./components/pages/ScenarioPage.vue";
-import AboutPage from "./components/pages/AboutPage.vue";
-import LogoutSuccess from "./components/pages/LogoutSuccess.vue";
-import ErrorPage from "./components/pages/ErrorPage.vue";
+import MainPage from "../components/pages/MainPage.vue";
+import ScenarioPage from "../components/pages/ScenarioPage.vue";
+import AboutPage from "../components/pages/AboutPage.vue";
+import LogoutSuccess from "../components/pages/LogoutSuccess.vue";
+import ErrorPage from "../components/pages/ErrorPage.vue";
 
 
 function requireAuth(to, from, next) {
@@ -69,8 +69,8 @@ export const router = createRouter({
         },
 
         {
-            path: '/about', component: AboutPage,
-            beforeEnter: requireAuth
+            path: '/about', 
+            component: AboutPage
         },
     ]
 });

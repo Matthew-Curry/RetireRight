@@ -4,14 +4,16 @@
     </div>
 </template>
 <script>
+
 export default {
     name: "App",
     
-    data: function(){
+    data() {
         return {
             message: ""
         }
     },
+    
     mounted(){
         this.message = this.$route.query.message;
     }

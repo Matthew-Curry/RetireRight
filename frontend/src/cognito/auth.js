@@ -1,6 +1,6 @@
 /* eslint-disable */
 import { CognitoAuth, StorageHelper } from 'amazon-cognito-auth-js';
-import { router } from '../router';
+import { router } from '../router/router';
 import userInfoStore from './user-info-store';
 
 const CLIENT_ID = process.env.VUE_APP_COGNITO_CLIENT_ID;
@@ -25,7 +25,13 @@ var auth = new CognitoAuth(authData);
 auth.userhandler = {
     onSuccess: function () {
         userInfoStore.setLoggedIn(true);
-        router.push('/')
+        getUserInfo().then(response => {
+            console.log('THE RESPONSE')
+            console.log(response)
+            console.log('THE TOKEN')
+            console.log(auth.getSignInUserSession().getIdToken().jwtToken)
+            router.push('/')
+        })
     },
 
     onFailure: function (err) {
@@ -69,13 +75,30 @@ export default {
     login() {
         auth.getSession();
     },
+    //sillyTest() {},
     logout() {
+        console.log("1")
         if (auth.isUserSignedIn()) {
+            console.log("2")
             var userInfoKey = this.getUserInfoStorageKey();
+            console.log("3")
             auth.signOut();
+        //    console.log("4")
 
             storage.removeItem(userInfoKey);
+        //    console.log("5")
+        //} else{
+        //    console.log('USER NOT SIGNED IN')
         }
+    },
+
+    isTokenHere() {
+        if(auth.getSignInUserSession().getIdToken().jwtToken) {
+            console.log("RETURNING TRUE")
+            return true;
+        }
+        console.log("RETURNING FALSE")
+        return false;
     },
     getUserInfoStorageKey,
     getUserInfo
