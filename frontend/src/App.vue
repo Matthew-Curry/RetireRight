@@ -11,20 +11,26 @@
         <li>
           <router-link to="/about">About</router-link>
         </li>
+        <li>
+          <router-link to="/logout">Logout</router-link>
+        </li>
       </ul>
     </nav>
     <router-view></router-view>
+    <h1> APP {{ userInfo }}</h1>
   </main>
 </template>
 
 <script>
 import { computed } from "vue";
+import UserInfoStore from './cognito/user-info-store';
 
 export default {
   name: "App",
 
   data() {
     return {
+      userInfo: UserInfoStore.state,
       user: {
         username: "Matt",
         stockAllocation: 0.7,

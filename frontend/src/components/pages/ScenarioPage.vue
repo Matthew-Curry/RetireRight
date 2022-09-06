@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import AppScenario from "../components/AppScenario.vue";
+import AppScenario from "../core/AppScenario.vue";
 
 export default {
   name: "App",

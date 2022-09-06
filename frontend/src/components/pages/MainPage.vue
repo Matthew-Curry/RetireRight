@@ -36,15 +36,24 @@
       :worstData="worstData.value"
       :averageData="averageData.value"
     ></chart>
+    <h1>{{ userInfo }}</h1>
   </div>
 </template>
 
 <script>
-import AppUser from "../components/AppUser.vue";
-import TheChart from "../components/TheChart.vue";
+import AppUser from "../core/AppUser.vue";
+import TheChart from "../core/TheChart.vue";
+
+import UserInfoStore from '../../cognito/user-info-store';
 
 export default {
   name: "App",
+
+  data() {
+    return {
+      userInfo: UserInfoStore.state,
+    }
+  },
 
   components: {
     user: AppUser,
