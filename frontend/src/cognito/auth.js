@@ -25,9 +25,7 @@ var auth = new CognitoAuth(authData);
 auth.userhandler = {
     onSuccess: function () {
         userInfoStore.setLoggedIn(true);
-        getUserInfo().then(response => {
-            router.push('/')
-        });
+        router.push('/')
     },
 
     onFailure: function (err) {
