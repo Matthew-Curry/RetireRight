@@ -33,6 +33,9 @@ class ResultList:
         self.append(principle)
 
     def append(self, val):
+        if isinstance(val, Decimal) == False:
+            val = Decimal(str(val))
+
         self.list.append({'x': self.next_item, 'y': val.quantize(Decimal('.01'))})
         self.next_item += 1
 

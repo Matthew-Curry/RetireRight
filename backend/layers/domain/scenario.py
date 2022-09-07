@@ -163,7 +163,7 @@ class Scenario(Item):
         if "ageKids" in params:
             for age in params["ageKids"]:
                 if age < current_age:
-                    raise InvalidAgeParam("ageKids", params["ageKids"], current_age)
+                    raise InvalidAgeParam("ageKids", age, current_age)
 
         # if income inc is given, current age must be included, all other ages must be greater than the current age, 
         # and all income values must be positive integers. Income information must be provided.

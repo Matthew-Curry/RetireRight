@@ -5,6 +5,8 @@ const BASE_URL = 'https://msgyw11a6d.execute-api.us-east-2.amazonaws.com'
 const USER_URL = BASE_URL + '/test/users/'
 //const SCENARIO_URL = USER_URL + '/scenarios/'
 
+console.log(auth.auth.getSignInUserSession().getIdToken().jwtToken)
+
 function getUpdatedHeaders() {
     return {
         'Authorization': auth.auth.getSignInUserSession().getIdToken().jwtToken
