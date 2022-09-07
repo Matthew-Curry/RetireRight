@@ -23,6 +23,27 @@ CHILD_COST = 12980
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
+class ResultList:
+    """Wrapper class to hold result list in API consistent with frontend and database requirements"""
+
+    def __init__(self, principle):
+        self.next_item = 0
+        self.list = []
+
+        self.append(principle)
+
+    def append(self, val):
+        self.list.append({'x': self.next_item, 'y': val.quantize(Decimal('.01'))})
+        self.next_item += 1
+
+    def get_list(self):
+        return self.list
+
+    @property
+    def end_value(self):
+        return self.list[-1]['y']
+
+
 def simulate_scenario(user, scenario) -> tuple:
     """Runs asset growth simulation for a user and a scenario
     args:
@@ -89,7 +110,7 @@ def simulate_scenario(user, scenario) -> tuple:
         # kid cost initialized to global var before adjusting during simulation run
         yearly_kid_cost = CHILD_COST
         # the result to populate, list holding net assets for each year
-        result = []
+        result = ResultList(total_assets)
         logger.info("All variables initialized for simulation run. Starting run..")
         for year in range(1, years + 1):
             # apply inflation adjustment to all cost of living estimates
@@ -133,23 +154,23 @@ def simulate_scenario(user, scenario) -> tuple:
             total_assets = total_assets + net_income
             total_assets = total_assets * (1 + Decimal(returns[year - 1]))
 
-            result.append(total_assets.quantize(Decimal('.01')))
+            result.append(total_assets)
         
         # apply this result to the global simulation result
         logger.info(f"Completed run {n}. Recording results..")
         if n == 0:
             max_result = min_result = av_result = result
         else:
-            if result[-1] > max_result[-1]:
+            if result.end_value > max_result.end_value:
                 max_result = result
         
-            if result[-1] < min_result[-1]:
+            if result.end_value < min_result.end_value:
                 min_result = result
 
-            sum_ending_balance = sum_ending_balance + result[-1]
+            sum_ending_balance = sum_ending_balance + result.end_value
             av = sum_ending_balance/n 
 
-            if abs(av - result[-1]) < abs(av - closest_av):
+            if abs(av - result.end_value) < abs(av - closest_av):
                 closest_av = av
                 av_result = result 
         
@@ -162,7 +183,7 @@ def simulate_scenario(user, scenario) -> tuple:
 
         retirement_total_cost = retirement_yearly_cost * RETIREMENT_LENGTH + home_payoff
 
-        if result[-1] > retirement_total_cost:
+        if result.end_value > retirement_total_cost:
             num_success += 1
     
-    return Decimal(str(num_success/N)), max_result, min_result, av_result
+    return Decimal(str(num_success/N)), max_result.get_list(), min_result.get_list(), av_result.get_list()
