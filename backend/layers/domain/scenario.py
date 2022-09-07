@@ -5,7 +5,8 @@ import uuid
 import time
 
 from .item import Item
-from .exceptions import InvalidAgeParam, MissingHomeParam, InvalidIncAgeType, InvalidIncType, NegetiveIncomeException, NoCurrentIncomeException, IncomeRequiredException
+from .exceptions import (InvalidAgeParam, MissingHomeParam, InvalidIncAgeType, InvalidIncType, 
+    NegetiveIncomeException, NoCurrentIncomeException, IncomeRequiredException, IncRepeatedAge)
 
 class Scenario(Item):
     PK_PREFIX = "USER#"
@@ -169,7 +170,13 @@ class Scenario(Item):
         # and all income values must be positive integers. Income information must be provided.
         found_current_age = False
         if "incomeInc" in params:
-            for k, v in params["incomeInc"].items():
+            income_inc = params["incomeInc"]
+
+            # keys must be unique
+            if len(income_inc) != len(set(income_inc.values())):
+                raise IncRepeatedAge
+
+            for k, v in income_inc.items():
                 try:
                     k = int(k)
                 except Exception as e:

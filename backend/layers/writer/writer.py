@@ -5,9 +5,9 @@ from decimal import Decimal
 
 class DecimalEncoder(json.JSONEncoder):
     def default(self, obj):
-        # if obj is decimal convert to string
+        # if obj is decimal convert to float
         if isinstance(obj, Decimal):
-            return str(obj)
+            return float(obj)
         return json.JSONEncoder.default(self, obj)
 
 def write_response(status_code:int, body:str) -> dict:

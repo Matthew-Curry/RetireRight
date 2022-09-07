@@ -49,6 +49,10 @@ class NegetiveIncomeException(InvalidIncIncrease):
     def __init__(self):
         super().__init__("Income increases must be positive.")
 
+class IncRepeatedAge(InvalidIncIncrease):
+    def __init__(self):
+        super().__init__("Cannot provide the same age for an income increase.")
+
 class NoCurrentIncomeException(InvalidIncIncrease):
     def __init__(self):
         super().__init__("Income increases must include the income of the user's current age.")
