@@ -1,5 +1,5 @@
 <template>
-  <main v-if="(error.length === 0)">
+  <main v-if="getScenarioError.length === 0 && getUserError.length === 0">
     <nav>
       <ul>
         <li>
@@ -18,7 +18,14 @@
     </nav>
     <router-view></router-view>
   </main>
-  <div v-else>{{ error }}</div>
+  <div v-else>
+    <div v-if="getScenarioError.length > 0">
+      {{ getScenarioError }}
+    </div>
+    <div v-if="getUserError.length > 0">
+      {{ getUserError }}
+    </div>
+  </div>
 </template>
 
 <script>
@@ -32,7 +39,8 @@ export default {
   data() {
     return {
       user: null,
-      error: "",
+      getScenarioError: "",
+      getUserError: "",
       selectedScenarioIndex: 0,
       scenarios: [
         {
@@ -287,13 +295,29 @@ export default {
 
     updateUserData() {
       apiCon.getUser().then((data) => {
-        this.user = data;
         if (data === apiCon.userError) {
-          this.error = data;
-        } else if (
-          Object.prototype.hasOwnProperty.call(data, "stockAllocation")
-        ) {
+          this.getUserError = data;
+        } else {
+          this.user = data;
+        }
+
+        if (Object.prototype.hasOwnProperty.call(data, "stockAllocation")) {
           this.user.stockAllocation = parseFloat(this.user.stockAllocation);
+        }
+      });
+    },
+
+    patchUser(patchValues) {
+      if (Object.keys(patchValues).length === 0) {
+        alert("No fields were changed, so there is nothing to update.");
+        return;
+      } 
+
+      apiCon.patchUser(patchValues).then((data) => {
+        if (data === apiCon.userPatchError) {
+          alert(data);
+        } else {
+          alert("User updated!");
         }
       });
     },
@@ -332,31 +356,12 @@ export default {
 
       this.selectedScenarioIndex = this.scenarios.length - 1;
     },
-
-    updateUserStockAllocation(newVal) {
-      this.user.stockAllocation = newVal;
-    },
-
-    updateUserRetirementAge(newVal) {
-      this.user.retirementAge = newVal;
-    },
-
-    updateUserCurrentAge(newVal) {
-      this.user.currentAge = newVal;
-    },
-
-    updateUserPrinciple(newVal) {
-      this.user.principle = newVal;
-    },
   },
 
   provide() {
     return {
       user: computed(() => this.user),
-      updateUserStockAllocation: this.updateUserStockAllocation,
-      updateUserRetirementAge: this.updateUserRetirementAge,
-      updateUserCurrentAge: this.updateUserCurrentAge,
-      updateUserPrinciple: this.updateUserPrinciple,
+      patchUser: this.patchUser,
 
       bestData: computed(() => this.bestData),
       worstData: computed(() => this.worstData),

@@ -14,10 +14,7 @@
         :retirementAge="user.value.retirementAge"
         :currentAge="user.value.currentAge"
         :principle="user.value.principle"
-        @updated-stock-allocation="updateUserStockAllocation"
-        @updated-retirement-age="updateUserRetirementAge"
-        @updated-current-age="updateUserCurrentAge"
-        @updated-principle="updateUserPrinciple"
+        @user-form-submitted="patchUser"
       ></user>
       <label id="dropdown" for="scenarios">Choose a Scenario:</label>
       <select :value="selectedScenarioIndex.value" name="scenarios" id="scenarios" @change="updateSelectedScenario(parseInt($event.target.value))">
@@ -60,10 +57,7 @@ export default {
     "updateSelectedScenario",
     "selectedScenarioIndex",
     "user",
-    "updateUserStockAllocation",
-    "updateUserRetirementAge",
-    "updateUserCurrentAge",
-    "updateUserPrinciple",
+    "patchUser",
 
     "bestData",
     "worstData",

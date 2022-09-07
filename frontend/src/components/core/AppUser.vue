@@ -97,12 +97,7 @@ export default {
     },
   },
 
-  emits: [
-    "updated-stock-allocation",
-    "updated-retirement-age",
-    "updated-current-age",
-    "updated-principle",
-  ],
+  emits: ["user-form-submitted"],
 
   data() {
     return {
@@ -112,13 +107,13 @@ export default {
       localPrinciple: null,
 
       changedFields: [],
-      saveHovered: false,
-      eventMap: {
-        localStockAllocation: "updated-stock-allocation",
-        localRetirementAge: "updated-retirement-age",
-        localCurrentAge: "updated-current-age",
-        localPrinciple: "updated-principle",
+      nameMap: {
+        localStockAllocation: 'stockAllocation',
+        localRetirementAge: 'retirementAge',
+        localCurrentAge: 'currentAge',
+        localPrinciple: 'principle',
       },
+      saveHovered: false,
     };
   },
 
@@ -172,12 +167,14 @@ export default {
         alert(msg);
         return;
       }
-      // emit events for each changed field
+      // build JSON of only the changed fields
+      const patchValues = {};
       for (const field of this.changedFields) {
-        const eventName = this.eventMap[field];
-        const value = this.$data[field];
-        this.$emit(eventName, value);
+        const globalName = this.nameMap[field]
+        patchValues[globalName] = this.$data[field];
       }
+
+      this.$emit("user-form-submitted", patchValues);
 
       this.changedFields = [];
     },
