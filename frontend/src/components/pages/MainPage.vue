@@ -7,7 +7,7 @@
       probability of success for each. More information can be found on the
       "About" page.
     </p>
-    <div style="float: right">
+    <div v-if="user.value" style="float: right">
       <user
         :username="user.value.UserName"
         :stockAllocation="user.value.stockAllocation"
@@ -30,7 +30,7 @@
         </option>
       </select>
     </div>
-    <chart
+    <chart v-if="scenarios.value"
       :key="selectedScenarioIndex.value"
       :bestData="bestData.value"
       :worstData="worstData.value"
@@ -43,16 +43,8 @@
 import AppUser from "../core/AppUser.vue";
 import TheChart from "../core/TheChart.vue";
 
-import UserInfoStore from '../../cognito/user-info-store';
-
 export default {
   name: "App",
-
-  data() {
-    return {
-      userInfo: UserInfoStore.state,
-    }
-  },
 
   components: {
     user: AppUser,

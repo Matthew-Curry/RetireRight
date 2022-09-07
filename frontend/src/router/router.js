@@ -2,7 +2,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
 import auth  from '../cognito/auth';
-import UserInfoStore from '../cognito/user-info-store';
 
 import MainPage from "../components/pages/MainPage.vue";
 import ScenarioPage from "../components/pages/ScenarioPage.vue";
@@ -14,20 +13,14 @@ import ErrorPage from "../components/pages/ErrorPage.vue";
 function requireAuth(to, from, next) {
 
     if (!auth.auth.isUserSignedIn()) {
-        UserInfoStore.setLoggedIn(false);
         next({
             path: '/login',
             query: { redirect: to.fullPath }
         });
     } else {
-        auth.getUserInfo().then(response => {
-            UserInfoStore.setLoggedIn(true);
-            UserInfoStore.setCognitoInfo(response);
             next();
-        });
-
+        };
     }
-}
 
 export const router = createRouter({
     history: createWebHistory(),

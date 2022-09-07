@@ -1,7 +1,6 @@
 /* eslint-disable */
 import { CognitoAuth, StorageHelper } from 'amazon-cognito-auth-js';
 import { router } from '../router/router';
-import userInfoStore from './user-info-store';
 
 const CLIENT_ID = process.env.VUE_APP_COGNITO_CLIENT_ID;
 const APP_DOMAIN = process.env.VUE_APP_COGNITO_DOMAIN;
@@ -24,14 +23,8 @@ var auth = new CognitoAuth(authData);
 
 auth.userhandler = {
     onSuccess: function () {
-        userInfoStore.setLoggedIn(true);
-        getUserInfo().then(response => {
-            console.log('THE RESPONSE')
-            console.log(response)
-            console.log('THE TOKEN')
-            console.log(auth.getSignInUserSession().getIdToken().jwtToken)
-            router.push('/')
-        })
+        router.push('/')
+
     },
 
     onFailure: function (err) {
@@ -45,19 +38,6 @@ auth.userhandler = {
     }
 };
 
-function getUserInfo() {
-    var jwtToken = auth.getSignInUserSession().getAccessToken().jwtToken;
-    const USERINFO_URL = 'http://' + auth.getAppWebDomain() + '/oauth2/userInfo';
-    var requestData = {
-        headers: {
-            'Authorization': 'Bearer ' + jwtToken,
-            'Content-Type': 'application/x-www-form-urlencoded'
-        }
-    }
-
-    return fetch(USERINFO_URL, requestData).then(res => res.json())
-
-}
 
 function getUserInfoStorageKey() {
     var keyPrefix = 'CognitoIdentityServiceProvider.' + auth.getClientId();
@@ -75,31 +55,20 @@ export default {
     login() {
         auth.getSession();
     },
-    //sillyTest() {},
-    logout() {
-        console.log("1")
-        if (auth.isUserSignedIn()) {
-            console.log("2")
-            var userInfoKey = this.getUserInfoStorageKey();
-            console.log("3")
-            auth.signOut();
-        //    console.log("4")
 
+    logout() {
+        if (auth.isUserSignedIn()) {
+            var userInfoKey = this.getUserInfoStorageKey();
+            auth.signOut();
             storage.removeItem(userInfoKey);
-        //    console.log("5")
-        //} else{
-        //    console.log('USER NOT SIGNED IN')
         }
     },
 
     isTokenHere() {
-        if(auth.getSignInUserSession().getIdToken().jwtToken) {
-            console.log("RETURNING TRUE")
+        if (auth.getSignInUserSession().getIdToken().jwtToken) {
             return true;
         }
-        console.log("RETURNING FALSE")
         return false;
     },
-    getUserInfoStorageKey,
-    getUserInfo
+    getUserInfoStorageKey
 }

@@ -1,5 +1,5 @@
 <template>
-  <main v-if="renderPage">
+  <main >
     <nav>
       <ul>
         <li>
@@ -17,6 +17,7 @@
       </ul>
     </nav>
     <router-view></router-view>
+    <h1>{{ error }}</h1>
   </main>
 </template>
 
@@ -31,7 +32,7 @@ export default {
   data() {
     return {
       user: null,
-      renderPage: false,
+      error: "",
       selectedScenarioIndex: 0,
       scenarios: [
         {
@@ -263,124 +264,115 @@ export default {
     averageData() {
       return this.scenarios[this.selectedScenarioIndex].average;
     },
-
-    currentRouteName() {
-      console.log("CURRENT REOUTE NAME");
-      console.log(this.$router.currentRoute.path);
-      return this.$router.currentRoute.path;
-    },
   },
 
   watch: {
-    '$route' (to, from) {
-      console.log('IN THE WATCHER')
+    $route(to, from) {
       if (to.fullPath === "/" && to.fullPath === from.fullPath) {
-        console.log('IN THE IF')
-        this.updateUserData();
-      }
-    }
-  },
-
-     mounted() {
-      if(auth.isTokenHere()) {
+        console.log("TRYING TO REFRESH THROUGH WATCHING");
         this.refreshData();
       }
     },
+  },
 
-    methods: {
+  mounted() {
+    if (auth.isTokenHere()) {
+      console.log("TRYING TO REFRESH THROUGH MOUNTING");
+      this.refreshData();
+    }
+  },
 
-      refreshData() {
-        this.updateUserData();
-        this.renderPage = true;
-      },
+  methods: {
+    refreshData() {
+      this.updateUserData();
+    },
 
-      updateUserData() {
-        console.log("CURRENT PATH");
-        console.log(console.log(this.$router.currentRoute.path));
-        apiCon.getUser().then((data) => {
-          this.user = data;
-
-          if ("stockAllocation" in this.user) {
-            this.user.stockAllocation = parseFloat(this.user.stockAllocation);
-          }
-          console.log("THIS IS THE USER");
-          console.log(this.user);
-        });
-      },
-
-      updateSelectedScenario(newIndex) {
-        this.selectedScenarioIndex = newIndex;
-      },
-
-      patchScenario(index, patchValues) {
-        for (let field in patchValues) {
-          this.scenarios[index][field] = patchValues[field];
+    updateUserData() {
+      apiCon.getUser().then((data) => {
+        this.user = data;
+        if (data === apiCon.userError) {
+          this.error = data;
+        } else if (
+          Object.prototype.hasOwnProperty.call(data, "stockAllocation")
+        ) {
+          this.user.stockAllocation = parseFloat(this.user.stockAllocation);
         }
-
-        alert("Scenario updated!");
-      },
-
-      deleteScenario(index) {
-        this.scenarios.splice(index, 1);
-      },
-
-      addScenario() {
-        this.scenarios.push({
-          percentSuccess: null,
-          rent: null,
-          food: null,
-          entertainment: null,
-          yearlyTravel: null,
-          ageHome: null,
-          homeCost: null,
-          downpaymentSavings: null,
-          mortgageRate: null,
-          mortgageLength: null,
-          ageKids: [],
-          incomeInc: {},
-        });
-
-        this.selectedScenarioIndex = this.scenarios.length - 1;
-      },
-
-      updateUserStockAllocation(newVal) {
-        this.user.stockAllocation = newVal;
-      },
-
-      updateUserRetirementAge(newVal) {
-        this.user.retirementAge = newVal;
-      },
-
-      updateUserCurrentAge(newVal) {
-        this.user.currentAge = newVal;
-      },
-
-      updateUserPrinciple(newVal) {
-        this.user.principle = newVal;
-      },
+      });
     },
 
-    provide() {
-      return {
-        user: computed(() => this.user),
-        updateUserStockAllocation: this.updateUserStockAllocation,
-        updateUserRetirementAge: this.updateUserRetirementAge,
-        updateUserCurrentAge: this.updateUserCurrentAge,
-        updateUserPrinciple: this.updateUserPrinciple,
-
-        bestData: computed(() => this.bestData),
-        worstData: computed(() => this.worstData),
-        averageData: computed(() => this.averageData),
-
-        scenarios: computed(() => this.scenarios),
-        updateSelectedScenario: this.updateSelectedScenario,
-        patchScenario: this.patchScenario,
-        deleteScenario: this.deleteScenario,
-        selectedScenarioIndex: computed(() => this.selectedScenarioIndex),
-        addScenario: this.addScenario,
-      };
+    updateSelectedScenario(newIndex) {
+      this.selectedScenarioIndex = newIndex;
     },
-  };
+
+    patchScenario(index, patchValues) {
+      for (let field in patchValues) {
+        this.scenarios[index][field] = patchValues[field];
+      }
+
+      alert("Scenario updated!");
+    },
+
+    deleteScenario(index) {
+      this.scenarios.splice(index, 1);
+    },
+
+    addScenario() {
+      this.scenarios.push({
+        percentSuccess: null,
+        rent: null,
+        food: null,
+        entertainment: null,
+        yearlyTravel: null,
+        ageHome: null,
+        homeCost: null,
+        downpaymentSavings: null,
+        mortgageRate: null,
+        mortgageLength: null,
+        ageKids: [],
+        incomeInc: {},
+      });
+
+      this.selectedScenarioIndex = this.scenarios.length - 1;
+    },
+
+    updateUserStockAllocation(newVal) {
+      this.user.stockAllocation = newVal;
+    },
+
+    updateUserRetirementAge(newVal) {
+      this.user.retirementAge = newVal;
+    },
+
+    updateUserCurrentAge(newVal) {
+      this.user.currentAge = newVal;
+    },
+
+    updateUserPrinciple(newVal) {
+      this.user.principle = newVal;
+    },
+  },
+
+  provide() {
+    return {
+      user: computed(() => this.user),
+      updateUserStockAllocation: this.updateUserStockAllocation,
+      updateUserRetirementAge: this.updateUserRetirementAge,
+      updateUserCurrentAge: this.updateUserCurrentAge,
+      updateUserPrinciple: this.updateUserPrinciple,
+
+      bestData: computed(() => this.bestData),
+      worstData: computed(() => this.worstData),
+      averageData: computed(() => this.averageData),
+
+      scenarios: computed(() => this.scenarios),
+      updateSelectedScenario: this.updateSelectedScenario,
+      patchScenario: this.patchScenario,
+      deleteScenario: this.deleteScenario,
+      selectedScenarioIndex: computed(() => this.selectedScenarioIndex),
+      addScenario: this.addScenario,
+    };
+  },
+};
 </script>
 
 <style>
