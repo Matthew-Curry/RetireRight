@@ -75,6 +75,18 @@
       </div>
 
       <div class="form-control flex-box">
+        <label class="single-input-label" for="ageHome">Home Cost</label>
+        <input
+          id="homeCost"
+          name="homeCost"
+          type="number"
+          min="0"
+          v-model="homeCost"
+          @input="updateChangedFields('homeCost')"
+        />
+      </div>
+
+      <div class="form-control flex-box">
         <label class="single-input-label" for="downpaymentSavings"
           >Downpayment Savings</label
         >
@@ -292,6 +304,7 @@ export default {
       entertainment: null,
       yearlyTravel: null,
       ageHome: null,
+      homeCost: null,
       downpaymentSavings: null,
       mortgageRate: null,
       mortgageLength: null,
@@ -306,6 +319,7 @@ export default {
     this.entertainment = this.sourceData.entertainment;
     this.yearlyTravel = this.sourceData.yearlyTravel;
     this.ageHome = this.sourceData.ageHome;
+    this.homeCost = this.sourceData.homeCost;
     this.downpaymentSavings = this.sourceData.downpaymentSavings;
     this.mortgageRate = this.sourceData.mortgageRate;
     this.mortgageLength = this.sourceData.mortgageLength;
@@ -444,8 +458,12 @@ export default {
         return "Age of home purchase cannot be negative.";
       }
 
-      if (this.ageHome < this.currentAge) {
+      if (this.ageHome !== 0 && this.ageHome < this.currentAge) {
         return "Age of home purchase cannot be smaller than the current age.";
+      }
+
+      if (this.ageHome && !this.homeCost) {
+        return "A home cost must be given if an age of home purchase is provided."
       }
 
       for (const age of this.ageKids) {
@@ -454,9 +472,13 @@ export default {
         }
       }
 
+      if( Object.keys(this.incomeInc).length === 0){
+        return "Income information must be provided."
+      }
+
       for (const age of Object.keys(this.incomeInc)) {
         if (age < this.currentAge) {
-          return "No age of an income increase can exceed the user's current age.";
+          return "No age of an income increase can preceed the user's current age.";
         }
       }
     },
