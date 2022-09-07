@@ -1,5 +1,5 @@
 <template>
-  <main >
+  <main v-if="(error.length === 0)">
     <nav>
       <ul>
         <li>
@@ -17,8 +17,8 @@
       </ul>
     </nav>
     <router-view></router-view>
-    <h1>{{ error }}</h1>
   </main>
+  <div v-else>{{ error }}</div>
 </template>
 
 <script>
@@ -269,7 +269,6 @@ export default {
   watch: {
     $route(to, from) {
       if (to.fullPath === "/" && to.fullPath === from.fullPath) {
-        console.log("TRYING TO REFRESH THROUGH WATCHING");
         this.refreshData();
       }
     },
@@ -277,7 +276,6 @@ export default {
 
   mounted() {
     if (auth.isTokenHere()) {
-      console.log("TRYING TO REFRESH THROUGH MOUNTING");
       this.refreshData();
     }
   },

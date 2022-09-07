@@ -1,5 +1,5 @@
 import auth from '../cognito/auth';
-import router from '../router/router'
+import { router } from '../router/router'
 
 const BASE_URL = 'https://msgyw11a6d.execute-api.us-east-2.amazonaws.com'
 
