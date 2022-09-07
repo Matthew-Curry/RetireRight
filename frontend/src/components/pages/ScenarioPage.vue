@@ -7,7 +7,7 @@
           v-for="(sourceData, index) in scenarios.value"
           :key="index"
           @selected="updateSelectedScenario"
-          @form-submitted="patchScenario"
+          @scenario-form-submitted="patchScenario"
           @deleted="deleteScenario"
           :currentAge="user.value.currentAge"
           :scenarioIndex="index"

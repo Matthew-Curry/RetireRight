@@ -271,7 +271,7 @@ export default {
     },
   },
 
-  emits: ["selected", "form-submitted", "deleted"],
+  emits: ["selected", "scenario-form-submitted", "deleted"],
 
   data() {
     return {
@@ -472,7 +472,9 @@ export default {
       for (const field of this.changedFields) {
         patchValues[field] = this.$data[field];
       }
-      this.$emit("form-submitted", this.scenarioIndex, patchValues);
+      this.$emit("scenario-form-submitted", this.scenarioIndex, patchValues);
+
+      this.changedFields = [];
     },
   },
 };
