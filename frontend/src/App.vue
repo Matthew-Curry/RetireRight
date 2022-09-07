@@ -1,5 +1,5 @@
 <template>
-  <main>
+  <main v-if="(error.length === 0)">
     <nav>
       <ul>
         <li>
@@ -11,28 +11,28 @@
         <li>
           <router-link to="/about">About</router-link>
         </li>
+        <li>
+          <router-link to="/logout">Logout</router-link>
+        </li>
       </ul>
     </nav>
     <router-view></router-view>
   </main>
+  <div v-else>{{ error }}</div>
 </template>
 
 <script>
 import { computed } from "vue";
+import apiCon from "./api/apiService";
+import auth from "./cognito/auth";
 
 export default {
   name: "App",
 
   data() {
     return {
-      user: {
-        username: "Matt",
-        stockAllocation: 0.7,
-        retirementAge: 55,
-        currentAge: 25,
-        principle: 3000,
-      },
-
+      user: null,
+      error: "",
       selectedScenarioIndex: 0,
       scenarios: [
         {
@@ -266,7 +266,38 @@ export default {
     },
   },
 
+  watch: {
+    $route(to, from) {
+      if (to.fullPath === "/" && to.fullPath === from.fullPath) {
+        this.refreshData();
+      }
+    },
+  },
+
+  mounted() {
+    if (auth.isTokenHere()) {
+      this.refreshData();
+    }
+  },
+
   methods: {
+    refreshData() {
+      this.updateUserData();
+    },
+
+    updateUserData() {
+      apiCon.getUser().then((data) => {
+        this.user = data;
+        if (data === apiCon.userError) {
+          this.error = data;
+        } else if (
+          Object.prototype.hasOwnProperty.call(data, "stockAllocation")
+        ) {
+          this.user.stockAllocation = parseFloat(this.user.stockAllocation);
+        }
+      });
+    },
+
     updateSelectedScenario(newIndex) {
       this.selectedScenarioIndex = newIndex;
     },
@@ -330,9 +361,6 @@ export default {
       bestData: computed(() => this.bestData),
       worstData: computed(() => this.worstData),
       averageData: computed(() => this.averageData),
-      //bestData: this.bestData,
-      //worstData: this.worstData,
-      //averageData: this.averageData,
 
       scenarios: computed(() => this.scenarios),
       updateSelectedScenario: this.updateSelectedScenario,

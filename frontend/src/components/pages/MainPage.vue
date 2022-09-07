@@ -7,9 +7,9 @@
       probability of success for each. More information can be found on the
       "About" page.
     </p>
-    <div style="float: right">
+    <div v-if="user.value" style="float: right">
       <user
-        :username="user.value.username"
+        :username="user.value.UserName"
         :stockAllocation="user.value.stockAllocation"
         :retirementAge="user.value.retirementAge"
         :currentAge="user.value.currentAge"
@@ -30,18 +30,21 @@
         </option>
       </select>
     </div>
-    <chart
+    <loading v-else></loading>
+    <chart v-if="scenarios.value"
       :key="selectedScenarioIndex.value"
       :bestData="bestData.value"
       :worstData="worstData.value"
       :averageData="averageData.value"
     ></chart>
+    <loading v-else></loading>
   </div>
 </template>
 
 <script>
-import AppUser from "../components/AppUser.vue";
-import TheChart from "../components/TheChart.vue";
+import AppUser from "../core/AppUser.vue";
+import TheChart from "../core/TheChart.vue";
+import LoadingMessage from "../core/LoadingMessage.vue";
 
 export default {
   name: "App",
@@ -49,6 +52,7 @@ export default {
   components: {
     user: AppUser,
     chart: TheChart,
+    loading: LoadingMessage
   },
 
   inject: [
