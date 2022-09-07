@@ -1,5 +1,5 @@
 <template>
     <div>
-      Loading...
+      Loading scenarios...
     </div>
 </template>

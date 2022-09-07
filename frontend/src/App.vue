@@ -43,19 +43,32 @@ export default {
       getUserError: "",
       selectedScenarioIndex: 0,
       scenarios: null,
+      savingScenario: false
     };
   },
 
   computed: {
     bestData() {
+      if (!this.scenarios || this.scenarios.length === 0) {
+        return []
+      }
+
       return this.scenarios[this.selectedScenarioIndex].best;
     },
 
     worstData() {
+      if (!this.scenarios || this.scenarios.length === 0) {
+        return []
+      }
+
       return this.scenarios[this.selectedScenarioIndex].worst;
     },
 
     averageData() {
+      if (!this.scenarios || this.scenarios.length === 0) {
+        return []
+      }
+
       return this.scenarios[this.selectedScenarioIndex].average;
     },
   },
@@ -69,7 +82,7 @@ export default {
   },
 
   mounted() {
-    if (auth.isTokenHere()) {
+    if (auth.isTokenValid()) {
       this.refreshData();
     }
   },
@@ -117,6 +130,9 @@ export default {
           alert("User updated!");
         }
       });
+
+      // need to refresh the scenarios to trigger updated simulation
+      
     },
 
     updateSelectedScenario(newIndex) {
@@ -124,6 +140,7 @@ export default {
     },
 
     patchScenario(index, patchValues) {
+      this.savingScenario = true;
       const scenario = this.scenarios[index];
       // if the patchValues contains a scenario id, this is a patch on an existing scenario
       if (Object.prototype.hasOwnProperty.call(scenario, "ScenarioId")) {
@@ -133,6 +150,7 @@ export default {
           } else {
             this.scenarios[index] = data;
             this.selectedScenarioIndex = index;
+            this.savingScenario = false;
             alert("Scenario updated!");
           }
         });
@@ -141,9 +159,9 @@ export default {
           if (data === apiCon.scenarioPostError) {
             alert(data);
           } else {
-            console.log(data);
             this.scenarios[index] = data;
             this.selectedScenarioIndex = index;
+            this.savingScenario = false;
             alert("Scenario posted!");
           }
         });
@@ -151,12 +169,13 @@ export default {
     },
 
     deleteScenario(index) {
-      const scenarioId = this.scenarios[index];
+      const scenarioId = this.scenarios[index].ScenarioId;
       apiCon.deleteScenario(scenarioId).then((data) => {
         if (data === apiCon.scenarioDeleteError) {
           alert(data);
         } else {
           this.scenarios.splice(index, 1);
+          this.selectedScenarioIndex = 0;
           alert("Scenario Deleted");
         }
       });
@@ -199,6 +218,7 @@ export default {
       deleteScenario: this.deleteScenario,
       selectedScenarioIndex: computed(() => this.selectedScenarioIndex),
       addScenario: this.addScenario,
+      savingScenario: computed(() => this.savingScenario)
     };
   },
 };

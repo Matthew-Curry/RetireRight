@@ -5,8 +5,6 @@ const BASE_URL = 'https://msgyw11a6d.execute-api.us-east-2.amazonaws.com'
 const USER_URL = BASE_URL + '/test/users/'
 const SCENARIO_URL = USER_URL + 'scenarios/'
 
-console.log(auth.auth.getSignInUserSession().getIdToken().jwtToken)
-
 function getUpdatedHeaders() {
     return {
         'Authorization': auth.auth.getSignInUserSession().getIdToken().jwtToken
@@ -17,7 +15,7 @@ function getUpdatedHeaders() {
 function processLogic(res, errMsg) {
     if (res.ok) {
         return res.json();
-    } else if (res.status === 403) {
+    } else if (res.status === 401) {
         // auth expired, redirect to sign in
         router.push('/login');
         throw new Error('User was logged out, but authentication flow has been retriggered. Please try again');
@@ -29,8 +27,6 @@ function processLogic(res, errMsg) {
 // function to run after recieving a response from fetch wrapper to get the data
 function processResponse(resPair) {
     const [res, errMsg] = resPair;
-    console.log('here is the res')
-    console.log(res)
 
     return processLogic(res, errMsg).then(data => {
         return data;

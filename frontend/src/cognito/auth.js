@@ -64,8 +64,8 @@ export default {
         }
     },
 
-    isTokenHere() {
-        if (auth.getSignInUserSession().getIdToken().jwtToken) {
+    isTokenValid() {
+        if (auth.getSignInUserSession().getIdToken().jwtToken && auth.getSignInUserSession().isValid()) {
             return true;
         }
         return false;

@@ -8,6 +8,7 @@
   >
     <h2>Scenario {{ scenarioNumber }}</h2>
     <h3 id="percentage" :class="percentCSSClass">{{ percentSuccess }}</h3>
+    <h3 v-if="savingScenario.value === true && selectedScenarioIndex.value === scenarioIndex">Saving Scenario and Running Simmulation...</h3>
     <section v-if="isSelected">
       <div class="form-control flex-box">
         <label class="single-input-label" for="rent">Rent</label>
@@ -281,9 +282,16 @@ export default {
       type: Number,
       required: true,
     },
+
+    isSaving: {
+      type: Boolean,
+      required: true,
+    },
   },
 
   emits: ["selected", "scenario-form-submitted", "deleted"],
+
+  inject: ["savingScenario", "selectedScenarioIndex"],
 
   data() {
     return {
@@ -458,17 +466,33 @@ export default {
         return "Age of home purchase cannot be negative.";
       }
 
-      if (this.ageHome !== 0 && this.ageHome < this.currentAge) {
-        return "Age of home purchase cannot be smaller than the current age.";
+      if (this.homeCost < 0) {
+        return "Home cost cannot be negative.";
       }
 
+      if (this.ageHome && this.ageHome < this.currentAge) {
+        return "Age of home purchase cannot be smaller than the current age.";
+      }
+      
       if (this.ageHome && !this.homeCost) {
         return "A home cost must be given if an age of home purchase is provided."
       }
 
+      if (this.ageHome && !this.mortgageRate) {
+        return "A mortgage rate must be given if an age of home purchase is provided."
+      }
+
+      if (this.ageHome && !this.mortgageLength) {
+        return "A mortgage length must be given if an age of home purchase is provided."
+      }
+
+      if(!this.ageHome && (this.homeCost || this.mortgageRate || this.mortgageLength || this.downpaymentSavings)) {
+        return "Cannot provide home related variables without giving a home purchase age and cost."
+      }
+
       for (const age of this.ageKids) {
         if (age < this.currentAge) {
-          return "No age of having a child can exceed the user's current age.";
+          return "No age of having a child can preceed the user's current age.";
         }
       }
 
@@ -476,10 +500,17 @@ export default {
         return "Income information must be provided."
       }
 
+      let foundMatch = false;
       for (const age of Object.keys(this.incomeInc)) {
         if (age < this.currentAge) {
           return "No age of an income increase can preceed the user's current age.";
+        } else if (age == this.currentAge) {
+          foundMatch = true;
         }
+      }
+
+      if (!foundMatch) {
+        return "Income for the user's current age must be provided"
       }
     },
 
@@ -492,6 +523,10 @@ export default {
       // build JSON of only the changed fields
       const patchValues = {};
       for (const field of this.changedFields) {
+        if (this.$data[field] === null || this.$data[field] === '') {
+          this.$data[field] = 0;
+        } 
+
         patchValues[field] = this.$data[field];
       }
       this.$emit("scenario-form-submitted", this.scenarioIndex, patchValues);

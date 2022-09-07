@@ -2,7 +2,7 @@
   <div>
     <h1>Scenarios</h1>
     <div>
-      <ul>
+      <ul v-if="scenarios.value">
         <app-scenario
           v-for="(sourceData, index) in scenarios.value"
           :key="index"
@@ -16,6 +16,7 @@
         >
         </app-scenario>
       </ul>
+      <loadingScenario v-else></loadingScenario>
     </div>
     <button @click="addScenario">Add Scenario</button>
   </div>
@@ -23,12 +24,14 @@
 
 <script>
 import AppScenario from "../core/AppScenario.vue";
+import LoadingScenario from "../core/LoadingScenario.vue";
 
 export default {
   name: "App",
 
   components: {
     "app-scenario": AppScenario,
+    loadingScenario: LoadingScenario
   },
 
   inject: [
@@ -39,6 +42,7 @@ export default {
     "deleteScenario",
     "selectedScenarioIndex",
     "addScenario",
+    "savingScenario"
   ],
 };
 </script>

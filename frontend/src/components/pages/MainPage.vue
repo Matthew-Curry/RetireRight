@@ -27,21 +27,22 @@
         </option>
       </select>
     </div>
-    <loading v-else></loading>
+    <loadingUser v-else></loadingUser>
     <chart v-if="scenarios.value"
       :key="selectedScenarioIndex.value"
       :bestData="bestData.value"
       :worstData="worstData.value"
       :averageData="averageData.value"
     ></chart>
-    <loading v-else></loading>
+    <loadingScenario v-else></loadingScenario>
   </div>
 </template>
 
 <script>
 import AppUser from "../core/AppUser.vue";
 import TheChart from "../core/TheChart.vue";
-import LoadingMessage from "../core/LoadingMessage.vue";
+import LoadingUser from "../core/LoadingUser.vue";
+import LoadingScenario from "../core/LoadingScenario.vue";
 
 export default {
   name: "App",
@@ -49,7 +50,8 @@ export default {
   components: {
     user: AppUser,
     chart: TheChart,
-    loading: LoadingMessage
+    loadingUser: LoadingUser,
+    loadingScenario: LoadingScenario
   },
 
   inject: [
