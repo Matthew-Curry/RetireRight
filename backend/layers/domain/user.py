@@ -81,7 +81,7 @@ class User(Item):
         """
         for field in self.PATCH_FIELDS.keys():
             if field not in attr.keys():
-                raise MissingUserParam
+                raise MissingUserParam(field)
         
         if attr['retirementAge'] < attr['currentAge']:
             raise InvalidAgeParam('retirementAge', attr['retirementAge'], attr['currentAge'])

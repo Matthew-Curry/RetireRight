@@ -137,15 +137,15 @@ export default {
       this.updatingScenarios = true;
       apiCon.patchUser(userPatchBody).then((data) => {
         if (data === apiCon.userPatchError) {
-          this.userRefreshKey = this.userRefreshKey + 1;
           this.updatingScenarios = false;
+          this.userRefreshKey ++;
           alert(data);
         } else {
           userPatchBody['UserId'] = userId;
           this.user = userPatchBody;
           this.scenarios = data;
           this.updatingScenarios = false;
-          this.userRefreshKey = this.userRefreshKey + 1;
+          this.userRefreshKey ++;
           alert("User updated and all scenarios have been re-simulated!");
         }
       });
@@ -229,7 +229,7 @@ export default {
     return {
       user: computed(() => this.user),
       patchUser: this.patchUser,
-      userRefreshKey: this.userRefreshKey,
+      userRefreshKey: computed(() => this.userRefreshKey),
 
       bestData: computed(() => this.bestData),
       worstData: computed(() => this.worstData),
