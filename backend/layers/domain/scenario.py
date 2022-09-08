@@ -242,10 +242,10 @@ class Scenario(Item):
             min_age = float('inf')
             smaller_ages = []
             for age in self.incomeInc.keys():
-                if age < min_age:
+                if int(age) < min_age:
                     min_age = age
                 
-                if age < current_age:
+                if int(age) < current_age:
                     smaller_ages.append(age)
             
             # reasign the min age to the current age, remove all ages that
