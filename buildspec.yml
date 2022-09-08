@@ -162,7 +162,7 @@ phases:
       - echo "Updating patch-user-lambda.."
       - echo "Updating patch-user-lambda to use latest layers it requires.."
       - echo "Updating to use the latest layers"
-      - aws lambda update-function-configuration --function-name patch-user-lambda --layers ${latestdomain} ${latestDynamoUtils} ${latestWriter}
+      - aws lambda update-function-configuration --function-name patch-user-lambda --layers ${latestdomain} ${latestDynamoUtils} ${latestWriter} ${latestSimulator}
       - echo "Sleeping for 30 seconds"
       - sleep 30
       - echo "Updating to use the latest code"

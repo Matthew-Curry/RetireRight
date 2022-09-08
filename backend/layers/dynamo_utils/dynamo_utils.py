@@ -14,6 +14,7 @@ class DynamoResourceCache:
 
     def __init__(self):
         logger.info("Initializing Dynamo resources to None")
+        self.client = None
         self.dynamodb = None
         self.table = None
         # the configuration to use in establishing new sessions
@@ -22,25 +23,33 @@ class DynamoResourceCache:
                         read_timeout =1
                     )
 
-    def get_db_resources(self) -> tuple:
+    def get_db_resources(self, client=False) -> tuple:
         """Helper method to return DynamoDB service and user table resources. Checks if resources are cached from a 
         warm start, else creates new resources, then returns them.
+        args:
+            client (boolean): whether or not to also return the client resource
         raises: 
             UnableToStartSession: if either the service or table resource cannot be instantiated
         returns:
-            tuple of the resources in form (service, table) """
+            tuple of the resources in form (service, table). If client arg passed, will return tuple in
+            form (service, table, client) """
       
         if self.dynamodb is None or self.table is None:
             logger.info("Not able to find both Dynamo resources. Creating new ones..")
             try:
                 self.dynamodb = boto3.resource('dynamodb', config = self.config)
                 self.table = self.dynamodb.Table('users')
+                if client:
+                    self.client = boto3.client('dynamodb', config = self.config)
             except Exception as e:
                 raise UnableToStartSession
             logger.info("Successfully created DynamoDB resources")
         else:
             logger.info("Returning cached DynamoDB resources.")
         
+        if client:
+            return self.dynamodb, self.table, self.client
+
         return self.dynamodb, self.table
 
 # instantiation of cache lambda handlers will import to initialize the resource cache

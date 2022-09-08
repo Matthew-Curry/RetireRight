@@ -14,7 +14,7 @@ logger.setLevel(logging.INFO)
 
 def lambda_handler(event, context):
     try:
-        dynamodb, table = dynamo_resource_cache.get_db_resources()
+        _, table, client = dynamo_resource_cache.get_db_resources(client=True)
     except UnableToStartSession:
         return write_response(500, "Internal error. Please try again later")
 
@@ -27,7 +27,10 @@ def lambda_handler(event, context):
 
     logging.info(
         "Successfully validated parameters. Pulling the user's scenarios from the database..")
-    user = User.from_item(user_params)
+    user_id =  event['requestContext']['authorizer']['claims']['sub']
+    user_params["UserId"] = user_id
+    user = User(user_id)
+    user._append_attr(user_params, False)
 
     try:
         items = table.query(
@@ -39,14 +42,15 @@ def lambda_handler(event, context):
     except ClientError as e:
         logger.error(e)
         return write_response(500, "Internal error. Please try again later")
-
+    print("HERE ARE THE ITEM")
+    print(items)
     # if the user has scenarios, re-rerun the simulations with new user information
-    scenarios, update_exps = get_updated_results(items['Items'], user)
+    scenarios, update_exps = get_updated_results(items, user)
 
     logging.info(
         "Starting a DynamoDB transaction to update the user and the scenarios..")
     try:
-        dynamodb.transact_write_items(
+        client.transact_write_items(
             update_exps
         )
     except ClientError as e:
@@ -69,32 +73,41 @@ def get_updated_results(items:dict, user) -> tuple:
         user (User): The user that owns the scenarios
     returns:
         tuple in form (scenarios, update_expressions)"""
-
-    dynamo_update_exp, dynamo_update_values = get_dynamo_update_params(
-        scenario.get_patch())
-    update_expressions = {'Put': {
+    print("IN GET UPDATED RESULTS")
+    update_expressions = [{'Put': {
         'TableName': 'users',
         'Item': user.to_item()
-    }}
+    }}]
     update_base = {'Update': {
         'TableName': 'users',
         'Key': '',
-        'UpdateExpression': dynamo_update_exp,
-        'ExpressionAttributeValues': dynamo_update_values,
+        'UpdateExpression': '',
+        'ExpressionAttributeValues': '',
         'ConditionExpression': 'attribute_exists(PK)'
     }
     }
     scenarios = []
-    n = len(items['Items'])
     if 'Items' in items:
-        for i, scenario in enumerate(items['Items']):
+        print("in the if statement")
+        n = len(items['Items'])
+        for i, data in enumerate(items['Items']):
+            print("in the loop")
+            scenario = Scenario.from_item(data)
             logger.info(f"Running simulation for scenario {i} of {n}")
             per_suc, best, worst, av = simulate_scenario(user, scenario)
             scenario.append_simulation_fields(per_suc, best, worst, av)
             scenarios.append(scenario)
-
+            
+            dynamo_update_exp, dynamo_update_values = get_dynamo_update_params(
+            {'percentSuccess': scenario.percentSuccess,
+            'best': scenario.best,
+            'worst': scenario.worst,
+            'average': scenario.average
+            })
             exp = update_base
             exp['Key'] = scenario.get_key()
+            exp['UpdateExpression'] = dynamo_update_exp
+            exp['ExpressionAttributeValues'] = dynamo_update_values
             update_expressions.append(exp)
     
     if scenarios:
