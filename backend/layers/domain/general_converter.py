@@ -32,7 +32,10 @@ def get_converted_params(request_body: str, valid_params:dict) -> dict:
     for p, v in request_body.items():
         try: 
             data_type = valid_params[p]
-            if isinstance(v, data_type) == False:
+            # edge case of passing 1 for decimal value
+            if v == 1 and data_type is Decimal:
+                pass
+            elif isinstance(v, data_type) == False:
                 raise InvalidParamType(p, valid_params[p])
         except KeyError as e:
             raise InvalidParam(p)

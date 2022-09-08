@@ -9,6 +9,7 @@
     </p>
     <div v-if="user.value" style="float: right">
       <user
+        :key="userRefreshKey.value"
         :username="user.value.UserName"
         :stockAllocation="user.value.stockAllocation"
         :retirementAge="user.value.retirementAge"
@@ -60,6 +61,7 @@ export default {
     "selectedScenarioIndex",
     "user",
     "patchUser",
+    "userRefreshKey",
 
     "bestData",
     "worstData",

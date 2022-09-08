@@ -1,5 +1,6 @@
 <template>
   <main v-if="getScenarioError.length === 0 && getUserError.length === 0">
+    <h1 v-if="updatingScenarios == true">Scenarios are currently updating with submitted user info..</h1> 
     <nav>
       <ul>
         <li>
@@ -39,6 +40,8 @@ export default {
   data() {
     return {
       user: null,
+      userRefreshKey: 0,
+      updatingScenarios: false,
       getScenarioError: "",
       getUserError: "",
       selectedScenarioIndex: 0,
@@ -122,8 +125,7 @@ export default {
         alert("No fields were changed, so there is nothing to update.");
         return;
       }
-      console.log(this.user.UserName)
-      console.log(typeof(this.user.UserName))
+
       this.user.UserName = 'matt';
       let userPatchBody = JSON.parse(JSON.stringify(this.user)); 
       const userId = userPatchBody['UserId'];
@@ -132,19 +134,21 @@ export default {
       for (const [field, val] of Object.entries(patchValues)) {
         userPatchBody[field] = val
       }
-
+      this.updatingScenarios = true;
       apiCon.patchUser(userPatchBody).then((data) => {
         if (data === apiCon.userPatchError) {
+          this.userRefreshKey = this.userRefreshKey + 1;
+          this.updatingScenarios = false;
           alert(data);
         } else {
           userPatchBody['UserId'] = userId;
           this.user = userPatchBody;
           this.scenarios = data;
+          this.updatingScenarios = false;
+          this.userRefreshKey = this.userRefreshKey + 1;
           alert("User updated and all scenarios have been re-simulated!");
         }
       });
-
-      // need to refresh the scenarios to trigger updated simulation
       
     },
 
@@ -225,6 +229,7 @@ export default {
     return {
       user: computed(() => this.user),
       patchUser: this.patchUser,
+      userRefreshKey: this.userRefreshKey,
 
       bestData: computed(() => this.bestData),
       worstData: computed(() => this.worstData),
