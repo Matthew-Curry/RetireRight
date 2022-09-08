@@ -19,8 +19,8 @@ def lambda_handler(event, context):
     user_id =  event['requestContext']['authorizer']['claims']['sub']
     user = User(user_id)
 
-    # use the limit if it is passed as a query parameter, else give practically infinite limit
-    limit = 1000000000000
+    # use the limit if it is passed as a query parameter, return the max the app allows
+    limit = 15
     if event["queryStringParameters"]:
         if 'limit' in event["queryStringParameters"]:
             limit = int(event["queryStringParameters"]['limit']) + 1

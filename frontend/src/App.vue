@@ -127,7 +127,8 @@ export default {
         if (data === apiCon.userPatchError) {
           alert(data);
         } else {
-          alert("User updated!");
+          this.scenarios = data;
+          alert("User updated and all scenarios have been re-simulated!");
         }
       });
 
@@ -184,6 +185,11 @@ export default {
     },
 
     addScenario() {
+      if (this.scenarios.length === 15) {
+        alert("Max of 15 scenarios allowed. Please delete or edit an existing scenario.");
+        return;
+      }
+
       this.scenarios.push({
         percentSuccess: null,
         rent: null,

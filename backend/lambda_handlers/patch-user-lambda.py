@@ -1,40 +1,53 @@
 import logging
+from boto3.dynamodb.conditions import Key
 from botocore.exceptions import ClientError
 
 from writer import write_response
 from dynamo_utils import dynamo_resource_cache, UnableToStartSession, get_dynamo_update_params
 from domain.user import User
+from domain.scenario import Scenario
 from domain.exceptions import NoParamGiven, InvalidParam, InvalidRequestBody, InvalidParamType
+from simulator import simulate_scenario
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 def lambda_handler(event, context):
     try:
-        _, table = dynamo_resource_cache.get_db_resources()
+        dynamodb, table = dynamo_resource_cache.get_db_resources()
     except UnableToStartSession:
         return write_response(500, "Internal error. Please try again later")
 
     # convert the string request body to required types, return 400 on exception
     try:
-        params = User.get_converted_patch_params(event['body'])
-    except (NoParamGiven, InvalidParam, InvalidRequestBody, InvalidParamType)  as e:
+        user_params = User.get_converted_patch_params(event['body'])
+    except (NoParamGiven, InvalidParam, InvalidRequestBody, InvalidParamType) as e:
         logger.error(e)
         return write_response(400, str(e))
 
-    logging.info("Successfully validated parameters, updating item in DynamoDB")
-    dynamo_update_exp, dynamo_update_values = get_dynamo_update_params(params)
-    
-    user_id =  event['requestContext']['authorizer']['claims']['sub']
-    user = User(user_id)
-    
-    logging.info("Making request to DynamoDB to patch the item")
+    logging.info(
+        "Successfully validated parameters. Pulling the user's scenarios from the database..")
+    user = User.from_item(user_params)
+
     try:
-        table.update_item(
-            Key=user.get_key(),
-            UpdateExpression=dynamo_update_exp,
-            ExpressionAttributeValues=dynamo_update_values,
-            ConditionExpression='attribute_exists(PK)'
+        items = table.query(
+            KeyConditionExpression=Key("PK").eq(user.get_pk()),
+            FilterExpression='attribute_exists(ScenarioId)',
+            ScanIndexForward=False,
+            Limit=15
+        )
+    except ClientError as e:
+        logger.error(e)
+        return write_response(500, "Internal error. Please try again later")
+
+    # if the user has scenarios, re-rerun the simulations with new user information
+    scenarios, update_exps = get_updated_results(items['Items'], user)
+
+    logging.info(
+        "Starting a DynamoDB transaction to update the user and the scenarios..")
+    try:
+        dynamodb.transact_write_items(
+            update_exps
         )
     except ClientError as e:
         logger.error(e)
@@ -43,6 +56,48 @@ def lambda_handler(event, context):
         else:
             return write_response(500, "Internal error. Please try again later")
     
-    logging.info(f"Successfully patched user {user_id}")
+    for i, s in enumerate(scenarios):
+        scenarios[i] = Scenario.from_item(s).to_response()
 
-    return write_response(204, None)
+    return write_response(200, scenarios)
+
+
+def get_updated_results(items:dict, user) -> tuple:
+    """Gets updated Scenario values and update expressions after re-running each Scenario's simulation
+    args:
+        items (dict): Result from DynamoDB query for user Scenarios
+        user (User): The user that owns the scenarios
+    returns:
+        tuple in form (scenarios, update_expressions)"""
+
+    dynamo_update_exp, dynamo_update_values = get_dynamo_update_params(
+        scenario.get_patch())
+    update_expressions = {'Put': {
+        'TableName': 'users',
+        'Item': user.to_item()
+    }}
+    update_base = {'Update': {
+        'TableName': 'users',
+        'Key': '',
+        'UpdateExpression': dynamo_update_exp,
+        'ExpressionAttributeValues': dynamo_update_values,
+        'ConditionExpression': 'attribute_exists(PK)'
+    }
+    }
+    scenarios = []
+    n = len(items['Items'])
+    if 'Items' in items:
+        for i, scenario in enumerate(items['Items']):
+            logger.info(f"Running simulation for scenario {i} of {n}")
+            per_suc, best, worst, av = simulate_scenario(user, scenario)
+            scenario.append_simulation_fields(per_suc, best, worst, av)
+            scenarios.append(scenario)
+
+            exp = update_base
+            exp['Key'] = scenario.get_key()
+            update_expressions.append(exp)
+    
+    if scenarios:
+        logger.info(f"Ran simualations for {len(scenarios)} scenarios.")
+    
+    return scenarios, update_expressions
