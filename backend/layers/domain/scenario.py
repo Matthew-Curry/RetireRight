@@ -229,3 +229,34 @@ class Scenario(Item):
             public_fields.pop("patch")
 
         return public_fields
+
+    def update_current_age(self, current_age:int):
+        """Updates the minimum age in the incomeInc attribute to the given age, and removes all ages
+            smaller than the new current age if any exist.
+        args:
+            current_age (int): age to update the minimum age to"""
+        
+        if current_age not in self.incomeInc:
+            # find the smallest age to replace and all ages smaller than the
+            # new current age.
+            min_age = float('inf')
+            smaller_ages = []
+            for age in self.incomeInc.keys():
+                if age < min_age:
+                    min_age = age
+                
+                if age < current_age:
+                    smaller_ages.append(age)
+            
+            # reasign the min age to the current age, remove all ages that
+            # are smaller than new current
+            self.incomeInc[min_age] = self.incomeInc.pop(current_age)
+            [self.incomeInc.pop(age) for age in smaller_ages]
+            
+
+
+            
+
+            
+
+

@@ -95,6 +95,7 @@ def get_updated_results(items: dict, user) -> tuple:
         n = len(items['Items'])
         for i, data in enumerate(items['Items']):
             scenario = Scenario.from_item(data)
+            scenario.update_current_age(user.currentAge)
             logger.info(f"Running simulation for scenario {i} of {n}")
             per_suc, best, worst, av = simulate_scenario(user, scenario)
             scenario.append_simulation_fields(per_suc, best, worst, av)

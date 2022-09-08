@@ -122,7 +122,9 @@ export default {
         alert("No fields were changed, so there is nothing to update.");
         return;
       }
-
+      console.log(this.user.UserName)
+      console.log(typeof(this.user.UserName))
+      this.user.UserName = 'matt';
       let userPatchBody = JSON.parse(JSON.stringify(this.user)); 
       const userId = userPatchBody['UserId'];
       delete userPatchBody['UserId'];
