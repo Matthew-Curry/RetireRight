@@ -84,5 +84,4 @@ class User(Item):
                 raise MissingUserParam
         
         if attr['retirementAge'] > attr['currentAge']:
-            raise InvalidAgeParam
-            
+            raise InvalidAgeParam('retirementAge', attr['retirementAge'], attr['currentAge'])

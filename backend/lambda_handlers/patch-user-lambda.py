@@ -32,7 +32,7 @@ def lambda_handler(event, context):
     user_params["UserId"] = user_id
     user = User(user_id)
     try:
-        user.append_valid_patch_attr(user_params, False)
+        user.append_valid_patch_attr(user_params)
     except (MissingUserParam, InvalidAgeParam) as e:
         logger.error(e)
         return write_response(400, str(e))
