@@ -123,10 +123,20 @@ export default {
         return;
       }
 
-      apiCon.patchUser(patchValues).then((data) => {
+      let userPatchBody = JSON.parse(JSON.stringify(this.user)); 
+      const userId = userPatchBody['UserId'];
+      delete userPatchBody['UserId'];
+
+      for (const [field, val] of Object.entries(patchValues)) {
+        userPatchBody[field] = val
+      }
+
+      apiCon.patchUser(userPatchBody).then((data) => {
         if (data === apiCon.userPatchError) {
           alert(data);
         } else {
+          userPatchBody['UserId'] = userId;
+          this.user = userPatchBody;
           this.scenarios = data;
           alert("User updated and all scenarios have been re-simulated!");
         }

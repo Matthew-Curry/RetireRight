@@ -6,7 +6,7 @@ from .exceptions import InvalidAgeParam, MissingUserParam
 
 class User(Item):
     PK_PREFIX = SK_PREFIX = "USER#"
-    PATCH_FIELDS = {'stockAllocation': Decimal, 'retirementAge': int, 'currentAge': int, 'principle': int}
+    PATCH_FIELDS = {'UserName': str, 'stockAllocation': Decimal, 'retirementAge': int, 'currentAge': int, 'principle': int}
     POST_FIELDS = {'UserName':str}
     PROCESSED_FIELDS = {}
 
