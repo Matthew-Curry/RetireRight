@@ -240,7 +240,7 @@ class Scenario(Item):
         if current_age not in self.incomeInc:
             # find the smallest age to replace and all ages smaller than the
             # new current age.
-            min_age = sys.maxint
+            min_age = sys.maxsize
             smaller_ages = []
             for age in self.incomeInc.keys():
                 if int(age) < int(min_age):
