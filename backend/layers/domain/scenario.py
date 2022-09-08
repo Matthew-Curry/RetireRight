@@ -3,6 +3,7 @@
 from decimal import Decimal
 import uuid
 import time
+import math
 
 from .item import Item
 from .exceptions import (InvalidAgeParam, MissingHomeParam, InvalidIncAgeType, InvalidIncType, 
@@ -239,10 +240,10 @@ class Scenario(Item):
         if current_age not in self.incomeInc:
             # find the smallest age to replace and all ages smaller than the
             # new current age.
-            min_age = float('inf')
+            min_age = math.inf
             smaller_ages = []
             for age in self.incomeInc.keys():
-                if int(age) < min_age:
+                if int(age) < int(min_age):
                     min_age = age
                 
                 if int(age) < current_age:
