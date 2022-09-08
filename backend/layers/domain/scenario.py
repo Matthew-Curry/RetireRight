@@ -251,13 +251,6 @@ class Scenario(Item):
             
             # reasign the min age to the current age, remove all ages that
             # are smaller than new current
-            self.incomeInc[min_age] = self.incomeInc.pop(current_age)
+            self.incomeInc[str(min_age)] = self.incomeInc.pop(str(current_age))
             [self.incomeInc.pop(age) for age in smaller_ages]
             
-
-
-            
-
-            
-
-

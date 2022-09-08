@@ -177,6 +177,11 @@ export default {
       this.$emit("user-form-submitted", patchValues);
 
       this.changedFields = [];
+
+      this.localStockAllocation = this.stockAllocation;
+      this.localRetirementAge = this.retirementAge;
+      this.localCurrentAge = this.currentAge;
+      this.localPrinciple = this.principle;
     },
   },
 };
