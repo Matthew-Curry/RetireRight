@@ -2,6 +2,7 @@
 
 from decimal import Decimal
 from .item import Item
+from .exceptions import InvalidAgeParam, MissingUserParam
 
 class User(Item):
     PK_PREFIX = SK_PREFIX = "USER#"
@@ -58,3 +59,29 @@ class User(Item):
             public_fields.pop("SK")
 
         return public_fields
+
+    def append_valid_patch_attr(self, attr:dict):
+        """Validate patch attributes and if valid, append
+        args:
+            attr (dict): the attributes to append
+        raises: 
+            InvalidAgeParam: if the retirement age exceeds the current age
+            MissingUserParam: if required param is missing
+        """
+        self.verify_user_fields(attr)
+        self._append_attr(attr, False)
+
+    def verify_user_fields(self, attr:dict):
+        """helper method to verify the given fields to create a user are valid
+        args:
+            attr (dict): the attributes to check
+        raises: 
+            InvalidAgeParam: if the retirement age exceeds the current age
+            MissingUserParam: if required param is missing
+        """
+        for field in self.PATCH_FIELDS.keys():
+            if field not in attr.keys():
+                raise MissingUserParam
+        
+        if attr['retirementAge'] > attr['currentAge']:
+            raise InvalidAgeParam

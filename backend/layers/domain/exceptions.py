@@ -32,6 +32,11 @@ class MissingHomeParam(BaseException):
         self.param = param
         super().__init__(f"If age_home param given, {param} is required.")
 
+class MissingUserParam(BaseException):
+    def __init__(self, param):
+        super().__init__(f"The user parameter {param} is missing.")
+
+
 # income increase errors
 class InvalidIncIncrease(BaseException):
     def __init__(self, err):
@@ -60,4 +65,3 @@ class NoCurrentIncomeException(InvalidIncIncrease):
 class IncomeRequiredException(InvalidIncIncrease):
     def __init__(self):
         super().__init__("Income information must be provided.")
-

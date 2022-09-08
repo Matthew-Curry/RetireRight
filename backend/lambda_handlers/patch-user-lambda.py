@@ -1,4 +1,5 @@
 import logging
+import copy
 from boto3.dynamodb.conditions import Key
 from botocore.exceptions import ClientError
 
@@ -6,7 +7,7 @@ from writer import write_response, write_response_from_obj
 from dynamo_utils import dynamo_resource_cache, UnableToStartSession, get_dynamo_update_params
 from domain.user import User
 from domain.scenario import Scenario
-from domain.exceptions import NoParamGiven, InvalidParam, InvalidRequestBody, InvalidParamType
+from domain.exceptions import NoParamGiven, InvalidParam, InvalidRequestBody, InvalidParamType, MissingUserParam, InvalidAgeParam
 from simulator import simulate_scenario
 
 logger = logging.getLogger()
@@ -27,10 +28,14 @@ def lambda_handler(event, context):
 
     logging.info(
         "Successfully validated parameters. Pulling the user's scenarios from the database..")
-    user_id =  event['requestContext']['authorizer']['claims']['sub']
+    user_id = event['requestContext']['authorizer']['claims']['sub']
     user_params["UserId"] = user_id
     user = User(user_id)
-    user._append_attr(user_params, False)
+    try:
+        user.append_valid_patch_attr(user_params, False)
+    except (MissingUserParam, InvalidAgeParam) as e:
+        logger.error(e)
+        return write_response(400, str(e))
 
     try:
         items = table.query(
@@ -49,7 +54,7 @@ def lambda_handler(event, context):
         "Starting a DynamoDB transaction to update the user and the scenarios..")
     try:
         dynamodb.meta.client.transact_write_items(
-            TransactItems = update_exps
+            TransactItems=update_exps
         )
     except ClientError as e:
         logger.error(e)
@@ -57,15 +62,15 @@ def lambda_handler(event, context):
             return write_response(404, f"The user does not exists.")
         else:
             return write_response(500, "Internal error. Please try again later")
-    
+
     for i, scenario in enumerate(scenarios):
         scenarios[i] = scenario.to_response()
-    
+
     logger.info('Writing 200 response')
     return write_response_from_obj(200, scenarios)
 
 
-def get_updated_results(items:dict, user) -> tuple:
+def get_updated_results(items: dict, user) -> tuple:
     """Gets updated Scenario values and update expressions after re-running each Scenario's simulation
     args:
         items (dict): Result from DynamoDB query for user Scenarios
@@ -94,20 +99,20 @@ def get_updated_results(items:dict, user) -> tuple:
             per_suc, best, worst, av = simulate_scenario(user, scenario)
             scenario.append_simulation_fields(per_suc, best, worst, av)
             scenarios.append(scenario)
-            
+
             dynamo_update_exp, dynamo_update_values = get_dynamo_update_params(
-            {'percentSuccess': scenario.percentSuccess,
-            'best': scenario.best,
-            'worst': scenario.worst,
-            'average': scenario.average
-            })
-            exp = update_base
+                {'percentSuccess': scenario.percentSuccess,
+                 'best': scenario.best,
+                 'worst': scenario.worst,
+                 'average': scenario.average
+                 })
+            exp = copy.deepcopy(update_base)
             exp['Update']['Key'] = scenario.get_key()
             exp['Update']['UpdateExpression'] = dynamo_update_exp
             exp['Update']['ExpressionAttributeValues'] = dynamo_update_values
             update_expressions.append(exp)
-    
+
     if scenarios:
         logger.info(f"Ran simualations for {len(scenarios)} scenarios.")
-    
+
     return scenarios, update_expressions
