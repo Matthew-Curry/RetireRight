@@ -83,5 +83,5 @@ class User(Item):
             if field not in attr.keys():
                 raise MissingUserParam
         
-        if attr['retirementAge'] > attr['currentAge']:
+        if attr['retirementAge'] < attr['currentAge']:
             raise InvalidAgeParam('retirementAge', attr['retirementAge'], attr['currentAge'])
