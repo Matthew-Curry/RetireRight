@@ -74,7 +74,7 @@ class Scenario(Item):
     @classmethod
     def from_item(cls, item: dict):
         # construct a cls with the needed starting keys
-        new_scenario = cls(item["PK"], item["SK"].removeprefix(cls.SK_PREFIX))
+        new_scenario = cls(item["PK"].removeprefix(cls.SK_PREFIX), item["SK"].removeprefix(cls.SK_PREFIX))
         item.pop("PK")
         item.pop("SK")
         # append remaining keys if valid and return

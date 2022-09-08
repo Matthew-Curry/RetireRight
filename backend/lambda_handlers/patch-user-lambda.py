@@ -2,7 +2,7 @@ import logging
 from boto3.dynamodb.conditions import Key
 from botocore.exceptions import ClientError
 
-from writer import write_response
+from writer import write_response, write_response_from_obj
 from dynamo_utils import dynamo_resource_cache, UnableToStartSession, get_dynamo_update_params
 from domain.user import User
 from domain.scenario import Scenario
@@ -14,7 +14,7 @@ logger.setLevel(logging.INFO)
 
 def lambda_handler(event, context):
     try:
-        _, table, client = dynamo_resource_cache.get_db_resources(client=True)
+        dynamodb, table = dynamo_resource_cache.get_db_resources()
     except UnableToStartSession:
         return write_response(500, "Internal error. Please try again later")
 
@@ -42,16 +42,14 @@ def lambda_handler(event, context):
     except ClientError as e:
         logger.error(e)
         return write_response(500, "Internal error. Please try again later")
-    print("HERE ARE THE ITEM")
-    print(items)
     # if the user has scenarios, re-rerun the simulations with new user information
     scenarios, update_exps = get_updated_results(items, user)
 
     logging.info(
         "Starting a DynamoDB transaction to update the user and the scenarios..")
     try:
-        client.transact_write_items(
-            update_exps
+        dynamodb.meta.client.transact_write_items(
+            TransactItems = update_exps
         )
     except ClientError as e:
         logger.error(e)
@@ -60,10 +58,11 @@ def lambda_handler(event, context):
         else:
             return write_response(500, "Internal error. Please try again later")
     
-    for i, s in enumerate(scenarios):
-        scenarios[i] = Scenario.from_item(s).to_response()
-
-    return write_response(200, scenarios)
+    for i, scenario in enumerate(scenarios):
+        scenarios[i] = scenario.to_response()
+    
+    logger.info('Writing 200 response')
+    return write_response_from_obj(200, scenarios)
 
 
 def get_updated_results(items:dict, user) -> tuple:
@@ -73,7 +72,7 @@ def get_updated_results(items:dict, user) -> tuple:
         user (User): The user that owns the scenarios
     returns:
         tuple in form (scenarios, update_expressions)"""
-    print("IN GET UPDATED RESULTS")
+
     update_expressions = [{'Put': {
         'TableName': 'users',
         'Item': user.to_item()
@@ -88,10 +87,8 @@ def get_updated_results(items:dict, user) -> tuple:
     }
     scenarios = []
     if 'Items' in items:
-        print("in the if statement")
         n = len(items['Items'])
         for i, data in enumerate(items['Items']):
-            print("in the loop")
             scenario = Scenario.from_item(data)
             logger.info(f"Running simulation for scenario {i} of {n}")
             per_suc, best, worst, av = simulate_scenario(user, scenario)
@@ -105,9 +102,9 @@ def get_updated_results(items:dict, user) -> tuple:
             'average': scenario.average
             })
             exp = update_base
-            exp['Key'] = scenario.get_key()
-            exp['UpdateExpression'] = dynamo_update_exp
-            exp['ExpressionAttributeValues'] = dynamo_update_values
+            exp['Update']['Key'] = scenario.get_key()
+            exp['Update']['UpdateExpression'] = dynamo_update_exp
+            exp['Update']['ExpressionAttributeValues'] = dynamo_update_values
             update_expressions.append(exp)
     
     if scenarios:

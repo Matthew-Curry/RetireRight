@@ -27,7 +27,7 @@ class DynamoResourceCache:
         """Helper method to return DynamoDB service and user table resources. Checks if resources are cached from a 
         warm start, else creates new resources, then returns them.
         args:
-            client (boolean): whether or not to also return the client resource
+            client (bool): whether or not to also return the client resource
         raises: 
             UnableToStartSession: if either the service or table resource cannot be instantiated
         returns:
