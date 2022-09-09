@@ -13,6 +13,7 @@ from simulator import simulate_scenario
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
+
 def lambda_handler(event, context):
     try:
         dynamodb, table = dynamo_resource_cache.get_db_resources()
@@ -101,6 +102,8 @@ def get_updated_results(items: dict, user) -> tuple:
             scenario.append_simulation_fields(per_suc, best, worst, av)
             scenarios.append(scenario)
 
+            # in addition to simulation results, all variables that can change 
+            # with a user age change should be updated
             dynamo_update_exp, dynamo_update_values = get_dynamo_update_params(
                 {'percentSuccess': scenario.percentSuccess,
                  'best': scenario.best,
@@ -108,7 +111,11 @@ def get_updated_results(items: dict, user) -> tuple:
                  'average': scenario.average,
                  'ageKids': scenario.ageKids,
                  'incomeInc': scenario.incomeInc,
-                 'ageHome': scenario.ageHome
+                 'ageHome': scenario.ageHome,
+                 'homeCost': scenario.homeCost,
+                 'downpaymentSavings': scenario.downpaymentSavings,
+                 'mortgageRate': scenario.mortgageRate,
+                 'mortgageLength': scenario.mortgageLength
                  })
             exp = copy.deepcopy(update_base)
             exp['Update']['Key'] = scenario.get_key()
