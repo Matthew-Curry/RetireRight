@@ -335,6 +335,7 @@ export default {
     sourceData() {
       this.ageKids = [...this.sourceData.ageKids];
       this.incomeInc = JSON.parse(JSON.stringify(this.sourceData.incomeInc));
+      this.ageHome = this.sourceData.ageHome;
     },
   },
 
