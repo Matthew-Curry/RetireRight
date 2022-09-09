@@ -35,7 +35,7 @@ phases:
     
       # Build lambda function artifacts
       - echo "Building the lambda functions.."
-      - cd lambda_handlers
+      - cd handlers
 
       - echo "Building the create user lambda"
       - cp create-user-lambda.py lambda_function.py

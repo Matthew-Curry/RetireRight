@@ -98,10 +98,33 @@ export default {
     this.chartData.data.datasets[2].data = this.averageData;
   },
 
-  mounted() {
-    const ctx = document.getElementById("the-chart");
-    new Chart(ctx, this.chartData);
+  watch: {
+    bestData() {
+      this.chartData.data.datasets[0].data = this.bestData;
+      this.createChart();
+    },
+
+    worstData() {
+      this.chartData.data.datasets[1].data = this.worstData;
+      this.createChart();
+    },
+
+    averageData() {
+      this.chartData.data.datasets[2].data = this.averageData;
+      this.createChart();
+    },
   },
+
+  mounted() {
+    this.createChart();
+  },
+
+  methods: {
+    createChart() {
+      const ctx = document.getElementById("the-chart");
+      new Chart(ctx, this.chartData);
+    }
+  }
 };
 </script>
 

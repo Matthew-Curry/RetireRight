@@ -65,8 +65,8 @@ def lambda_handler(event, context):
         return write_response(400, str(e))
 
     logging.info("Successfully validated parameters, calling the simulator to process the scenario")
-    per_suc, best, worst, av = simulate_scenario(user, scenerio)
-    scenerio.append_simulation_fields(per_suc, best, worst, av)
+    per_suc, rtc, best, worst, av = simulate_scenario(user, scenerio)
+    scenerio.append_simulation_fields(per_suc, rtc, best, worst, av)
 
     logging.info("Making request to DynamoDB to place the item")
     try:

@@ -28,6 +28,7 @@ class Scenario(Item):
     
     PROCESSED_FIELDS = {
         "percentSuccess": Decimal,
+        "retirementTotalCost": int,
         "best": list,
         "worst": list,
         "average": list
@@ -204,9 +205,10 @@ class Scenario(Item):
         else:
             raise IncomeRequiredException
                     
-    def append_simulation_fields(self, per_suc:Decimal, best:list, worst:list, av:list):
+    def append_simulation_fields(self, per_suc:Decimal, retirementTotalCost: int, best:list, worst:list, av:list):
         """Used as entrypoint to add simulation result fields to an already constructed scenario"""
         self.percentSuccess = per_suc
+        self.retirementTotalCost = retirementTotalCost
         self.best = best
         self.worst = worst
         self.average = av

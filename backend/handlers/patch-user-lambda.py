@@ -98,14 +98,15 @@ def get_updated_results(items: dict, user) -> tuple:
             scenario = Scenario.from_item(data)
             scenario.update_current_age(user.currentAge)
             logger.info(f"Running simulation for scenario {i} of {n}")
-            per_suc, best, worst, av = simulate_scenario(user, scenario)
-            scenario.append_simulation_fields(per_suc, best, worst, av)
+            per_suc, rtc, best, worst, av = simulate_scenario(user, scenario)
+            scenario.append_simulation_fields(per_suc, rtc, best, worst, av)
             scenarios.append(scenario)
 
             # in addition to simulation results, all variables that can change 
             # with a user age change should be updated
             dynamo_update_exp, dynamo_update_values = get_dynamo_update_params(
                 {'percentSuccess': scenario.percentSuccess,
+                'retirementTotalCost': scenario.retirementTotalCost,
                  'best': scenario.best,
                  'worst': scenario.worst,
                  'average': scenario.average,

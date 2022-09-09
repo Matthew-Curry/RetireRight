@@ -86,8 +86,8 @@ def lambda_handler(event, context):
         return write_response(400, str(e))
             
     logging.info("Successfully applied patch to the scenario, starting simulation..")
-    per_suc, best, worst, av = simulate_scenario(user, scenario)
-    scenario.append_simulation_fields(per_suc, best, worst, av)
+    per_suc, rtc, best, worst, av = simulate_scenario(user, scenario)
+    scenario.append_simulation_fields(per_suc, rtc, best, worst, av)
 
     dynamo_update_exp, dynamo_update_values = get_dynamo_update_params(scenario.get_patch())
     
