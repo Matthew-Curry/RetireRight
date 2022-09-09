@@ -119,7 +119,7 @@ def simulate_scenario(user, scenario) -> tuple:
         mortgage_payment = mortgage_factor * yearly_split
         age_home_paid = age_home + mortgage_length
 
-    retirement_cost = get_total_retirement_cost(food, entertainment, yearly_travel, rent, age_home, 
+    retirement_cost = get_total_retirement_cost(scenario.food, scenario.entertainment, scenario.yearly_travel, scenario.rent, age_home, 
                                     current_age, retirement_age, age_home_paid, mortgage_payment)
 
     # inflation factor is one plus the global var holding inflation rate
