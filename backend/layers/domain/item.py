@@ -3,7 +3,7 @@
 from abc import ABC, abstractmethod
 from decimal import Decimal
 
-from .general_converter import get_converted_params
+from .general_converter import get_converted_params, is_type
 
 def abstractproperty(func):
    return property(classmethod(abstractmethod(func)))
@@ -68,10 +68,10 @@ class Item(ABC):
             is_post (bool): whether to validate against the post fields, else will valid against the patch fields"""
         for k, v in attr.items():
             if is_post:
-                if k in self.POST_FIELDS and isinstance(v, self.POST_FIELDS[k]):
+                if k in self.POST_FIELDS and is_type(v, self.POST_FIELDS[k]):
                     setattr(self, k, v)
             else:
-                if k in self.PATCH_FIELDS and isinstance(v, self.PATCH_FIELDS[k]):
+                if k in self.PATCH_FIELDS and is_type(v, self.PATCH_FIELDS[k]):
                     setattr(self, k, v)
 
     def append_db_attr(self, attr:dict):

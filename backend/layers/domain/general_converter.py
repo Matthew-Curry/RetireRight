@@ -32,10 +32,7 @@ def get_converted_params(request_body: str, valid_params:dict) -> dict:
     for p, v in request_body.items():
         try: 
             data_type = valid_params[p]
-            # edge case of passing 1 for decimal value
-            if v == 1 and data_type is Decimal:
-                pass
-            elif isinstance(v, data_type) == False:
+            if is_type(v, data_type) == False:
                 raise InvalidParamType(p, valid_params[p])
         except KeyError as e:
             raise InvalidParam(p)
@@ -43,3 +40,13 @@ def get_converted_params(request_body: str, valid_params:dict) -> dict:
             raise e
     
     return request_body
+
+def is_type(v, data_type):
+    """Helper method to check if given value matches type. Handles edge case of 
+    int of 1 that should be decimal"""
+    if isinstance(v, data_type):
+        return True
+    elif v == 1 and data_type is Decimal:
+        return True
+    
+    return False
