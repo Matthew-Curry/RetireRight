@@ -118,6 +118,9 @@ def simulate_scenario(user, scenario) -> tuple:
             yearly_downpayment_saving = 0
         else:
             yearly_downpayment_saving = (DOWNPAYMENT_PERCENT*home_cost - downpayment_savings)/(age_home - current_age)
+    else:
+        age_home_paid = None
+        mortgage_payment = None
 
     retirement_cost = get_total_retirement_cost(scenario.food, scenario.entertainment, scenario.yearlyTravel, scenario.rent, age_home, 
                                     current_age, retirement_age, age_home_paid, mortgage_payment)
