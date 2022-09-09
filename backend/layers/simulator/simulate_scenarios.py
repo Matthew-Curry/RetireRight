@@ -101,7 +101,10 @@ def simulate_scenario(user, scenario) -> tuple:
         returns = dist.samples(years, seed = random.random())
         # set variables from home decision attributes
         if age_home:
-            yearly_downpayment_saving = (DOWNPAYMENT_PERCENT*home_cost - downpayment_savings)/(age_home - current_age)
+            if age_home == current_age:
+                yearly_downpayment_saving = 0
+            else:
+                yearly_downpayment_saving = (DOWNPAYMENT_PERCENT*home_cost - downpayment_savings)/(age_home - current_age)
             yearly_split = (home_cost *(1-DOWNPAYMENT_PERCENT))/mortgage_length
             mortgage_payment = mortgage_factor * yearly_split
             age_home_paid = age_home + mortgage_length
