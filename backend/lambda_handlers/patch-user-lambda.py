@@ -105,7 +105,9 @@ def get_updated_results(items: dict, user) -> tuple:
                 {'percentSuccess': scenario.percentSuccess,
                  'best': scenario.best,
                  'worst': scenario.worst,
-                 'average': scenario.average
+                 'average': scenario.average,
+                 'ageKids': scenario.ageKids,
+                 'incomeInc': scenario.incomeInc
                  })
             exp = copy.deepcopy(update_base)
             exp['Update']['Key'] = scenario.get_key()

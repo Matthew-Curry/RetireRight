@@ -283,10 +283,6 @@ export default {
       required: true,
     },
 
-    isSaving: {
-      type: Boolean,
-      required: true,
-    },
   },
 
   emits: ["selected", "scenario-form-submitted", "deleted"],
@@ -333,6 +329,13 @@ export default {
     this.mortgageLength = this.sourceData.mortgageLength;
     this.ageKids = [...this.sourceData.ageKids];
     this.incomeInc = JSON.parse(JSON.stringify(this.sourceData.incomeInc));
+  },
+
+  watch: {
+    sourceData() {
+      this.ageKids = [...this.sourceData.ageKids];
+      this.incomeInc = JSON.parse(JSON.stringify(this.sourceData.incomeInc));
+    },
   },
 
   computed: {

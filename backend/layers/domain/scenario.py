@@ -233,9 +233,11 @@ class Scenario(Item):
 
     def update_current_age(self, current_age:int):
         """Updates the minimum age in the incomeInc attribute to the given age, and removes all ages
-            smaller than the new current age if any exist.
+            smaller than the new current age if any exist in incomeInc and ageKids
         args:
             current_age (int): age to update the minimum age to"""
+
+        self.ageKids[:] = [age for age in self.ageKids if age >= current_age]
         
         if current_age not in self.incomeInc:
             # find the smallest age to replace and all ages smaller than the
@@ -253,4 +255,3 @@ class Scenario(Item):
             # are smaller than new current
             self.incomeInc[str(current_age)] = self.incomeInc.pop(str(min_age))
             [self.incomeInc.pop(age) for age in smaller_ages if age != str(min_age)]
-            
