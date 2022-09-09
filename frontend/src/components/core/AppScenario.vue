@@ -336,6 +336,10 @@ export default {
       this.ageKids = [...this.sourceData.ageKids];
       this.incomeInc = JSON.parse(JSON.stringify(this.sourceData.incomeInc));
       this.ageHome = this.sourceData.ageHome;
+      this.homeCost = this.sourceData.homeCost;
+      this.downpaymentSavings = this.sourceData.downpaymentSavings;
+      this.mortgageRate = this.sourceData.mortgageRate;
+      this.mortgageLength = this.sourceData.mortgageLength;
     },
   },
 
