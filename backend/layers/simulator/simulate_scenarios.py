@@ -111,13 +111,13 @@ def simulate_scenario(user, scenario) -> tuple:
     income_inc = scenario.incomeInc
     # set variables from home decision attributes
     if age_home:
+        mortgage_payment = mortgage_factor * yearly_split
+        age_home_paid = age_home + mortgage_length
+        yearly_split = (home_cost *(1-DOWNPAYMENT_PERCENT))/mortgage_length
         if age_home == current_age:
             yearly_downpayment_saving = 0
         else:
             yearly_downpayment_saving = (DOWNPAYMENT_PERCENT*home_cost - downpayment_savings)/(age_home - current_age)
-        yearly_split = (home_cost *(1-DOWNPAYMENT_PERCENT))/mortgage_length
-        mortgage_payment = mortgage_factor * yearly_split
-        age_home_paid = age_home + mortgage_length
 
     retirement_cost = get_total_retirement_cost(scenario.food, scenario.entertainment, scenario.yearlyTravel, scenario.rent, age_home, 
                                     current_age, retirement_age, age_home_paid, mortgage_payment)
