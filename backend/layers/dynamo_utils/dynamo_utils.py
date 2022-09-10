@@ -6,9 +6,11 @@ from botocore.config import Config
 
 logger = logging.getLogger()
 
+
 class UnableToStartSession(BaseException):
     def __init__(self):
         super().__init__("Unable to start the DynamoDB session.")
+
 
 class DynamoResourceCache:
 
@@ -19,9 +21,9 @@ class DynamoResourceCache:
         self.table = None
         # the configuration to use in establishing new sessions
         self.config = Config(
-                        connect_timeout = 1,
-                        read_timeout =1
-                    )
+            connect_timeout=1,
+            read_timeout=1
+        )
 
     def get_db_resources(self, client=False) -> tuple:
         """Helper method to return DynamoDB service and user table resources. Checks if resources are cached from a 
@@ -33,29 +35,32 @@ class DynamoResourceCache:
         returns:
             tuple of the resources in form (service, table). If client arg passed, will return tuple in
             form (service, table, client) """
-      
+
         if self.dynamodb is None or self.table is None:
-            logger.info("Not able to find both Dynamo resources. Creating new ones..")
+            logger.info(
+                "Not able to find both Dynamo resources. Creating new ones..")
             try:
-                self.dynamodb = boto3.resource('dynamodb', config = self.config)
+                self.dynamodb = boto3.resource('dynamodb', config=self.config)
                 self.table = self.dynamodb.Table('users')
                 if client:
-                    self.client = boto3.client('dynamodb', config = self.config)
+                    self.client = boto3.client('dynamodb', config=self.config)
             except Exception as e:
                 raise UnableToStartSession
             logger.info("Successfully created DynamoDB resources")
         else:
             logger.info("Returning cached DynamoDB resources.")
-        
+
         if client:
             return self.dynamodb, self.table, self.client
 
         return self.dynamodb, self.table
 
+
 # instantiation of cache lambda handlers will import to initialize the resource cache
 dynamo_resource_cache = DynamoResourceCache()
 
-def get_dynamo_update_params(fields:dict) -> tuple:
+
+def get_dynamo_update_params(fields: dict) -> tuple:
     """helper method to return DynamoDB update expression and expression values for the given fields
     args:
         fields (dict): dictionary mapping fields to update to values
@@ -65,12 +70,12 @@ def get_dynamo_update_params(fields:dict) -> tuple:
     expression_vals = {}
     for i, k in enumerate(fields.keys()):
         # append to the update expression
-        if i == len(fields.keys()) -1:
+        if i == len(fields.keys()) - 1:
             update_exp = update_exp + f'{k}=:val{i + 1}'
         else:
             update_exp = update_exp + f'{k}=:val{i + 1} ,'
-        
+
         # append to the values
         expression_vals[f':val{i + 1}'] = fields[k]
-    
+
     return update_exp, expression_vals

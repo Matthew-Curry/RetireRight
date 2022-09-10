@@ -4,13 +4,15 @@ from decimal import Decimal
 from .item import Item
 from .exceptions import InvalidAgeParam, MissingUserParam
 
+
 class User(Item):
     PK_PREFIX = SK_PREFIX = "USER#"
-    PATCH_FIELDS = {'UserName': str, 'stockAllocation': Decimal, 'retirementAge': int, 'currentAge': int, 'principle': int}
-    POST_FIELDS = {'UserName':str}
+    PATCH_FIELDS = {'UserName': str, 'stockAllocation': Decimal,
+                    'retirementAge': int, 'currentAge': int, 'principle': int}
+    POST_FIELDS = {'UserName': str}
     PROCESSED_FIELDS = {}
 
-    def __init__(self, UserId:str, UserName=None):
+    def __init__(self, UserId: str, UserName=None):
         self.UserId = UserId
         self.UserName = UserName
 
@@ -20,19 +22,19 @@ class User(Item):
     def get_key(self) -> dict:
         """Return key of this User as dict"""
         return {'PK': self.PK, 'SK': self.SK}
-    
+
     def get_pk(self):
         return self.PK
 
     def get_sk(self):
         return self.SK
-    
+
     def has_sim_attr(self) -> bool:
         """returns whether the user instance has all fields needed to run a simulation (the PATCH fields)"""
         for field in self.PATCH_FIELDS:
             if field not in self.__dict__:
                 return False
-        
+
         return True
 
     @classmethod
@@ -44,7 +46,7 @@ class User(Item):
         new_user.append_db_attr(item)
 
         return new_user
-    
+
     def to_item(self) -> dict:
         """Convert item into dynamodb compatible key value pairs"""
         return self.__dict__
@@ -60,7 +62,7 @@ class User(Item):
 
         return public_fields
 
-    def append_valid_patch_attr(self, attr:dict):
+    def append_valid_patch_attr(self, attr: dict):
         """Validate patch attributes and if valid, append
         args:
             attr (dict): the attributes to append
@@ -71,7 +73,7 @@ class User(Item):
         self.verify_user_fields(attr)
         self._append_attr(attr, False)
 
-    def verify_user_fields(self, attr:dict):
+    def verify_user_fields(self, attr: dict):
         """helper method to verify the given fields to create a user are valid
         args:
             attr (dict): the attributes to check
@@ -82,6 +84,7 @@ class User(Item):
         for field in self.PATCH_FIELDS.keys():
             if field not in attr.keys():
                 raise MissingUserParam(field)
-        
+
         if attr['retirementAge'] < attr['currentAge']:
-            raise InvalidAgeParam('retirementAge', attr['retirementAge'], attr['currentAge'])
+            raise InvalidAgeParam(
+                'retirementAge', attr['retirementAge'], attr['currentAge'])

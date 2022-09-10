@@ -133,7 +133,7 @@ def simulate_scenario(user, scenario) -> tuple:
         # initialize total assests and income
         total_assets = principle
         income = scenario.incomeInc[str(current_age)]
-        # initialize all vars from the scenario
+        # initialize cost vars from the scenario
         rent = scenario.rent
         food = scenario.food
         entertainment = scenario.entertainment
@@ -162,7 +162,6 @@ def simulate_scenario(user, scenario) -> tuple:
             if str(age) in income_inc:
                 income = income_inc[str(age)]
 
-            # update the net income to the income
             net_income = income
             
             if age_home:

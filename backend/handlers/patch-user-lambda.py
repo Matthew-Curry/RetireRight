@@ -102,22 +102,8 @@ def get_updated_results(items: dict, user) -> tuple:
             scenario.append_simulation_fields(per_suc, rtc, best, worst, av)
             scenarios.append(scenario)
 
-            # in addition to simulation results, all variables that can change 
-            # with a user age change should be updated
             dynamo_update_exp, dynamo_update_values = get_dynamo_update_params(
-                {'percentSuccess': scenario.percentSuccess,
-                'retirementTotalCost': scenario.retirementTotalCost,
-                 'best': scenario.best,
-                 'worst': scenario.worst,
-                 'average': scenario.average,
-                 'ageKids': scenario.ageKids,
-                 'incomeInc': scenario.incomeInc,
-                 'ageHome': scenario.ageHome,
-                 'homeCost': scenario.homeCost,
-                 'downpaymentSavings': scenario.downpaymentSavings,
-                 'mortgageRate': scenario.mortgageRate,
-                 'mortgageLength': scenario.mortgageLength
-                 })
+                scenario.get_patch())
             exp = copy.deepcopy(update_base)
             exp['Update']['Key'] = scenario.get_key()
             exp['Update']['UpdateExpression'] = dynamo_update_exp

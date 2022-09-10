@@ -3,6 +3,7 @@
 import json
 from decimal import Decimal
 
+
 class DecimalEncoder(json.JSONEncoder):
     def default(self, obj):
         # if obj is decimal convert to float
@@ -10,14 +11,15 @@ class DecimalEncoder(json.JSONEncoder):
             return float(obj)
         return json.JSONEncoder.default(self, obj)
 
-def write_response(status_code:int, body:str) -> dict:
+
+def write_response(status_code: int, body: str) -> dict:
     """write http response with CORS headers
     args:
         status_code (int): the status code to return in the HTTP response
         body (str): string representing the body of the response
     returns:
         Dictionary representing the response with needed CORS headers"""
-    resp = {"statusCode": status_code, 
+    resp = {"statusCode": status_code,
             "isBase64Encoded": False,
             'headers': {
                 'Content-Type': "application/json",
@@ -25,8 +27,8 @@ def write_response(status_code:int, body:str) -> dict:
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PATCH,DELETE'
             },
-        }
-    
+            }
+
     if body:
         resp["body"] = body
     else:
@@ -34,7 +36,8 @@ def write_response(status_code:int, body:str) -> dict:
 
     return resp
 
-def write_response_from_obj(status_code:int, body:dict) -> dict:
+
+def write_response_from_obj(status_code: int, body: dict) -> dict:
     """write http response with CORS headers given body as dictionary
     args:
         status_code (int): the status code to return in the HTTP response

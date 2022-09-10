@@ -278,3 +278,12 @@ class Scenario(Item):
             self.incomeInc[str(current_age)] = self.incomeInc.pop(str(min_age))
             [self.incomeInc.pop(age)
              for age in smaller_ages if age != str(min_age)]
+        
+        # all potentially changed fields should be included in the scenario's patch
+        self.patch['ageKids'] = self.ageKids
+        self.patch['incomeInc'] = self.incomeInc
+        self.patch['ageHome'] = self.ageHome
+        self.patch['homeCost'] = self.homeCost
+        self.patch['downpaymentSavings'] = self.downpaymentSavings
+        self.patch['mortgageRate'] = self.mortgageRate
+        self.patch['mortgageLength'] = self.mortgageLength
