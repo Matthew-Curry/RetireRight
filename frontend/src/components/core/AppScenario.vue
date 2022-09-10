@@ -495,37 +495,39 @@ export default {
         return this.getErrorMsg("Home cost cannot be negative.");
       }
 
-      if (this.ageHome && this.ageHome < this.currentAge) {
+      if (this.ageHome !== 0 && this.ageHome < this.currentAge) {
         return this.getErrorMsg(
           "Age of home purchase cannot be smaller than the current age."
         );
       }
 
-      if (this.ageHome && !this.homeCost) {
+      if (this.ageHome !== 0 && !this.homeCost) {
         return this.getErrorMsg(
           "A home cost must be given if an age of home purchase is provided."
         );
       }
 
-      if (this.ageHome && !this.mortgageRate) {
+      if (this.ageHome !== 0 && !this.mortgageRate) {
         return this.getErrorMsg(
           "A mortgage rate must be given if an age of home purchase is provided."
         );
       }
 
-      if (this.ageHome && !this.mortgageLength) {
+      if (this.ageHome !== 0 && !this.mortgageLength) {
         return this.getErrorMsg(
           "A mortgage length must be given if an age of home purchase is provided."
         );
       }
 
       if (
-        !this.ageHome &&
-        (this.homeCost ||
-          this.mortgageRate ||
-          this.mortgageLength ||
-          this.downpaymentSavings)
+        this.ageHome !== 0 &&
+        (this.homeCost === 0 ||
+          this.mortgageRate === 0 ||
+          this.mortgageLength === 0 ||
+          this.downpaymentSavings === 0)
       ) {
+        console.log(this.ageHome);
+        console.log(typeof this.ageHome);
         return this.getErrorMsg(
           "Cannot provide home related variables without giving a home purchase age and cost."
         );
@@ -535,6 +537,7 @@ export default {
     castBaseFields() {
       // cast all vals as needed after initial checks pass
       this.rent = this.castToInt(this.rent);
+      this.food = this.castToInt(this.food);
       this.entertainment = this.castToInt(this.entertainment);
       this.yearlyTravel = this.castToInt(this.yearlyTravel);
       this.downpaymentSavings = this.castToInt(this.downpaymentSavings);
@@ -555,8 +558,6 @@ export default {
     },
 
     checkIncomeInc() {
-
-
       if (Object.keys(this.incomeInc).length === 0) {
         return this.getErrorMsg("Income information must be provided.");
       }
@@ -604,18 +605,19 @@ export default {
     },
 
     validateFields() {
+      this.castBaseFields();
       const b = this.checkBaseFields();
       if (b) {
-        return b
+        return b;
       }
-      this.castBaseFields();
+      //this.castBaseFields();
       const a = this.checkAgeKids();
       if (a) {
-        return a
+        return a;
       }
       const i = this.checkIncomeInc();
       if (i) {
-        return i
+        return i;
       }
     },
 
@@ -627,6 +629,7 @@ export default {
       }
       // build JSON of only the changed fields
       const patchValues = {};
+      console.log(this.changedFields)
       for (const field of this.changedFields) {
         patchValues[field] = this.$data[field];
       }

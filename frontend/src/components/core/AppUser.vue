@@ -147,8 +147,10 @@ export default {
         this.setAttr();
         return "Investment principle cannot be negative.";
       }
-
+      console.log(this.patchValues.retirementAge)
+      console.log(this.patchValues.currentAge)
       if (this.patchValues.retirementAge < this.patchValues.currentAge) {
+        console.log("IN THE IF")
         this.setAttr();
         return "Retirement age must be greater than current age";
       }

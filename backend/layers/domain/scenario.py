@@ -151,7 +151,7 @@ class Scenario(Item):
         # if an age of home purchase is provided, a homeCost, mortgageRate, and
         # mortgageLength must also be provided.
         if "ageHome" in params:
-            if params["ageHome"]:
+            if params["ageHome"] is not None:
                 if params["ageHome"] < current_age:
                     raise InvalidAgeParam(
                         "ageHome", params["ageHome"], current_age)

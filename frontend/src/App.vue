@@ -182,7 +182,6 @@ export default {
     },
 
     patchUser(patchValues) {
-      console.log("YEP PATCH USER");
       if (
         patchValues.currentAge === this.user.currentAge &&
         patchValues.retirementAge === this.user.retirementAge &&
@@ -270,7 +269,6 @@ export default {
         }
       });
 
-      this.scenarios.splice(index, 1);
     },
 
     addScenario() {
