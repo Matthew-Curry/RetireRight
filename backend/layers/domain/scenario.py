@@ -280,6 +280,9 @@ class Scenario(Item):
              for age in smaller_ages if age != str(min_age)]
         
         # all potentially changed fields should be included in the scenario's patch
+        if not self.patch:
+            self.patch = {}
+            
         self.patch['ageKids'] = self.ageKids
         self.patch['incomeInc'] = self.incomeInc
         self.patch['ageHome'] = self.ageHome
