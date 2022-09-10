@@ -66,7 +66,7 @@ def get_total_retirement_cost(food, entertainment, yearly_travel, rent, age_home
     total_cost = retirement_yearly_cost + home_payoff
     length = LIFE_EXPECTANCY - retirement_age
     for _ in range(1, length):
-        total_cost = retirement_yearly_cost * (1 + INFLATION_RATE)
+        total_cost = total_cost + retirement_yearly_cost * (1 + INFLATION_RATE)
 
     return total_cost
 
