@@ -62,7 +62,10 @@ export default {
       }
 
       if (
-        Object.prototype.hasOwnProperty.call(this.scenarios, "best") === false
+        Object.prototype.hasOwnProperty.call(
+          this.scenarios[this.selectedScenarioIndex],
+          "best"
+        ) === false
       ) {
         return [];
       }
@@ -76,7 +79,10 @@ export default {
       }
 
       if (
-        Object.prototype.hasOwnProperty.call(this.scenarios, "worst") === false
+        Object.prototype.hasOwnProperty.call(
+          this.scenarios[this.selectedScenarioIndex],
+          "worst"
+        ) === false
       ) {
         return [];
       }
@@ -90,8 +96,10 @@ export default {
       }
 
       if (
-        Object.prototype.hasOwnProperty.call(this.scenarios, "average") ===
-        false
+        Object.prototype.hasOwnProperty.call(
+          this.scenarios[this.selectedScenarioIndex],
+          "average"
+        ) === false
       ) {
         return [];
       }
@@ -106,7 +114,7 @@ export default {
 
       if (
         Object.prototype.hasOwnProperty.call(
-          this.scenarios,
+          this.scenarios[this.selectedScenarioIndex],
           "retirementTotalCost"
         ) === false
       ) {
@@ -174,6 +182,7 @@ export default {
     },
 
     patchUser(patchValues) {
+      console.log("YEP PATCH USER");
       if (
         patchValues.currentAge === this.user.currentAge &&
         patchValues.retirementAge === this.user.retirementAge &&
@@ -197,7 +206,7 @@ export default {
         }
       }
 
-      patchValues['UserName'] = this.user['UserName']
+      patchValues["UserName"] = this.user["UserName"];
 
       this.updatingScenarios = true;
       apiCon.patchUser(patchValues).then((data) => {
@@ -353,7 +362,8 @@ export default {
       selectedScenarioIndex: computed(() => this.selectedScenarioIndex),
       addScenario: this.addScenario,
       savingScenario: computed(() => this.savingScenario),
-      isBlank: this.isBlank
+      isBlank: this.isBlank,
+      castToInt: this.castToInt,
     };
   },
 };

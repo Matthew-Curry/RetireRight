@@ -296,7 +296,7 @@ export default {
 
   emits: ["selected", "scenario-form-submitted", "deleted"],
 
-  inject: ["savingScenario", "selectedScenarioIndex", "isBlank"],
+  inject: ["savingScenario", "selectedScenarioIndex", "isBlank", "castToInt"],
 
   data() {
     return {
@@ -448,14 +448,6 @@ export default {
 
     deleteScenario() {
       this.$emit("deleted", this.scenarioIndex);
-    },
-
-    castToInt(val) {
-      if (this.isBlank(val)) {
-        return 0;
-      } else {
-        return Math.ceil(val);
-      }
     },
 
     checkBaseFields() {

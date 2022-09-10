@@ -37,7 +37,7 @@
     <chart
       v-if="scenarios.value"
       :key="selectedScenarioIndex.value"
-      :targetLine="targetLine"
+      :targetLine="targetLine.value"
       :bestData="bestData.value"
       :worstData="worstData.value"
       :averageData="averageData.value"
