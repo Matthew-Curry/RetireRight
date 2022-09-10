@@ -1,5 +1,3 @@
 <template>
-    <div>
-      Loading scenarios...
-    </div>
+  <div>Loading scenarios...</div>
 </template>

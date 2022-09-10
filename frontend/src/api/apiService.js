@@ -39,12 +39,12 @@ function processResponse(resPair) {
 function fetchWrapper(url, options, errMsg) {
     return new Promise((resolve, reject) => {
         fetch(url, options)
-        .then((res) => {
-            resolve([res, errMsg]);
-        })
-        .catch((err) => {
-            reject(err);
-        })
+            .then((res) => {
+                resolve([res, errMsg]);
+            })
+            .catch((err) => {
+                reject(err);
+            })
     });
 }
 
@@ -77,10 +77,10 @@ export default {
         };
 
         return fetchWrapper(USER_URL, options, this.userPatchError)
-        .then(processResponse)
-        .catch((err) => {
-            return err.message
-        });
+            .then(processResponse)
+            .catch((err) => {
+                return err.message
+            });
     },
 
     getScenarios() {
@@ -96,8 +96,10 @@ export default {
 
     deleteScenario(scenarioId) {
         const headers = getUpdatedHeaders();
-        const options = { headers: headers, 
-                        method: 'DELETE'}
+        const options = {
+            headers: headers,
+            method: 'DELETE'
+        }
         const scenario_delete_url = SCENARIO_URL + scenarioId;
 
         return fetchWrapper(scenario_delete_url, options, this.scenarioDeleteError)
@@ -117,10 +119,10 @@ export default {
         };
 
         return fetchWrapper(SCENARIO_URL, options, this.scnenarioPostError)
-        .then(processResponse)
-        .catch((err) => {
-            return err.message
-        });
+            .then(processResponse)
+            .catch((err) => {
+                return err.message
+            });
     },
 
     patchScenario(scenarioId, patchValues) {
@@ -134,9 +136,9 @@ export default {
         const scenario_patch_url = SCENARIO_URL + scenarioId;
 
         return fetchWrapper(scenario_patch_url, options, this.scnenarioPostError)
-        .then(processResponse)
-        .catch((err) => {
-            return err.message
-        });
+            .then(processResponse)
+            .catch((err) => {
+                return err.message
+            });
     }
 }

@@ -31,7 +31,7 @@ export default {
 
   components: {
     "app-scenario": AppScenario,
-    loadingScenario: LoadingScenario
+    loadingScenario: LoadingScenario,
   },
 
   inject: [
@@ -42,7 +42,7 @@ export default {
     "deleteScenario",
     "selectedScenarioIndex",
     "addScenario",
-    "savingScenario"
+    "savingScenario",
   ],
 };
 </script>

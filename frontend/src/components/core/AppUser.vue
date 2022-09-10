@@ -108,10 +108,10 @@ export default {
 
       changedFields: [],
       nameMap: {
-        localStockAllocation: 'stockAllocation',
-        localRetirementAge: 'retirementAge',
-        localCurrentAge: 'currentAge',
-        localPrinciple: 'principle',
+        localStockAllocation: "stockAllocation",
+        localRetirementAge: "retirementAge",
+        localCurrentAge: "currentAge",
+        localPrinciple: "principle",
       },
       saveHovered: false,
     };
@@ -136,7 +136,6 @@ export default {
     },
 
     validateFailure() {
-
       if (this.localStockAllocation < 0) {
         this.setAttr();
         return "Stock allocation cannot be negative.";
@@ -181,10 +180,10 @@ export default {
       // build JSON of only the changed fields
       const patchValues = {};
       for (const field of this.changedFields) {
-        if (this.$data[field] === null || this.$data[field] === '') {
+        if (this.$data[field] === null || this.$data[field] === "") {
           this.$data[field] = 0;
-        } 
-        const globalName = this.nameMap[field]
+        }
+        const globalName = this.nameMap[field];
         patchValues[globalName] = this.$data[field];
       }
 

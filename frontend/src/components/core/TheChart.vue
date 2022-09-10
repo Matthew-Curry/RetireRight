@@ -55,7 +55,7 @@ export default {
             {
               label: "Average",
               data: null,
-              borderColor: "rgba(243, 225, 107)", 
+              borderColor: "rgba(243, 225, 107)",
               borderWidth: 3,
               maxHeight: 40,
               showLine: true,
@@ -145,8 +145,7 @@ export default {
       const ctx = document.getElementById("the-chart");
       new Chart(ctx, this.chartData);
     },
-
-  }
+  },
 };
 </script>
 

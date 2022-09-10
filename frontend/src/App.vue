@@ -186,7 +186,6 @@ export default {
           if (data === apiCon.scenarioPatchError) {
             alert(data);
           } else {
-            console.log("THIS IS A PATCH AND IT SUCCEEDED")
             this.scenarios[index] = data;
             this.selectedScenarioIndex = index;
             this.savingScenario = false;

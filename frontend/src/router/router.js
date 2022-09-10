@@ -1,7 +1,7 @@
 /* eslint-disable */
 import { createRouter, createWebHistory } from 'vue-router';
 
-import auth  from '../cognito/auth';
+import auth from '../cognito/auth';
 
 import MainPage from "../components/pages/MainPage.vue";
 import ScenarioPage from "../components/pages/ScenarioPage.vue";
@@ -18,9 +18,9 @@ function requireAuth(to, from, next) {
             query: { redirect: to.fullPath }
         });
     } else {
-            next();
-        };
-    }
+        next();
+    };
+}
 
 export const router = createRouter({
     history: createWebHistory(),
@@ -62,7 +62,7 @@ export const router = createRouter({
         },
 
         {
-            path: '/about', 
+            path: '/about',
             component: AboutPage
         },
     ]

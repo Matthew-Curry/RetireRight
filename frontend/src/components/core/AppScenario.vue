@@ -8,7 +8,14 @@
   >
     <h2>Scenario {{ scenarioNumber }}</h2>
     <h3 id="percentage" :class="percentCSSClass">{{ percentSuccess }}</h3>
-    <h3 v-if="savingScenario.value === true && selectedScenarioIndex.value === scenarioIndex">Saving Scenario and Running Simmulation...</h3>
+    <h3
+      v-if="
+        savingScenario.value === true &&
+        selectedScenarioIndex.value === scenarioIndex
+      "
+    >
+      Saving Scenario and Running Simmulation...
+    </h3>
     <section v-if="isSelected">
       <div class="form-control flex-box">
         <label class="single-input-label" for="rent">Rent</label>
@@ -282,7 +289,6 @@ export default {
       type: Number,
       required: true,
     },
-
   },
 
   emits: ["selected", "scenario-form-submitted", "deleted"],
@@ -373,7 +379,7 @@ export default {
       this.food = this.sourceData.food;
       this.entertainment = this.sourceData.entertainment;
       this.yearlyTravel = this.sourceData.yearlyTravel;
-      this.setSimChangeAttr()
+      this.setSimChangeAttr();
     },
 
     setSimChangeAttr() {
@@ -416,12 +422,12 @@ export default {
 
     removeAge(index) {
       this.ageKids.splice(index, 1);
-      this.updateChangedFields('ageKids');
+      this.updateChangedFields("ageKids");
     },
 
     removeIncomeAge(age) {
       delete this.incomeInc[age];
-      this.updateChangedFields('incomeInc');
+      this.updateChangedFields("incomeInc");
     },
 
     submitIncome(age) {
@@ -496,29 +502,35 @@ export default {
         this.setAttr();
         return "Age of home purchase cannot be smaller than the current age.";
       }
-      
+
       if (this.ageHome && !this.homeCost) {
         this.setAttr();
-        return "A home cost must be given if an age of home purchase is provided."
+        return "A home cost must be given if an age of home purchase is provided.";
       }
 
       if (this.ageHome && !this.mortgageRate) {
         this.setAttr();
-        return "A mortgage rate must be given if an age of home purchase is provided."
+        return "A mortgage rate must be given if an age of home purchase is provided.";
       }
 
       if (this.ageHome && !this.mortgageLength) {
         this.setAttr();
-        return "A mortgage length must be given if an age of home purchase is provided."
+        return "A mortgage length must be given if an age of home purchase is provided.";
       }
 
-      if(!this.ageHome && (this.homeCost || this.mortgageRate || this.mortgageLength || this.downpaymentSavings)) {
+      if (
+        !this.ageHome &&
+        (this.homeCost ||
+          this.mortgageRate ||
+          this.mortgageLength ||
+          this.downpaymentSavings)
+      ) {
         this.setAttr();
-        return "Cannot provide home related variables without giving a home purchase age and cost."
+        return "Cannot provide home related variables without giving a home purchase age and cost.";
       }
 
       for (let age of this.ageKids) {
-        if (age == null || age === 'undefined' || age === '') {
+        if (age == null || age === "undefined" || age === "") {
           age = 0;
         }
 
@@ -528,22 +540,21 @@ export default {
         }
       }
 
-      if( Object.keys(this.incomeInc).length === 0){
+      if (Object.keys(this.incomeInc).length === 0) {
         this.setAttr();
-        return "Income information must be provided."
+        return "Income information must be provided.";
       }
 
       let foundMatch = false;
       for (let [age, income] of Object.entries(this.incomeInc)) {
-
-        if (income == null || income === 'undefined' || income === '') {
+        if (income == null || income === "undefined" || income === "") {
           income = 0;
           this.incomeInc[age] = income;
         }
 
-        if (age === undefined || age === 'undefined' || age === '') {
+        if (age === undefined || age === "undefined" || age === "") {
           delete this.incomeInc[age];
-          age = '0';
+          age = "0";
           this.incomeInc[age] = income;
         }
 
@@ -556,13 +567,13 @@ export default {
 
         if (income < 0) {
           this.setAttr();
-          return "Income cannot be negative"
+          return "Income cannot be negative";
         }
       }
 
       if (!foundMatch) {
         this.setAttr();
-        return "Income for the user's current age must be provided"
+        return "Income for the user's current age must be provided";
       }
     },
 
@@ -575,9 +586,13 @@ export default {
       // build JSON of only the changed fields
       const patchValues = {};
       for (const field of this.changedFields) {
-        if (this.$data[field] == null || this.$data[field] == 'undefined' || this.$data[field] === '') {
+        if (
+          this.$data[field] == null ||
+          this.$data[field] == "undefined" ||
+          this.$data[field] === ""
+        ) {
           this.$data[field] = 0;
-        } 
+        }
 
         patchValues[field] = this.$data[field];
       }

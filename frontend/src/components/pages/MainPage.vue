@@ -18,7 +18,12 @@
         @user-form-submitted="patchUser"
       ></user>
       <label id="dropdown" for="scenarios">Choose a Scenario:</label>
-      <select :value="selectedScenarioIndex.value" name="scenarios" id="scenarios" @change="updateSelectedScenario(parseInt($event.target.value))">
+      <select
+        :value="selectedScenarioIndex.value"
+        name="scenarios"
+        id="scenarios"
+        @change="updateSelectedScenario(parseInt($event.target.value))"
+      >
         <option
           v-for="(sourceData, index) in scenarios.value"
           :key="index"
@@ -29,7 +34,8 @@
       </select>
     </div>
     <loadingUser v-else></loadingUser>
-    <chart v-if="scenarios.value"
+    <chart
+      v-if="scenarios.value"
       :key="selectedScenarioIndex.value"
       :targetLine="targetLine"
       :bestData="bestData.value"
@@ -53,7 +59,7 @@ export default {
     user: AppUser,
     chart: TheChart,
     loadingUser: LoadingUser,
-    loadingScenario: LoadingScenario
+    loadingScenario: LoadingScenario,
   },
 
   inject: [
@@ -67,7 +73,7 @@ export default {
     "bestData",
     "worstData",
     "averageData",
-    "targetLine"
+    "targetLine",
   ],
 };
 </script>
@@ -76,7 +82,4 @@ export default {
 #dropdown {
   font-size: 1.5em;
 }
-
-
-
 </style>

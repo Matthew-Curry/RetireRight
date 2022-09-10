@@ -1,5 +1,3 @@
 <template>
-    <div>
-      Loading user data...
-    </div>
+  <div>Loading user data...</div>
 </template>
