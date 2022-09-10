@@ -220,4 +220,4 @@ def simulate_scenario(user, scenario) -> tuple:
         retirement_target_line.append(retirement_cost)
 
     
-    return Decimal(str(num_success/N)), retirement_target_line, max_result.get_list(), min_result.get_list(), av_result.get_list()
+    return Decimal(str(num_success/N)), retirement_target_line.get_list(), max_result.get_list(), min_result.get_list(), av_result.get_list()
