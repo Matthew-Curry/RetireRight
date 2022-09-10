@@ -369,7 +369,6 @@ export default {
     },
 
     setAttr() {
-      console.log('set called')
       this.rent = this.sourceData.rent;
       this.food = this.sourceData.food;
       this.entertainment = this.sourceData.entertainment;
@@ -518,7 +517,11 @@ export default {
         return "Cannot provide home related variables without giving a home purchase age and cost."
       }
 
-      for (const age of this.ageKids) {
+      for (let age of this.ageKids) {
+        if (age == null || age === 'undefined' || age === '') {
+          age = 0;
+        }
+
         if (age < this.currentAge) {
           this.setAttr();
           return "No age of having a child can preceed the user's current age.";
@@ -531,12 +534,29 @@ export default {
       }
 
       let foundMatch = false;
-      for (const age of Object.keys(this.incomeInc)) {
+      for (let [age, income] of Object.entries(this.incomeInc)) {
+
+        if (income == null || income === 'undefined' || income === '') {
+          income = 0;
+          this.incomeInc[age] = income;
+        }
+
+        if (age === undefined || age === 'undefined' || age === '') {
+          delete this.incomeInc[age];
+          age = '0';
+          this.incomeInc[age] = income;
+        }
+
         if (age < this.currentAge) {
           this.setAttr();
           return "No age of an income increase can preceed the user's current age.";
         } else if (age == this.currentAge) {
           foundMatch = true;
+        }
+
+        if (income < 0) {
+          this.setAttr();
+          return "Income cannot be negative"
         }
       }
 
@@ -555,7 +575,7 @@ export default {
       // build JSON of only the changed fields
       const patchValues = {};
       for (const field of this.changedFields) {
-        if (this.$data[field] === null || this.$data[field] === '') {
+        if (this.$data[field] == null || this.$data[field] == 'undefined' || this.$data[field] === '') {
           this.$data[field] = 0;
         } 
 
