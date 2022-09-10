@@ -222,7 +222,7 @@ class Scenario(Item):
         self.patch['percentSuccess'] = self.percentSuccess
         self.patch['retirementTotalCost'] = self.retirementTotalCost
         self.patch['best'] = self.best
-        self.patch['best'] = self.best
+        self.patch['worst'] = self.worst
         self.patch['average'] = self.average
 
     def to_item(self) -> dict:
