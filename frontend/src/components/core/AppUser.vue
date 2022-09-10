@@ -2,58 +2,54 @@
   <section class="base">
     <h2>{{ username }}</h2>
     <div class="form-control">
-      <label for="localCurrentAge">Current Age</label>
+      <label for="patchValues.currentAge">Current Age</label>
       <input
-        id="localCurrentAge"
-        name="localCurrentAge"
+        id="patchValues.currentAge"
+        name="patchValues.currentAge"
         type="number"
         min="0"
         step="1"
-        v-model="localCurrentAge"
-        @input="updateChangedFields('localCurrentAge')"
+        v-model="patchValues.currentAge"
       />
     </div>
 
     <div class="form-control">
-      <label for="localRetirementAge">Retirement Age</label>
+      <label for="patchValues.retirementAge">Retirement Age</label>
       <input
-        id="localRetirementAge"
-        name="localRetirementAge"
+        id="patchValues.retirementAge"
+        name="patchValues.retirementAge"
         type="number"
         min="0"
         step="1"
-        v-model="localRetirementAge"
-        @input="updateChangedFields('localRetirementAge')"
-        ref="localRetirementAge"
+        v-model="patchValues.retirementAge"
+        ref="patchValues.retirementAge"
       />
     </div>
 
     <div class="form-control">
-      <label for="localPrinciple">Principle</label>
+      <label for="patchValues.principle">Principle</label>
       <input
-        id="localPrinciple"
-        name="localPrinciple"
+        id="patchValues.principle"
+        name="patchValues.principle"
         type="number"
         min="0"
         step="1"
-        v-model="localPrinciple"
-        @input="updateChangedFields('localPrinciple')"
-        ref="localPrinciple"
+        v-model="patchValues.principle"
+        ref="patchValues.principle"
       />
     </div>
 
     <div class="form-control">
-      <label for="localStockAllocation">Stock Allocation</label>
+      <label for="patchValues.stockAllocation">Stock Allocation</label>
       <input
-        id="localStockAllocation"
-        name="localStockAllocation"
+        id="patchValues.stockAllocation"
+        name="patchValues.stockAllocation"
         type="number"
         min="0"
         step="0.01"
         max="1"
-        v-model="localStockAllocation"
-        @input="updateChangedFields('localStockAllocation')"
-        ref="localStockAllocation"
+        v-model="patchValues.stockAllocation"
+        ref="patchValues.stockAllocation"
       />
     </div>
     <button
@@ -99,20 +95,17 @@ export default {
 
   emits: ["user-form-submitted"],
 
+  inject: ["castToInt"],
+
   data() {
     return {
-      localStockAllocation: null,
-      localRetirementAge: null,
-      localCurrentAge: null,
-      localPrinciple: null,
-
-      changedFields: [],
-      nameMap: {
-        localStockAllocation: "stockAllocation",
-        localRetirementAge: "retirementAge",
-        localCurrentAge: "currentAge",
-        localPrinciple: "principle",
+      patchValues: {
+        stockAllocation: null,
+        retirementAge: null,
+        currentAge: null,
+        principle: null,
       },
+
       saveHovered: false,
     };
   },
@@ -122,46 +115,40 @@ export default {
   },
 
   methods: {
-    updateChangedFields(field) {
-      if (!this.changedFields.includes(field)) {
-        this.changedFields.push(field);
-      }
-    },
-
     setAttr() {
-      this.localStockAllocation = this.stockAllocation;
-      this.localRetirementAge = this.retirementAge;
-      this.localCurrentAge = this.currentAge;
-      this.localPrinciple = this.principle;
+      this.patchValues.stockAllocation = this.stockAllocation;
+      this.patchValues.retirementAge = this.retirementAge;
+      this.patchValues.currentAge = this.currentAge;
+      this.patchValues.principle = this.principle;
     },
 
-    validateFailure() {
-      if (this.localStockAllocation < 0) {
+    validateFields() {
+      if (this.patchValues.stockAllocation < 0) {
         this.setAttr();
         return "Stock allocation cannot be negative.";
       }
 
-      if (this.localStockAllocation > 1) {
+      if (this.patchValues.stockAllocation > 1) {
         this.setAttr();
         return "Stock allocation cannot exceed 1.";
       }
 
-      if (this.localRetirementAge <= 0) {
+      if (this.patchValues.retirementAge <= 0) {
         this.setAttr();
         return "Retirement age must be greater than 0.";
       }
 
-      if (this.localCurrentAge <= 0) {
+      if (this.patchValues.currentAge <= 0) {
         this.setAttr();
         return "Current age must be greater than 0.";
       }
 
-      if (this.localPrinciple < 0) {
+      if (this.patchValues.principle < 0) {
         this.setAttr();
         return "Investment principle cannot be negative.";
       }
 
-      if (this.localRetirementAge < this.localCurrentAge) {
+      if (this.patchValues.retirementAge < this.patchValues.currentAge) {
         this.setAttr();
         return "Retirement age must be greater than current age";
       }
@@ -172,24 +159,17 @@ export default {
     },
 
     submitForm() {
-      const msg = this.validateFailure();
+      const msg = this.validateFields();
       if (msg) {
         alert(msg);
         return;
       }
-      // build JSON of only the changed fields
-      const patchValues = {};
-      for (const field of this.changedFields) {
-        if (this.$data[field] === null || this.$data[field] === "") {
-          this.$data[field] = 0;
-        }
-        const globalName = this.nameMap[field];
-        patchValues[globalName] = this.$data[field];
+
+      for (const field of Object.keys(this.patchValues)) {
+        this.patchValues[field] = this.castToInt(this.patchValues[field]);
       }
 
-      this.$emit("user-form-submitted", patchValues);
-
-      this.changedFields = [];
+      this.$emit("user-form-submitted", this.patchValues);
     },
   },
 };

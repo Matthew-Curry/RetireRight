@@ -24,6 +24,7 @@
           name="rent"
           type="number"
           min="0"
+          step="1"
           v-model="rent"
           @input="updateChangedFields('rent')"
         />
@@ -70,7 +71,9 @@
       </div>
 
       <div class="form-control flex-box">
-        <label class="single-input-label" for="ageHome">Age Home Purchase</label>
+        <label class="single-input-label" for="ageHome"
+          >Age Home Purchase</label
+        >
         <input
           id="ageHome"
           name="ageHome"
@@ -293,7 +296,7 @@ export default {
 
   emits: ["selected", "scenario-form-submitted", "deleted"],
 
-  inject: ["savingScenario", "selectedScenarioIndex"],
+  inject: ["savingScenario", "selectedScenarioIndex", "isBlank"],
 
   data() {
     return {
@@ -447,75 +450,81 @@ export default {
       this.$emit("deleted", this.scenarioIndex);
     },
 
-    validateFailure() {
+    castToInt(val) {
+      if (this.isBlank(val)) {
+        return 0;
+      } else {
+        return Math.ceil(val);
+      }
+    },
+
+    checkBaseFields() {
+      if (this.isBlank(this.mortgageRate)) {
+        this.mortgageRate = 0;
+      }
+
       if (this.rent < 0) {
-        this.setAttr();
-        return "Rent cannot be negative.";
+        return this.getErrorMsg("Rent cannot be negative.");
       }
 
       if (this.entertainment < 0) {
-        this.setAttr();
-        return "Entertainment spending cannot be negative.";
+        return this.getErrorMsg("Entertainment spending cannot be negative.");
       }
 
       if (this.food < 0) {
-        this.setAttr();
-        return "Food spending cannot be negative.";
+        return this.getErrorMsg("Food spending cannot be negative.");
       }
 
       if (this.yearlyTravel < 0) {
-        this.setAttr();
-        return "Yearly travel spending cannot be negative.";
+        return this.getErrorMsg("Yearly travel spending cannot be negative.");
       }
 
       if (this.downpaymentSavings < 0) {
-        this.setAttr();
-        return "Downpayment savings cannot be negative.";
+        return this.getErrorMsg("Downpayment savings cannot be negative.");
       }
 
       if (this.mortgageRate < 0) {
-        this.setAttr();
-        return "Mortgage rate cannot be negative.";
+        return this.getErrorMsg("Mortgage rate cannot be negative.");
       }
 
       if (this.mortgageRate > 1) {
-        this.setAttr();
-        return "Mortgage rate cannot be greater than 1.";
+        return this.getErrorMsg("Mortgage rate cannot be greater than 1.");
       }
 
       if (this.mortgageLength < 0) {
-        this.setAttr();
-        return "Mortgage length cannot be negative.";
+        return this.getErrorMsg("Mortgage length cannot be negative.");
       }
 
       if (this.ageHome < 0) {
-        this.setAttr();
-        return "Age of home purchase cannot be negative.";
+        return this.getErrorMsg("Age of home purchase cannot be negative.");
       }
 
       if (this.homeCost < 0) {
-        this.setAttr();
-        return "Home cost cannot be negative.";
+        return this.getErrorMsg("Home cost cannot be negative.");
       }
 
       if (this.ageHome && this.ageHome < this.currentAge) {
-        this.setAttr();
-        return "Age of home purchase cannot be smaller than the current age.";
+        return this.getErrorMsg(
+          "Age of home purchase cannot be smaller than the current age."
+        );
       }
 
       if (this.ageHome && !this.homeCost) {
-        this.setAttr();
-        return "A home cost must be given if an age of home purchase is provided.";
+        return this.getErrorMsg(
+          "A home cost must be given if an age of home purchase is provided."
+        );
       }
 
       if (this.ageHome && !this.mortgageRate) {
-        this.setAttr();
-        return "A mortgage rate must be given if an age of home purchase is provided.";
+        return this.getErrorMsg(
+          "A mortgage rate must be given if an age of home purchase is provided."
+        );
       }
 
       if (this.ageHome && !this.mortgageLength) {
-        this.setAttr();
-        return "A mortgage length must be given if an age of home purchase is provided.";
+        return this.getErrorMsg(
+          "A mortgage length must be given if an age of home purchase is provided."
+        );
       }
 
       if (
@@ -525,60 +534,101 @@ export default {
           this.mortgageLength ||
           this.downpaymentSavings)
       ) {
-        this.setAttr();
-        return "Cannot provide home related variables without giving a home purchase age and cost.";
+        return this.getErrorMsg(
+          "Cannot provide home related variables without giving a home purchase age and cost."
+        );
       }
+    },
 
+    castBaseFields() {
+      // cast all vals as needed after initial checks pass
+      this.rent = this.castToInt(this.rent);
+      this.entertainment = this.castToInt(this.entertainment);
+      this.yearlyTravel = this.castToInt(this.yearlyTravel);
+      this.downpaymentSavings = this.castToInt(this.downpaymentSavings);
+      this.ageHome = this.castToInt(this.ageHome);
+      this.homeCost = this.castToInt(this.homeCost);
+    },
+
+    checkAgeKids() {
       for (let age of this.ageKids) {
-        if (age == null || age === "undefined" || age === "") {
-          age = 0;
-        }
+        age = this.castToInt(age);
 
         if (age < this.currentAge) {
-          this.setAttr();
-          return "No age of having a child can preceed the user's current age.";
+          return this.getErrorMsg(
+            "No age of having a child can preceed the user's current age."
+          );
         }
       }
+    },
+
+    checkIncomeInc() {
+
 
       if (Object.keys(this.incomeInc).length === 0) {
-        this.setAttr();
-        return "Income information must be provided.";
+        return this.getErrorMsg("Income information must be provided.");
       }
 
       let foundMatch = false;
+      let incomeLkp = new Map();
       for (let [age, income] of Object.entries(this.incomeInc)) {
-        if (income == null || income === "undefined" || income === "") {
-          income = 0;
-          this.incomeInc[age] = income;
-        }
+        income = this.castToInt(income);
+        this.incomeInc[age] = income;
 
-        if (age === undefined || age === "undefined" || age === "") {
+        if (incomeLkp.has(income.toString())) {
+          return this.getErrorMsg("The same income cannot be provided twice.");
+        }
+        incomeLkp.set(income.toString());
+
+        if (this.isBlank(age)) {
           delete this.incomeInc[age];
           age = "0";
           this.incomeInc[age] = income;
         }
 
-        if (age < this.currentAge) {
-          this.setAttr();
-          return "No age of an income increase can preceed the user's current age.";
+        if (parseInt(age) < this.currentAge) {
+          return this.getErrorMsg(
+            "No age of an income increase can preceed the user's current age."
+          );
         } else if (age == this.currentAge) {
           foundMatch = true;
         }
 
         if (income < 0) {
-          this.setAttr();
-          return "Income cannot be negative";
+          return this.getErrorMsg("Income cannot be negative");
         }
       }
 
       if (!foundMatch) {
-        this.setAttr();
-        return "Income for the user's current age must be provided";
+        return this.getErrorMsg(
+          "Income for the user's current age must be provided"
+        );
+      }
+    },
+
+    getErrorMsg(msg) {
+      this.setAttr();
+      return msg;
+    },
+
+    validateFields() {
+      const b = this.checkBaseFields();
+      if (b) {
+        return b
+      }
+      this.castBaseFields();
+      const a = this.checkAgeKids();
+      if (a) {
+        return a
+      }
+      const i = this.checkIncomeInc();
+      if (i) {
+        return i
       }
     },
 
     submitForm() {
-      const msg = this.validateFailure();
+      const msg = this.validateFields();
       if (msg) {
         alert(msg);
         return;
@@ -586,16 +636,9 @@ export default {
       // build JSON of only the changed fields
       const patchValues = {};
       for (const field of this.changedFields) {
-        if (
-          this.$data[field] == null ||
-          this.$data[field] == "undefined" ||
-          this.$data[field] === ""
-        ) {
-          this.$data[field] = 0;
-        }
-
         patchValues[field] = this.$data[field];
       }
+
       this.$emit("scenario-form-submitted", this.scenarioIndex, patchValues);
 
       this.changedFields = [];

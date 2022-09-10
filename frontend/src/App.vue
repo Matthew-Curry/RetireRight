@@ -61,11 +61,23 @@ export default {
         return [];
       }
 
+      if (
+        Object.prototype.hasOwnProperty.call(this.scenarios, "best") === false
+      ) {
+        return [];
+      }
+
       return this.scenarios[this.selectedScenarioIndex].best;
     },
 
     worstData() {
       if (!this.scenarios || this.scenarios.length === 0) {
+        return [];
+      }
+
+      if (
+        Object.prototype.hasOwnProperty.call(this.scenarios, "worst") === false
+      ) {
         return [];
       }
 
@@ -77,11 +89,27 @@ export default {
         return [];
       }
 
+      if (
+        Object.prototype.hasOwnProperty.call(this.scenarios, "average") ===
+        false
+      ) {
+        return [];
+      }
+
       return this.scenarios[this.selectedScenarioIndex].average;
     },
 
     targetLine() {
       if (!this.scenarios || this.scenarios.length === 0) {
+        return [];
+      }
+
+      if (
+        Object.prototype.hasOwnProperty.call(
+          this.scenarios,
+          "retirementTotalCost"
+        ) === false
+      ) {
         return [];
       }
 
@@ -133,41 +161,53 @@ export default {
       });
     },
 
+    isBlank(val) {
+      return val == null || val === "undefined" || val === "";
+    },
+
+    castToInt(val) {
+      if (this.isBlank(val)) {
+        return 0;
+      } else {
+        return Math.ceil(val);
+      }
+    },
+
     patchUser(patchValues) {
-      if (Object.keys(patchValues).length === 0) {
+      if (
+        patchValues.currentAge === this.user.currentAge &&
+        patchValues.retirementAge === this.user.retirementAge &&
+        patchValues.principle === this.user.principle &&
+        patchValues.stockAllocation === this.user.stockAllocation
+      ) {
         alert("No fields were changed, so there is nothing to update.");
         return;
       }
 
-      let userPatchBody = JSON.parse(JSON.stringify(this.user));
-      const userId = userPatchBody["UserId"];
-      delete userPatchBody["UserId"];
-
-      for (const [field, val] of Object.entries(patchValues)) {
-        // if encounter current age, confirm if the user wants to patch
-        if (field === "currentAge") {
-          if (val !== this.user.currentAge) {
-            if (
-              confirm(
-                "Updating the current age will result in ages for home purchases, income increases, and having children lower than the new age being removed from your scenarios. Are you sure you would like to continue?"
-              ) === false
-            ) {
-              this.userRefreshKey++;
-              return;
-            }
+      if (Object.prototype.hasOwnProperty.call(patchValues, "currentAge")) {
+        if (patchValues["currentAge"] != this.user.currentAge) {
+          if (
+            confirm(
+              "Updating the current age will result in ages for home purchases, income increases, and having children lower than the new age being removed from your scenarios. Are you sure you would like to continue?"
+            ) === false
+          ) {
+            this.userRefreshKey++;
+            return;
           }
         }
-        userPatchBody[field] = val;
       }
+
+      patchValues['UserName'] = this.user['UserName']
+
       this.updatingScenarios = true;
-      apiCon.patchUser(userPatchBody).then((data) => {
+      apiCon.patchUser(patchValues).then((data) => {
         if (data === apiCon.userPatchError) {
           this.updatingScenarios = false;
           this.userRefreshKey++;
           alert(data);
         } else {
-          userPatchBody["UserId"] = userId;
-          this.user = userPatchBody;
+          patchValues["UserId"] = this.user["UserId"];
+          this.user = patchValues;
           this.scenarios = data;
           this.updatingScenarios = false;
           this.userRefreshKey++;
@@ -232,6 +272,50 @@ export default {
         return;
       }
 
+      if (
+        this.user.currentAge == null ||
+        this.user.currentAge == "undefined" ||
+        this.user.currentAge === ""
+      ) {
+        alert(
+          "All user information must be provided before scenarios can be added."
+        );
+        return;
+      }
+
+      if (
+        this.user.retirementAge == null ||
+        this.user.retirementAge == "undefined" ||
+        this.user.retirementAge === ""
+      ) {
+        alert(
+          "All user information must be provided before scenarios can be added."
+        );
+        return;
+      }
+
+      if (
+        this.user.principle == null ||
+        this.user.principle == "undefined" ||
+        this.user.principle === ""
+      ) {
+        alert(
+          "All user information must be provided before scenarios can be added."
+        );
+        return;
+      }
+
+      if (
+        this.user.stockAllocation == null ||
+        this.user.stockAllocation == "undefined" ||
+        this.user.stockAllocation === ""
+      ) {
+        alert(
+          "All user information must be provided before scenarios can be added."
+        );
+        return;
+      }
+
       this.scenarios.push({
         percentSuccess: null,
         rent: null,
@@ -269,6 +353,7 @@ export default {
       selectedScenarioIndex: computed(() => this.selectedScenarioIndex),
       addScenario: this.addScenario,
       savingScenario: computed(() => this.savingScenario),
+      isBlank: this.isBlank
     };
   },
 };
