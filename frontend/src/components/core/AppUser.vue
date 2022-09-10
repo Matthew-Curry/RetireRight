@@ -136,26 +136,6 @@ export default {
     },
 
     validateFailure() {
-      
-      if (this.localStockAllocation === '') {
-        this.setAttr();
-        return "Must provide value for stock allocation.";
-      }
-
-      if (this.localRetirementAge === '') {
-        this.setAttr();
-        return "Must provide value for retirement age.";
-      }
-
-      if (this.localCurrentAge === '') {
-        this.setAttr();
-        return "Must provide value for current age.";
-      }
-
-      if (this.localPrinciple === '') {
-        this.setAttr();
-        return "Must provide value for principle.";
-      }
 
       if (this.localStockAllocation < 0) {
         this.setAttr();
@@ -201,6 +181,9 @@ export default {
       // build JSON of only the changed fields
       const patchValues = {};
       for (const field of this.changedFields) {
+        if (this.$data[field] === null || this.$data[field] === '') {
+          this.$data[field] = 0;
+        } 
         const globalName = this.nameMap[field]
         patchValues[globalName] = this.$data[field];
       }

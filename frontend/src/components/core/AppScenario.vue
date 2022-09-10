@@ -318,28 +318,12 @@ export default {
   },
 
   beforeMount() {
-    this.rent = this.sourceData.rent;
-    this.food = this.sourceData.food;
-    this.entertainment = this.sourceData.entertainment;
-    this.yearlyTravel = this.sourceData.yearlyTravel;
-    this.ageHome = this.sourceData.ageHome;
-    this.homeCost = this.sourceData.homeCost;
-    this.downpaymentSavings = this.sourceData.downpaymentSavings;
-    this.mortgageRate = this.sourceData.mortgageRate;
-    this.mortgageLength = this.sourceData.mortgageLength;
-    this.ageKids = [...this.sourceData.ageKids];
-    this.incomeInc = JSON.parse(JSON.stringify(this.sourceData.incomeInc));
+    this.setAttr();
   },
 
   watch: {
     sourceData() {
-      this.ageKids = [...this.sourceData.ageKids];
-      this.incomeInc = JSON.parse(JSON.stringify(this.sourceData.incomeInc));
-      this.ageHome = this.sourceData.ageHome;
-      this.homeCost = this.sourceData.homeCost;
-      this.downpaymentSavings = this.sourceData.downpaymentSavings;
-      this.mortgageRate = this.sourceData.mortgageRate;
-      this.mortgageLength = this.sourceData.mortgageLength;
+      this.setSimChangeAttr();
     },
   },
 
@@ -382,6 +366,25 @@ export default {
       if (!this.isSelected) {
         this.$emit("selected", this.scenarioIndex);
       }
+    },
+
+    setAttr() {
+      console.log('set called')
+      this.rent = this.sourceData.rent;
+      this.food = this.sourceData.food;
+      this.entertainment = this.sourceData.entertainment;
+      this.yearlyTravel = this.sourceData.yearlyTravel;
+      this.setSimChangeAttr()
+    },
+
+    setSimChangeAttr() {
+      this.ageKids = [...this.sourceData.ageKids];
+      this.incomeInc = JSON.parse(JSON.stringify(this.sourceData.incomeInc));
+      this.ageHome = this.sourceData.ageHome;
+      this.homeCost = this.sourceData.homeCost;
+      this.downpaymentSavings = this.sourceData.downpaymentSavings;
+      this.mortgageRate = this.sourceData.mortgageRate;
+      this.mortgageLength = this.sourceData.mortgageLength;
     },
 
     showForm() {
@@ -441,78 +444,96 @@ export default {
 
     validateFailure() {
       if (this.rent < 0) {
+        this.setAttr();
         return "Rent cannot be negative.";
       }
 
       if (this.entertainment < 0) {
+        this.setAttr();
         return "Entertainment spending cannot be negative.";
       }
 
       if (this.food < 0) {
+        this.setAttr();
         return "Food spending cannot be negative.";
       }
 
       if (this.yearlyTravel < 0) {
+        this.setAttr();
         return "Yearly travel spending cannot be negative.";
       }
 
       if (this.downpaymentSavings < 0) {
+        this.setAttr();
         return "Downpayment savings cannot be negative.";
       }
 
       if (this.mortgageRate < 0) {
+        this.setAttr();
         return "Mortgage rate cannot be negative.";
       }
 
       if (this.mortgageRate > 1) {
+        this.setAttr();
         return "Mortgage rate cannot be greater than 1.";
       }
 
       if (this.mortgageLength < 0) {
+        this.setAttr();
         return "Mortgage length cannot be negative.";
       }
 
       if (this.ageHome < 0) {
+        this.setAttr();
         return "Age of home purchase cannot be negative.";
       }
 
       if (this.homeCost < 0) {
+        this.setAttr();
         return "Home cost cannot be negative.";
       }
 
       if (this.ageHome && this.ageHome < this.currentAge) {
+        this.setAttr();
         return "Age of home purchase cannot be smaller than the current age.";
       }
       
       if (this.ageHome && !this.homeCost) {
+        this.setAttr();
         return "A home cost must be given if an age of home purchase is provided."
       }
 
       if (this.ageHome && !this.mortgageRate) {
+        this.setAttr();
         return "A mortgage rate must be given if an age of home purchase is provided."
       }
 
       if (this.ageHome && !this.mortgageLength) {
+        this.setAttr();
         return "A mortgage length must be given if an age of home purchase is provided."
       }
 
       if(!this.ageHome && (this.homeCost || this.mortgageRate || this.mortgageLength || this.downpaymentSavings)) {
+        this.setAttr();
         return "Cannot provide home related variables without giving a home purchase age and cost."
       }
 
       for (const age of this.ageKids) {
         if (age < this.currentAge) {
+          this.setAttr();
           return "No age of having a child can preceed the user's current age.";
         }
       }
 
       if( Object.keys(this.incomeInc).length === 0){
+        this.setAttr();
         return "Income information must be provided."
       }
 
       let foundMatch = false;
       for (const age of Object.keys(this.incomeInc)) {
         if (age < this.currentAge) {
+          this.setAttr();
           return "No age of an income increase can preceed the user's current age.";
         } else if (age == this.currentAge) {
           foundMatch = true;
@@ -520,6 +541,7 @@ export default {
       }
 
       if (!foundMatch) {
+        this.setAttr();
         return "Income for the user's current age must be provided"
       }
     },
