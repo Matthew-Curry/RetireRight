@@ -1,6 +1,8 @@
 <template>
   <main v-if="getScenarioError.length === 0 && getUserError.length === 0">
-    <h1 v-if="updatingScenarios == true">Scenarios are currently updating with submitted user info..</h1> 
+    <h1 v-if="updatingScenarios == true">
+      Scenarios are currently updating with submitted user info..
+    </h1>
     <nav>
       <ul>
         <li>
@@ -46,14 +48,14 @@ export default {
       getUserError: "",
       selectedScenarioIndex: 0,
       scenarios: null,
-      savingScenario: false
+      savingScenario: false,
     };
   },
 
   computed: {
     bestData() {
       if (!this.scenarios || this.scenarios.length === 0) {
-        return []
+        return [];
       }
 
       return this.scenarios[this.selectedScenarioIndex].best;
@@ -61,7 +63,7 @@ export default {
 
     worstData() {
       if (!this.scenarios || this.scenarios.length === 0) {
-        return []
+        return [];
       }
 
       return this.scenarios[this.selectedScenarioIndex].worst;
@@ -69,21 +71,19 @@ export default {
 
     averageData() {
       if (!this.scenarios || this.scenarios.length === 0) {
-        return []
+        return [];
       }
 
       return this.scenarios[this.selectedScenarioIndex].average;
     },
 
-    targetValue() {
+    targetLine() {
       if (!this.scenarios || this.scenarios.length === 0) {
-        return null;
+        return [];
       }
 
       return this.scenarios[this.selectedScenarioIndex].retirementTotalCost;
     },
-
-    
   },
 
   watch: {
@@ -136,30 +136,41 @@ export default {
         return;
       }
 
-      this.user.UserName = 'matt';
-      let userPatchBody = JSON.parse(JSON.stringify(this.user)); 
-      const userId = userPatchBody['UserId'];
-      delete userPatchBody['UserId'];
+      let userPatchBody = JSON.parse(JSON.stringify(this.user));
+      const userId = userPatchBody["UserId"];
+      delete userPatchBody["UserId"];
 
       for (const [field, val] of Object.entries(patchValues)) {
-        userPatchBody[field] = val
+        // if encounter current age, confirm if the user wants to patch
+        if (field === "currentAge") {
+          if (val !== this.user.currentAge) {
+            if (
+              confirm(
+                "Updating the current age will result in ages for home purchases, income increases, and having children lower than the new age being removed from your scenarios. Are you sure you would like to continue?"
+              ) === false
+            ) {
+              this.userRefreshKey++;
+              return;
+            }
+          }
+        }
+        userPatchBody[field] = val;
       }
       this.updatingScenarios = true;
       apiCon.patchUser(userPatchBody).then((data) => {
         if (data === apiCon.userPatchError) {
           this.updatingScenarios = false;
-          this.userRefreshKey ++;
+          this.userRefreshKey++;
           alert(data);
         } else {
-          userPatchBody['UserId'] = userId;
+          userPatchBody["UserId"] = userId;
           this.user = userPatchBody;
           this.scenarios = data;
           this.updatingScenarios = false;
-          this.userRefreshKey ++;
+          this.userRefreshKey++;
           alert("User updated and all scenarios have been re-simulated!");
         }
       });
-      
     },
 
     updateSelectedScenario(newIndex) {
@@ -206,13 +217,15 @@ export default {
           alert("Scenario Deleted");
         }
       });
-      
+
       this.scenarios.splice(index, 1);
     },
 
     addScenario() {
       if (this.scenarios.length === 15) {
-        alert("Max of 15 scenarios allowed. Please delete or edit an existing scenario.");
+        alert(
+          "Max of 15 scenarios allowed. Please delete or edit an existing scenario."
+        );
         return;
       }
 
@@ -244,7 +257,7 @@ export default {
       bestData: computed(() => this.bestData),
       worstData: computed(() => this.worstData),
       averageData: computed(() => this.averageData),
-      targetValue: computed(() => this.targetValue),
+      targetLine: computed(() => this.targetLine),
 
       scenarios: computed(() => this.scenarios),
       updateSelectedScenario: this.updateSelectedScenario,
@@ -252,7 +265,7 @@ export default {
       deleteScenario: this.deleteScenario,
       selectedScenarioIndex: computed(() => this.selectedScenarioIndex),
       addScenario: this.addScenario,
-      savingScenario: computed(() => this.savingScenario)
+      savingScenario: computed(() => this.savingScenario),
     };
   },
 };

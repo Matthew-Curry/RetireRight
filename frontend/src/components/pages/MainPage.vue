@@ -31,7 +31,7 @@
     <loadingUser v-else></loadingUser>
     <chart v-if="scenarios.value"
       :key="selectedScenarioIndex.value"
-      :targetValue="targetValue"
+      :targetLine="targetLine"
       :bestData="bestData.value"
       :worstData="worstData.value"
       :averageData="averageData.value"
@@ -67,7 +67,7 @@ export default {
     "bestData",
     "worstData",
     "averageData",
-    "targetValue"
+    "targetLine"
   ],
 };
 </script>

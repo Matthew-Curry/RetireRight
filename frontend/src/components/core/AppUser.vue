@@ -118,10 +118,7 @@ export default {
   },
 
   beforeMount() {
-    this.localStockAllocation = this.stockAllocation;
-    this.localRetirementAge = this.retirementAge;
-    this.localCurrentAge = this.currentAge;
-    this.localPrinciple = this.principle;
+    this.setAttr();
   },
 
   methods: {
@@ -131,28 +128,62 @@ export default {
       }
     },
 
+    setAttr() {
+      this.localStockAllocation = this.stockAllocation;
+      this.localRetirementAge = this.retirementAge;
+      this.localCurrentAge = this.currentAge;
+      this.localPrinciple = this.principle;
+    },
+
     validateFailure() {
+      
+      if (this.localStockAllocation === '') {
+        this.setAttr();
+        return "Must provide value for stock allocation.";
+      }
+
+      if (this.localRetirementAge === '') {
+        this.setAttr();
+        return "Must provide value for retirement age.";
+      }
+
+      if (this.localCurrentAge === '') {
+        this.setAttr();
+        return "Must provide value for current age.";
+      }
+
+      if (this.localPrinciple === '') {
+        this.setAttr();
+        return "Must provide value for principle.";
+      }
+
       if (this.localStockAllocation < 0) {
+        this.setAttr();
         return "Stock allocation cannot be negative.";
       }
 
       if (this.localStockAllocation > 1) {
+        this.setAttr();
         return "Stock allocation cannot exceed 1.";
       }
 
       if (this.localRetirementAge <= 0) {
+        this.setAttr();
         return "Retirement age must be greater than 0.";
       }
 
       if (this.localCurrentAge <= 0) {
+        this.setAttr();
         return "Current age must be greater than 0.";
       }
 
       if (this.localPrinciple < 0) {
+        this.setAttr();
         return "Investment principle cannot be negative.";
       }
 
       if (this.localRetirementAge < this.localCurrentAge) {
+        this.setAttr();
         return "Retirement age must be greater than current age";
       }
     },

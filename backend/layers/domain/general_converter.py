@@ -43,10 +43,10 @@ def get_converted_params(request_body: str, valid_params:dict) -> dict:
 
 def is_type(v, data_type):
     """Helper method to check if given value matches type. Handles edge case of 
-    int of 1 that should be decimal"""
+    int of 1 or 0 that should be decimal"""
     if isinstance(v, data_type):
         return True
-    elif v == 1 and data_type is Decimal:
+    elif (v == 1 or v ==0) and data_type is Decimal:
         return True
     
     return False

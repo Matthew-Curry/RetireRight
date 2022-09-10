@@ -24,8 +24,8 @@ export default {
       required: true,
     },
 
-    targetValue: {
-      type: Number,
+    targetLine: {
+      type: Array,
       required: true,
     },
   },
@@ -55,7 +55,17 @@ export default {
             {
               label: "Average",
               data: null,
-              borderColor: "rgba(243, 225, 107)",
+              borderColor: "rgba(243, 225, 107)", 
+              borderWidth: 3,
+              maxHeight: 40,
+              showLine: true,
+              fill: false,
+            },
+
+            {
+              label: "Target",
+              data: null,
+              borderColor: "rgba(4, 59, 92)",
               borderWidth: 3,
               maxHeight: 40,
               showLine: true,
@@ -101,6 +111,7 @@ export default {
     this.chartData.data.datasets[0].data = this.bestData;
     this.chartData.data.datasets[1].data = this.worstData;
     this.chartData.data.datasets[2].data = this.averageData;
+    this.chartData.data.datasets[3].data = this.targetLine;
   },
 
   watch: {
@@ -118,6 +129,11 @@ export default {
       this.chartData.data.datasets[2].data = this.averageData;
       this.createChart();
     },
+
+    targetLine() {
+      this.chartData.data.datasets[3].data = this.targetLine;
+      this.createChart();
+    },
   },
 
   mounted() {
@@ -130,9 +146,6 @@ export default {
       new Chart(ctx, this.chartData);
     },
 
-    buildTargetLine() {
-
-    }
   }
 };
 </script>

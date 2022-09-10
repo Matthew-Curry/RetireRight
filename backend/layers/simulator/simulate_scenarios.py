@@ -46,7 +46,7 @@ class ResultList:
     def end_value(self):
         return self.list[-1]['y']
 
-def get_total_retirement_cost(food, entertainment, yearly_travel, rent, age_home, current_age, retirement_age, age_home_paid, mortgage_payment):
+def get_total_retirement_cost(food:int, entertainment:int, yearly_travel:int, rent:int, age_home:int, current_age:int, retirement_age:int, age_home_paid:int, mortgage_payment:int) -> int:
     """helper method to estimate retirement cost """
     # inflation adjust cost vars to retirement age
     working_time = retirement_age - current_age
@@ -76,7 +76,7 @@ def simulate_scenario(user, scenario) -> tuple:
         user (User): the user object, holds age and investment choice attributes
         scenario (Scenario): the given scenario holding lifestyle choice variables
     returns:
-        tuple in form (percent chance of success, best result, worst result, average result)"""
+        tuple in form (percent chance of success, target cost line, best result, worst result, average result)"""
     
     # unpack vars from the user
     current_age = user.currentAge
@@ -219,5 +219,4 @@ def simulate_scenario(user, scenario) -> tuple:
     for year in range(1, years + 1):
         retirement_target_line.append(retirement_cost)
 
-    
     return Decimal(str(num_success/N)), retirement_target_line.get_list(), max_result.get_list(), min_result.get_list(), av_result.get_list()
