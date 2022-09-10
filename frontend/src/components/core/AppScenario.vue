@@ -414,10 +414,12 @@ export default {
 
     removeAge(index) {
       this.ageKids.splice(index, 1);
+      this.updateChangedFields('ageKids');
     },
 
     removeIncomeAge(age) {
       delete this.incomeInc[age];
+      this.updateChangedFields('incomeInc');
     },
 
     submitIncome(age) {

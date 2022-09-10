@@ -120,6 +120,13 @@ class Scenario(Item):
             """
         # verify patch attributes alongside current attributes
         patch = attr
+        # append simulation fields if they exist as they may have changed
+        if self.percentSuccess:
+            patch['percentSuccess'] = self.percentSuccess
+            patch['retirementTotalCost'] = self.retirementTotalCost
+            patch['best'] = self.best
+            patch['best'] = self.best
+            patch['average'] = self.average
         merged_fields = {**self.__dict__, **attr}
         Scenario.verify_scenario_fields(current_age, merged_fields)
         # append the patch and store patched fields in instance variable
