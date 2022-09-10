@@ -13,17 +13,30 @@
       RetireRight accepts base user information and invesment allocation
       decisions, which can be reconfigured on the main page. It then accepts a
       set of lifestyle choice variables in the form of a "scenario". A user can
-      add as many scenarios to their account as they like. When updating a
-      scenario, a Monte Carlo simulation will be run for the user and scenario
-      information, and a percent chance of success, defined as the probability
-      the user will have enough money to spend at their estimated retirement
-      expenditures through a 30 year retirment, will be shown on the top of the
-      scenario.
+      add up to 15 scenarios. <br />
+      <br />
+
+      When updating a scenario, a Monte Carlo simulation will be run for the
+      user and scenario information, and a percent chance of success will be
+      shown on the top of the scenario. The chance of success is defined as the
+      probability the user will have enough money to spend at their estimated
+      retirement expenditures through retirement.
     </p>
     <p align="left">
-      On the main page, the user can select a scenario to see the worst,
-      average, and best possible outcomes for their invesment based on the
-      simualation.
+      On the main page, the user can select a scenario to see a graph of the
+      worst, average, and best possible outcomes for their invesment based on
+      the simualation. This view also shows a line representing the estimated
+      total retirement expenditures. <br />
+      <br />
+
+      More information can be found at the project's
+      <a href="https://github.com/Matthew-Curry/RetireRight">Github repo.</a>
     </p>
   </div>
 </template>
+
+<style scoped>
+p {
+  font-size: 20px;
+}
+</style>

@@ -18,7 +18,7 @@
     </h3>
     <section v-if="isSelected">
       <div class="form-control flex-box">
-        <label class="single-input-label" for="rent">Rent</label>
+        <label class="single-input-label" for="rent">Monthly Rent</label>
         <input
           id="rent"
           name="rent"
@@ -30,7 +30,7 @@
       </div>
 
       <div class="form-control flex-box">
-        <label class="single-input-label" for="food">Food</label>
+        <label class="single-input-label" for="food">Monthly Food Cost</label>
         <input
           id="food"
           name="food"
@@ -43,7 +43,7 @@
 
       <div class="form-control flex-box">
         <label class="single-input-label" for="entertainment"
-          >Entertainment</label
+          >Monthly Free Spending</label
         >
         <input
           id="entertainment"
@@ -70,7 +70,7 @@
       </div>
 
       <div class="form-control flex-box">
-        <label class="single-input-label" for="ageHome">Age Home</label>
+        <label class="single-input-label" for="ageHome">Age Home Purchase</label>
         <input
           id="ageHome"
           name="ageHome"

@@ -17,6 +17,9 @@
         <li>
           <router-link to="/logout">Logout</router-link>
         </li>
+        <li>
+          <a href="https://github.com/Matthew-Curry/RetireRight">Github Repo</a>
+        </li>
       </ul>
     </nav>
     <router-view></router-view>
