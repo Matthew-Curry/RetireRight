@@ -23,6 +23,11 @@ export default {
       type: Array,
       required: true,
     },
+
+    targetValue: {
+      type: Number,
+      required: true,
+    },
   },
 
   data() {
@@ -123,6 +128,10 @@ export default {
     createChart() {
       const ctx = document.getElementById("the-chart");
       new Chart(ctx, this.chartData);
+    },
+
+    buildTargetLine() {
+
     }
   }
 };

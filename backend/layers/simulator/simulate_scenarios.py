@@ -124,8 +124,6 @@ def simulate_scenario(user, scenario) -> tuple:
 
     retirement_cost = get_total_retirement_cost(scenario.food, scenario.entertainment, scenario.yearlyTravel, scenario.rent, age_home, 
                                     current_age, retirement_age, age_home_paid, mortgage_payment)
-    print("THIS IS THE COST")
-    print(retirement_cost)
 
     # inflation factor is one plus the global var holding inflation rate
     inflation_factor = 1 + INFLATION_RATE
@@ -141,7 +139,7 @@ def simulate_scenario(user, scenario) -> tuple:
         entertainment = scenario.entertainment
         yearly_travel = scenario.yearlyTravel
         # pull sample of returns for the number of years of the simulation
-        #logger.info("Generating simulated returns")
+        logger.info("Generating simulated returns")
         returns = dist.samples(years, seed = random.random())
         # initialize kids to 0, and a set to keep track of when kids become adults
         kids = 0
@@ -150,7 +148,7 @@ def simulate_scenario(user, scenario) -> tuple:
         yearly_kid_cost = CHILD_COST
         # the result to populate, list holding net assets for each year
         result = ResultList(total_assets)
-        #logger.info("All variables initialized for simulation run. Starting run..")
+        logger.info("All variables initialized for simulation run. Starting run..")
         for year in range(1, years + 1):
             # apply inflation adjustment to all cost of living estimates
             rent = inflation_factor * rent
@@ -196,7 +194,7 @@ def simulate_scenario(user, scenario) -> tuple:
             result.append(total_assets)
         
         # apply this result to the global simulation result
-        #logger.info(f"Completed run {n}. Recording results..")
+        logger.info(f"Completed run {n}. Recording results..")
         if n == 0:
             max_result = min_result = av_result = result
         else:
@@ -216,4 +214,10 @@ def simulate_scenario(user, scenario) -> tuple:
         if result.end_value > retirement_cost:
             num_success += 1
     
-    return Decimal(str(num_success/N)), retirement_cost, max_result.get_list(), min_result.get_list(), av_result.get_list()
+    # flat target value line
+    retirement_target_line = ResultList(retirement_cost)
+    for year in range(1, years + 1):
+        retirement_target_line.append(retirement_cost)
+
+    
+    return Decimal(str(num_success/N)), retirement_target_line, max_result.get_list(), min_result.get_list(), av_result.get_list()

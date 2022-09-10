@@ -28,7 +28,7 @@ class Scenario(Item):
     
     PROCESSED_FIELDS = {
         "percentSuccess": Decimal,
-        "retirementTotalCost": int,
+        "retirementTotalCost": list,
         "best": list,
         "worst": list,
         "average": list

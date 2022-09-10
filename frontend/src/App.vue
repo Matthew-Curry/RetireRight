@@ -74,6 +74,16 @@ export default {
 
       return this.scenarios[this.selectedScenarioIndex].average;
     },
+
+    targetValue() {
+      if (!this.scenarios || this.scenarios.length === 0) {
+        return null;
+      }
+
+      return this.scenarios[this.selectedScenarioIndex].retirementTotalCost;
+    },
+
+    
   },
 
   watch: {
@@ -234,6 +244,7 @@ export default {
       bestData: computed(() => this.bestData),
       worstData: computed(() => this.worstData),
       averageData: computed(() => this.averageData),
+      targetValue: computed(() => this.targetValue),
 
       scenarios: computed(() => this.scenarios),
       updateSelectedScenario: this.updateSelectedScenario,
