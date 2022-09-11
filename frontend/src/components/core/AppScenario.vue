@@ -296,7 +296,13 @@ export default {
 
   emits: ["selected", "scenario-form-submitted", "deleted"],
 
-  inject: ["savingScenario", "selectedScenarioIndex", "isBlank", "castToInt"],
+  inject: [
+    "savingScenario",
+    "selectedScenarioIndex",
+    "isBlank",
+    "castToInt",
+    "getErrorMsg",
+  ],
 
   data() {
     return {
@@ -487,7 +493,7 @@ export default {
         return this.getErrorMsg("Mortgage length cannot be negative.");
       }
 
-      if (this.ageHome < 0) {
+      if (Number.isFinite(this.ageHome) && this.ageHome < 0) {
         return this.getErrorMsg("Age of home purchase cannot be negative.");
       }
 
@@ -495,41 +501,26 @@ export default {
         return this.getErrorMsg("Home cost cannot be negative.");
       }
 
-      if (this.ageHome !== 0 && this.ageHome < this.currentAge) {
+      if (Number.isFinite(this.ageHome) && this.ageHome < this.currentAge) {
         return this.getErrorMsg(
           "Age of home purchase cannot be smaller than the current age."
         );
       }
-
-      if (this.ageHome !== 0 && !this.homeCost) {
+      if (this.ageHome && this.homeCost === 0) {
         return this.getErrorMsg(
           "A home cost must be given if an age of home purchase is provided."
         );
       }
 
-      if (this.ageHome !== 0 && !this.mortgageRate) {
+      if (this.ageHome && this.mortgageRate === 0) {
         return this.getErrorMsg(
           "A mortgage rate must be given if an age of home purchase is provided."
         );
       }
 
-      if (this.ageHome !== 0 && !this.mortgageLength) {
+      if (this.ageHome && this.mortgageLength === 0) {
         return this.getErrorMsg(
           "A mortgage length must be given if an age of home purchase is provided."
-        );
-      }
-
-      if (
-        this.ageHome !== 0 &&
-        (this.homeCost === 0 ||
-          this.mortgageRate === 0 ||
-          this.mortgageLength === 0 ||
-          this.downpaymentSavings === 0)
-      ) {
-        console.log(this.ageHome);
-        console.log(typeof this.ageHome);
-        return this.getErrorMsg(
-          "Cannot provide home related variables without giving a home purchase age and cost."
         );
       }
     },
@@ -541,8 +532,10 @@ export default {
       this.entertainment = this.castToInt(this.entertainment);
       this.yearlyTravel = this.castToInt(this.yearlyTravel);
       this.downpaymentSavings = this.castToInt(this.downpaymentSavings);
-      this.ageHome = this.castToInt(this.ageHome);
       this.homeCost = this.castToInt(this.homeCost);
+      if (this.isBlank(this.ageHome)) {
+        this.ageHome = null;
+      }
     },
 
     checkAgeKids() {
@@ -629,7 +622,6 @@ export default {
       }
       // build JSON of only the changed fields
       const patchValues = {};
-      console.log(this.changedFields)
       for (const field of this.changedFields) {
         patchValues[field] = this.$data[field];
       }

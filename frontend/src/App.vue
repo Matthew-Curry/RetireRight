@@ -268,7 +268,6 @@ export default {
           alert("Scenario Deleted");
         }
       });
-
     },
 
     addScenario() {
@@ -362,6 +361,7 @@ export default {
       savingScenario: computed(() => this.savingScenario),
       isBlank: this.isBlank,
       castToInt: this.castToInt,
+      getErrorMsg: this.getErrorMsg,
     };
   },
 };

@@ -1,6 +1,6 @@
 <template>
   <section class="base">
-    <h2>{{ username }}</h2>
+    <h2>{{ username }} {{patchValues.currentAge}}</h2>
     <div class="form-control">
       <label for="patchValues.currentAge">Current Age</label>
       <input
@@ -122,58 +122,69 @@ export default {
       this.patchValues.principle = this.principle;
     },
 
-    validateFields() {
+    checkBaseFields() {
       if (this.patchValues.stockAllocation < 0) {
-        this.setAttr();
-        return "Stock allocation cannot be negative.";
+        return this.getErrorMsg("Stock allocation cannot be negative.");
       }
 
       if (this.patchValues.stockAllocation > 1) {
-        this.setAttr();
-        return "Stock allocation cannot exceed 1.";
+        return this.getErrorMsg("Stock allocation cannot exceed 1.");
       }
 
       if (this.patchValues.retirementAge <= 0) {
-        this.setAttr();
-        return "Retirement age must be greater than 0.";
+        return this.getErrorMsg("Retirement age must be greater than 0.");
       }
 
       if (this.patchValues.currentAge <= 0) {
-        this.setAttr();
-        return "Current age must be greater than 0.";
+        return this.getErrorMsg("Current age must be greater than 0.");
       }
 
       if (this.patchValues.principle < 0) {
-        this.setAttr();
-        return "Investment principle cannot be negative.";
+        return this.getErrorMsg("Investment principle cannot be negative.");
       }
-      console.log(this.patchValues.retirementAge)
-      console.log(this.patchValues.currentAge)
-      if (this.patchValues.retirementAge < this.patchValues.currentAge) {
-        console.log("IN THE IF")
-        this.setAttr();
-        return "Retirement age must be greater than current age";
+
+      if (this.patchValues.retirementAge <= this.patchValues.currentAge) {
+        return this.getErrorMsg(
+          "Retirement age must be greater than current age"
+        );
       }
+
     },
 
-    updateSaveHovered() {
-      this.saveHovered = !this.saveHovered;
-    },
-
-    submitForm() {
-      const msg = this.validateFields();
-      if (msg) {
-        alert(msg);
-        return;
-      }
-
-      for (const field of Object.keys(this.patchValues)) {
-        this.patchValues[field] = this.castToInt(this.patchValues[field]);
-      }
-
-      this.$emit("user-form-submitted", this.patchValues);
-    },
+  castBaseFields() {
+    this.patchValues.currentAge = this.castToInt(this.patchValues.currentAge);
+    this.patchValues.principle = this.castToInt(this.patchValues.principle);
+    this.patchValues.retirementAge = this.castToInt(this.patchValues.retirementAge);
+    this.patchValues.stockAllocation = this.castToInt(this.patchValues.stockAllocation);
   },
+
+  validateFields() {
+    this.castBaseFields();
+    const c = this.checkBaseFields();
+    if (c) {
+        return c;
+      }
+  },
+
+  getErrorMsg(msg) {
+      this.setAttr();
+      return msg;
+    },
+
+  updateSaveHovered() {
+    this.saveHovered = !this.saveHovered;
+  },
+
+  submitForm() {
+    const msg = this.validateFields();
+    if (msg) {
+      alert(msg);
+      return;
+    }
+
+    this.$emit("user-form-submitted", this.patchValues);
+  },
+  }
 };
 </script>
 
