@@ -301,6 +301,7 @@ export default {
     "selectedScenarioIndex",
     "isBlank",
     "castToInt",
+    "castToFloat",
     "getErrorMsg",
   ],
 
@@ -344,7 +345,7 @@ export default {
 
   computed: {
     percentSuccess() {
-      return (this.sourceData.percentSuccess * 100).toString() + "%";
+      return (this.sourceData.percentSuccess * 100).toFixed(2).toString() + "%";
     },
 
     isExtraClass() {
@@ -526,13 +527,14 @@ export default {
     },
 
     castBaseFields() {
-      // cast all vals as needed after initial checks pass
       this.rent = this.castToInt(this.rent);
       this.food = this.castToInt(this.food);
       this.entertainment = this.castToInt(this.entertainment);
       this.yearlyTravel = this.castToInt(this.yearlyTravel);
       this.downpaymentSavings = this.castToInt(this.downpaymentSavings);
       this.homeCost = this.castToInt(this.homeCost);
+      this.mortgageLength = this.castToInt(this.mortgageLength);
+      this.mortgageRate = this.castToFloat(this.mortgageRate);
       if (this.isBlank(this.ageHome)) {
         this.ageHome = null;
       }
@@ -603,7 +605,7 @@ export default {
       if (b) {
         return b;
       }
-      //this.castBaseFields();
+
       const a = this.checkAgeKids();
       if (a) {
         return a;
@@ -620,9 +622,15 @@ export default {
         alert(msg);
         return;
       }
+
       // build JSON of only the changed fields
       const patchValues = {};
       for (const field of this.changedFields) {
+        // only allow non null ageHome to be posted to be consistent with API
+        if (field === "ageHome" && this.ageHome == null) {
+          continue;
+        }
+
         patchValues[field] = this.$data[field];
       }
 

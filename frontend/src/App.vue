@@ -181,6 +181,14 @@ export default {
       }
     },
 
+    castToFloat(val) {
+      if (this.isBlank(val)) {
+        return 0.0;
+      } else {
+        return Number.parseFloat(val);
+      }
+    },
+
     patchUser(patchValues) {
       if (
         patchValues.currentAge === this.user.currentAge &&
@@ -361,6 +369,7 @@ export default {
       savingScenario: computed(() => this.savingScenario),
       isBlank: this.isBlank,
       castToInt: this.castToInt,
+      castToFloat: this.castToFloat,
       getErrorMsg: this.getErrorMsg,
     };
   },

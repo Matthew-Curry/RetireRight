@@ -1,6 +1,6 @@
 <template>
   <section class="base">
-    <h2>{{ username }} {{patchValues.currentAge}}</h2>
+    <h2>{{ username }}</h2>
     <div class="form-control">
       <label for="patchValues.currentAge">Current Age</label>
       <input
@@ -95,7 +95,7 @@ export default {
 
   emits: ["user-form-submitted"],
 
-  inject: ["castToInt"],
+  inject: ["castToInt", "castToFloat"],
 
   data() {
     return {
@@ -148,43 +148,46 @@ export default {
           "Retirement age must be greater than current age"
         );
       }
-
     },
 
-  castBaseFields() {
-    this.patchValues.currentAge = this.castToInt(this.patchValues.currentAge);
-    this.patchValues.principle = this.castToInt(this.patchValues.principle);
-    this.patchValues.retirementAge = this.castToInt(this.patchValues.retirementAge);
-    this.patchValues.stockAllocation = this.castToInt(this.patchValues.stockAllocation);
-  },
+    castBaseFields() {
+      this.patchValues.currentAge = this.castToInt(this.patchValues.currentAge);
+      this.patchValues.principle = this.castToInt(this.patchValues.principle);
+      this.patchValues.retirementAge = this.castToInt(
+        this.patchValues.retirementAge
+      );
+      this.patchValues.stockAllocation = this.castToFloat(
+        this.patchValues.stockAllocation
+      );
+    },
 
-  validateFields() {
-    this.castBaseFields();
-    const c = this.checkBaseFields();
-    if (c) {
+    validateFields() {
+      this.castBaseFields();
+      const c = this.checkBaseFields();
+      if (c) {
         return c;
       }
-  },
+    },
 
-  getErrorMsg(msg) {
+    getErrorMsg(msg) {
       this.setAttr();
       return msg;
     },
 
-  updateSaveHovered() {
-    this.saveHovered = !this.saveHovered;
-  },
+    updateSaveHovered() {
+      this.saveHovered = !this.saveHovered;
+    },
 
-  submitForm() {
-    const msg = this.validateFields();
-    if (msg) {
-      alert(msg);
-      return;
-    }
+    submitForm() {
+      const msg = this.validateFields();
+      if (msg) {
+        alert(msg);
+        return;
+      }
 
-    this.$emit("user-form-submitted", this.patchValues);
+      this.$emit("user-form-submitted", this.patchValues);
+    },
   },
-  }
 };
 </script>
 
