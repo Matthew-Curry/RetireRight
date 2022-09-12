@@ -12,7 +12,7 @@ The backend is written in Python and the frontend is written in Vue.
 
 ### backend
 #### Holds two folders:
-**handlers:** The code for AWS lambda functions matching one for one with the REST API calls the SPA needs to make. <br>
+**handlers:** The code for the AWS lambda functions matching one for one with the REST API calls the SPA needs to make. <br>
 **layers:** Holds folders defining the lambda layers that are shared among the functions to perform core applicaiton functionality. <br>
 
 #### Layers include:
