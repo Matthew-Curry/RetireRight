@@ -11,11 +11,11 @@ Link to the application: https://rightretire.com/
 The backend is written in Python and the frontend is written in Vue.
 
 ### backend
-#### Holds two folders: <br> <br>
+#### Holds two folders:
 **handlers:** The code for AWS lambda functions matching one for one with the REST API calls the SPA needs to make. <br>
 **layers:** Holds folders defining the lambda layers that are shared among the functions to perform core applicaiton functionality. <br>
 
-#### Layers include: <br> <br>
+#### Layers include:
 **domain:** Holds Scenario and User domain objects used by the application. These objects are primarily used to translate data from the request to DynamoDB, and from DynamoDB back into the application. <br>
 **dynamo_utils:** Holds utility class to retrieve cached dynamo resources from a warm lambda start, as well as a query formatter helper method. <br>
 **writer:** Utility methods to write HTTP responses containing all needed CORS headers. <br>
