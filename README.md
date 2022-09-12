@@ -8,7 +8,7 @@ percent chance they will have enough money to fund their retirement, along with 
 Link to the application: https://rightretire.com/
 
 ## Code
-The backend is written in Python while the frontend is written in Vue.
+The backend is written in Python and the frontend is written in Vue.
 
 ### backend
 Holds two folders: <br> <br>
