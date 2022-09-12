@@ -213,7 +213,7 @@ artifacts:
         - writer.zip
     frontend:
       base-directory:
-        frontend
+        frontend/dist
       files:
-        - dist/*
+        - '**/*'
 
