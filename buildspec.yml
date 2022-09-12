@@ -3,7 +3,9 @@ phases:
   build:
     commands:
       - echo "Building the Vue frontend"
-      - cd "frontend"
+      - cd frontend
+      - npm install
+      - npm install -g @vue/cli-service
       - npm run build
 
       - cd ..
