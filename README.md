@@ -24,11 +24,11 @@ The backend is written in Python and the frontend is written in Vue.
 ### frontend
 Application code is in the src folder
 
-**api:** Holds Javascript methods used by the app to make calls to the backend REST API
-**cognito:** Javascript wrapper around the AWS cognito SDK to handle calls to the service for auth functionality
-**components/pages:** Application pages used by the router
-**components/core:** Core application components
-**router*:* The vue router to the different pages, handles auth flow.
-**App.vue**: The core app. Responsible for updating and mediating data to the other components.
+**api:** Holds Javascript methods used by the app to make calls to the backend REST API <br>
+**cognito:** Javascript wrapper around the AWS cognito SDK to handle calls to the service for auth functionality <br>
+**components/pages:** Application pages used by the router <br>
+**components/core:** Core application components <br>
+**router*:* The vue router to the different pages, handles auth flow. <br>
+**App.vue**: The core app. Responsible for updating and mediating data to the other components. <br>
 
 
