@@ -11,7 +11,7 @@ Link to the application: https://rightretire.com/
 The backend is written in Python while the frontend is written in Vue.
 
 ### backend
-Holds two folders: <br>
+Holds two folders: <br> <br>
 **handlers:** The code for AWS lambda functions matching one for one with the REST API calls the SPA needs to make. <br>
 **layers:** Holds folders defining the lambda layers that are shared among the functions to perform core applicaiton functionality. <br>
 
