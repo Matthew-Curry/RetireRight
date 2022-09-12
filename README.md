@@ -41,3 +41,7 @@ Application code is in the src folder
 * WAF for security around Cloudfront
 * Route53 for DNS
 
+## Next Steps
+* Review and expand on frontend styling
+* Explore ways to improve the simulation, including more descriptive lifestyle variables in an intuitive way
+* Explore AWS SAM and Amplify
