@@ -2,6 +2,12 @@ version: 0.2
 phases:
   build:
     commands:
+      - echo "Building the Vue frontend"
+      - cd "frontend"
+      - npm run build
+
+      - cd ..
+
       - echo "Building the lambda backend.."
 
       # Build lambda layer artifacts
@@ -177,6 +183,7 @@ phases:
       - echo "Updating to use the latest code"
       - aws lambda update-function-code --function-name post-scenario-lambda --zip-file fileb://post-scenario-deployment.zip
 
+
 artifacts:
   files:
     - '**/*'
@@ -202,4 +209,9 @@ artifacts:
         - dynamo_utils.zip
         - simulator.zip
         - writer.zip
-      lambda_layers: run_server
+    frontend:
+      base-directory:
+        frontend
+      files:
+        - dist/*
+
