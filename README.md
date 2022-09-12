@@ -43,5 +43,6 @@ Application code is in the src folder
 
 ## Next Steps
 * Review and expand on frontend styling
+* Make frontend more accessible to mobile devices
 * Explore ways to improve the simulation, including more descriptive lifestyle variables in an intuitive way
 * Explore AWS SAM and Amplify
