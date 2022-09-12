@@ -35,6 +35,7 @@ Application code is in the src folder
 * API Gateway for backend REST API, proxies to the lambdas
 * Lambda for backend compute
 * DynamoDB for data
+* Cognito for authentication
 * S3 to host artifacts and the Vue frontend
 * CodePipeline + CodeBuild to deploy code and artifacts
 * Cloudfront for CDN
