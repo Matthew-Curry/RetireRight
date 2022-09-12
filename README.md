@@ -17,7 +17,7 @@ Holds two folders: <br> <br>
 
 Layers include: <br> <br>
 **domain:** Holds Scenario and User domain objects used by the application. These objects are primarily used to translate data from the request to DynamoDB, and from DynamoDB back into the application. <br>
-**dynamo_utils:** Holds utility class to retrieved cached dynamo resources from a warm lambda start, as well as a query formatter helper method. <br>
+**dynamo_utils:** Holds utility class to retrieve cached dynamo resources from a warm lambda start, as well as a query formatter helper method. <br>
 **writer:** Utility methods to write HTTP responses containing all needed CORS headers. <br>
 **simulator:** Exposes core simulation method to simulate a given scenario for a given user <br>
 
