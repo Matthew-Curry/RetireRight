@@ -21,4 +21,14 @@ The backend is written in Python and the frontend is written in Vue.
 **writer:** Utility methods to write HTTP responses containing all needed CORS headers. <br>
 **simulator:** Exposes core simulation method to simulate a given scenario for a given user <br>
 
+### frontend
+Application code is in the src folder
+
+**api:** Holds Javascript methods used by the app to make calls to the backend REST API
+**cognito:** Javascript wrapper around the AWS cognito SDK to handle calls to the service for auth functionality
+**components/pages:** Application pages used by the router
+**components/core:** Core application components
+**router*:* The vue router to the different pages, handles auth flow.
+**App.vue**: The core app. Responsible for updating and mediating data to the other components.
+
 
