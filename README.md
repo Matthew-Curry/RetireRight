@@ -31,4 +31,13 @@ Application code is in the src folder
 **router**: The vue router to the different pages, handles auth flow. <br>
 **App.vue**: The core app. Responsible for updating and mediating data to the other components. <br>
 
+## Infrastructure
+* API Gateway for backend REST API, proxies to the lambdas
+* Lambda for backend compute
+* DynamoDB for data
+* S3 to host artifacts and the Vue frontend
+* CodePipeline + CodeBuild to deploy code and artifacts
+* Cloudfront for CDN
+* WAF for security around Cloudfront
+* Route53 for DNS
 
