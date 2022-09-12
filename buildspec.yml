@@ -4,6 +4,7 @@ phases:
     commands:
       - echo "Building the Vue frontend"
       - cd frontend
+      - aws s3 cp s3://retire-right/.env . 
       - npm install
       - npm install -g @vue/cli-service
       - npm run build
