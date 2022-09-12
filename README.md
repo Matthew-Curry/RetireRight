@@ -28,7 +28,7 @@ Application code is in the src folder
 **cognito:** Javascript wrapper around the AWS cognito SDK to handle calls to the service for auth functionality <br>
 **components/pages:** Application pages used by the router <br>
 **components/core:** Core application components <br>
-**router*:* The vue router to the different pages, handles auth flow. <br>
+**router**:* The vue router to the different pages, handles auth flow. <br>
 **App.vue**: The core app. Responsible for updating and mediating data to the other components. <br>
 
 
